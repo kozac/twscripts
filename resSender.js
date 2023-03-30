@@ -5,7 +5,7 @@
 // @param(string) destinyCoord
 // @step {gameUrl}/game.php?screen=overview&group={groupId}
 
-const { destinyCoord } = TWA;
+const { destinyCoord, resourcesReserve } = TWA;
 
 $.getScript("https://shinko-to-kuma.com/scripts/res-senderV2.js");
 
