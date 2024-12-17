@@ -1413,4 +1413,4 @@ TWMap.map._handleClick = function (e) {
         }
     }
     return false;
-};
+}};
