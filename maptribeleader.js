@@ -1,3 +1,4 @@
+javascript:
 var development = false;
 // declarando variáveis globais
 var options;
