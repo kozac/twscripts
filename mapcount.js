@@ -1,6 +1,6 @@
 /*
  * Script Name: Frontline Stacks Planner
- * Version: v1.0.4
+ * Version: v1.0.5
  * Last Updated: 2025-01-07
  * Author: RedAlert
  * Author URL: https://twscripts.dev/
@@ -23,7 +23,7 @@ var scriptConfig = {
     scriptData: {
         prefix: 'frontlineStacksPlanner',
         name: `Frontline Stacks Planner`,
-        version: 'v1.0.4',
+        version: 'v1.0.5',
         author: 'RedAlert',
         authorUrl: 'https://twscripts.dev/',
         helpLink:
@@ -183,7 +183,7 @@ $.getScript(
 
                     // Adiciona os dados da aldeia
                     villagesData.push({
-                        name: villageName,
+                        villageName: villageName, // **Alterado de 'name' para 'villageName'**
                         points: points,
                         troops: troops,
                         villageCoords: extractCoordsFromName(villageName), // Função para extrair coordenadas
@@ -916,7 +916,7 @@ $.getScript(
 
                                 // **Log de Depuração: Atualização do Mapa para Aldeia**
                                 if (DEBUG) {
-                                    console.log(`Atualizando Mapa para Aldeia: ${currentVillage.name}`);
+                                    console.log(`Atualizando Mapa para Aldeia: ${currentVillage.villageName}`);
                                     console.log('Tropas no Mapa:', troops);
                                 }
                             }
@@ -953,7 +953,7 @@ $.getScript(
 
                 // **Log de Depuração: Troops Calculated for Village**
                 if (DEBUG) {
-                    console.log(`Troops Calculated for Village ${village.name}:`, missingTroops);
+                    console.log(`Troops Calculated for Village ${village.villageName}:`, missingTroops);
                 }
             });
 
@@ -1051,7 +1051,7 @@ $.getScript(
 
                             // **Log de Depuração: Village Needs Stack**
                             if (DEBUG) {
-                                console.log(`Village Needs Stack: ${village.name}`, village);
+                                console.log(`Village Needs Stack: ${village.villageName}`, village);
                             }
                         }
                     }
@@ -1097,7 +1097,9 @@ $.getScript(
                     total += unitPopAmount * value;
                 }
             }
-            console.log('Total Pop Calculation:', units, total);
+            if (DEBUG) {
+                console.log('Total Pop Calculation:', units, total);
+            }
             return total;
         }
 
@@ -1220,7 +1222,7 @@ $.getScript(
                     membersToFetch.push({
                         url: url,
                         id: parseInt(option.value),
-                        name: option.text.trim(),
+                        name: option.text.trim(), // **Adicionado .trim() para remover espaços em branco**
                     });
                 }
             });
