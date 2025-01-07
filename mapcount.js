@@ -963,6 +963,7 @@ $.getScript(
         // Helper: Calculate total pop
         function calculatePop(units) {
             let total = 0;
+            let total2 = units;
 
             for (let [key, value] of Object.entries(units)) {
                 if (value) {
@@ -973,7 +974,8 @@ $.getScript(
                     total += unitPopAmount * value;
                 }
             }
-
+            console.log(total2)
+            console.log(units)
             return total;
         }
 
