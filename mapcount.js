@@ -945,7 +945,7 @@ $.getScript(
                                     if (count > 0 && unitIcons[unit]) {
                                         villageTroopsHTML += `
                                             <div style="display: flex; align-items: center; justify-content: center; gap: 2px; flex: 1;">
-                                                <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 15px; height: 15px;">
+                                                <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 14px; height: 14px;">
                                                 <span style="font-size: 8px;">${count}</span>
                                             </div>
                                         `;
