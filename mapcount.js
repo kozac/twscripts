@@ -119,147 +119,251 @@ $.getScript(
             }
         })();
 
-        // Initialize the script
-        async function initScript() {
-            const playersToFetch = await getTribeMembersList();
+// Função para mapear os índices das colunas às tropas
+function mapTroopColumns() {
+    const troopMap = {};
+    jQuery('table.vis.w100 thead tr th img').each(function(index) {
+        const title = jQuery(this).attr('title').toLowerCase(); // Nome da tropa
+        switch(title) {
+            case 'lanceiro':
+                troopMap['spear'] = index;
+                break;
+            case 'espadachim':
+                troopMap['sword'] = index;
+                break;
+            case 'bárbaro':
+                troopMap['axe'] = index;
+                break;
+            case 'explorador':
+                troopMap['spy'] = index;
+                break;
+            case 'cavalaria leve':
+                troopMap['light'] = index;
+                break;
+            case 'cavalaria pesada':
+                troopMap['heavy'] = index;
+                break;
+            case 'aríete':
+                troopMap['ram'] = index;
+                break;
+            case 'catapulta':
+                troopMap['catapult'] = index;
+                break;
+            case 'paladino':
+                troopMap['knight'] = index;
+                break;
+            case 'nobre':
+                troopMap['snob'] = index;
+                break;
+            case 'milícia':
+                troopMap['militia'] = index;
+                break;
+            // Adicione outros casos conforme necessário
+            default:
+                break;
+        }
+    });
+    return troopMap;
+}
 
-            if (playersToFetch.length) {
-                const playersData = [...playersToFetch];
-                const memberUrls = playersToFetch.map((item) => item.url);
+// Função para extrair os dados das tropas
+function extractTroopData(troopMap) {
+    const villagesData = [];
+    
+    jQuery('table.vis.w100 tbody tr').each(function() {
+        const row = jQuery(this);
+        const cells = row.find('td');
+        
+        // Verifica se a linha corresponde a um membro (possui links para aldeias)
+        const villageLink = row.find('a[href*="screen=info_village&id="]');
+        if(villageLink.length > 0) {
+            const villageName = villageLink.text().trim();
+            const points = row.find('td').eq(1).text().trim().replace(/\./g, '');
+            
+            // Troca de rowspan para pegar a segunda linha referente à mesma aldeia
+            const defenseRow = row.next('tr');
+            const defenseCells = defenseRow.find('td');
+            
+            const troops = {};
+            
+            for(const [unit, index] of Object.entries(troopMap)) {
+                const cell = cells.eq(index);
+                let count = cell.text().trim();
+                if(count === '') {
+                    // Tenta pegar da linha de defesa (a caminho)
+                    const defenseCell = defenseCells.eq(index);
+                    count = defenseCell.text().trim();
+                }
+                // Converte para número, tratando possíveis strings vazias
+                count = parseInt(count) || 0;
+                troops[unit] = count;
+            }
+            
+            // Adiciona os dados da aldeia
+            villagesData.push({
+                name: villageName,
+                points: parseInt(points),
+                troops: troops
+            });
+        }
+    });
+    
+    return villagesData;
+}
 
-                // Show progress bar and notify user
-                twSDK.startProgressBar(memberUrls.length);
+// Função de inicialização do script
+async function initScript() {
+    const playersToFetch = await getTribeMembersList();
 
-                twSDK.getAll(
-                    memberUrls,
-                    function (index, data) {
-                        twSDK.updateProgressBar(index, memberUrls.length);
+    if (playersToFetch.length) {
+        const playersData = [...playersToFetch];
+        const memberUrls = playersToFetch.map((item) => item.url);
 
-                        // parse reponse as html
-                        const htmlDoc = jQuery.parseHTML(data);
-                        const villagesTableRows = jQuery(htmlDoc)
-                            .find(`.table-responsive table.vis tbody tr`)
-                            .not(':first');
+        // Show progress bar and notify user
+        twSDK.startProgressBar(memberUrls.length);
 
-                        const villagesData = [];
+        twSDK.getAll(
+            memberUrls,
+            function (index, data) {
+                twSDK.updateProgressBar(index, memberUrls.length);
 
-                        // parse player information
-                        if (villagesTableRows && villagesTableRows.length) {
-                            villagesTableRows.each(function () {
-                                try {
-                                    const _this = jQuery(this);
+                // parse reponse as html
+                const htmlDoc = jQuery.parseHTML(data);
+                const villagesTableRows = jQuery(htmlDoc)
+                    .find(`.table-responsive table.vis tbody tr`)
+                    .not(':first');
 
-                                    const currentVillageName = _this
-                                        .find('td:first a')
-                                        .text()
-                                        .trim();
-                                    if (currentVillageName) {
-                                        const currentVillageId = parseInt(
-                                            twSDK.getParameterByName(
-                                                'id',
-                                                window.location.origin +
-                                                    _this
-                                                        .find('td:first a')
-                                                        .attr('href')
-                                            )
+                const villagesData = [];
+
+                // mapear as tropas corretamente
+                const troopMap = mapTroopColumns();
+
+                // parse player information
+                if (villagesTableRows && villagesTableRows.length) {
+                    villagesTableRows.each(function () {
+                        try {
+                            const _this = jQuery(this);
+
+                            const currentVillageName = _this
+                                .find('td:first a')
+                                .text()
+                                .trim();
+                            if (currentVillageName) {
+                                const currentVillageId = parseInt(
+                                    twSDK.getParameterByName(
+                                        'id',
+                                        window.location.origin +
+                                            _this
+                                                .find('td:first a')
+                                                .attr('href')
+                                    )
+                                );
+
+                                const currentVillageCoords = _this
+                                    .find('td:eq(0)')
+                                    .text()
+                                    .trim()
+                                    ?.match(twSDK.coordsRegex)[0];
+
+                                let villageData = [];
+
+                                _this
+                                    .find('td')
+                                    .not(':first')
+                                    .not(':last')
+                                    .not(':eq(0)')
+                                    .each(function () {
+                                        const unitAmount =
+                                            jQuery(this)
+                                                .text()
+                                                .trim() !== '?'
+                                                ? jQuery(this)
+                                                      .text()
+                                                      .trim()
+                                                : 0;
+                                        villageData.push(
+                                            parseInt(unitAmount)
                                         );
+                                    });
 
-                                        const currentVillageCoords = _this
-                                            .find('td:eq(0)')
-                                            .text()
-                                            .trim()
-                                            ?.match(twSDK.coordsRegex)[0];
+                                villageData = villageData.splice(
+                                    0,
+                                    game_data.units.length
+                                );
 
-                                        let villageData = [];
-
-                                        _this
-                                            .find('td')
-                                            .not(':first')
-                                            .not(':last')
-                                            .not(':eq(0)')
-                                            .each(function () {
-                                                const unitAmount =
-                                                    jQuery(this)
-                                                        .text()
-                                                        .trim() !== '?'
-                                                        ? jQuery(this)
-                                                              .text()
-                                                              .trim()
-                                                        : 0;
-                                                villageData.push(
-                                                    parseInt(unitAmount)
-                                                );
-                                            });
-
-                                        villageData = villageData.splice(
-                                            0,
-                                            game_data.units.length
-                                        );
-
-                                        let villageTroops = {};
-                                        game_data.units.forEach(
-                                            (unit, index) => {
-                                                villageTroops[unit] = villageData[index] || 0;
-                                            }
-                                        );
-
-                                        villagesData.push({
-                                            villageId: currentVillageId,
-                                            villageName: currentVillageName,
-                                            villageCoords: currentVillageCoords,
-                                            troops: villageTroops,
-                                        });
+                                let villageTroops = {};
+                                game_data.units.forEach(
+                                    (unit, index) => {
+                                        villageTroops[unit] = villageData[index] || 0;
                                     }
-                                } catch (error) {
-                                    UI.ErrorMessage(
-                                        twSDK.tt(
-                                            'Error fetching player incomings!'
-                                        )
-                                    );
-                                    console.error(
-                                        `${scriptInfo} Error:`,
-                                        error
-                                    );
-                                }
-                            });
-                        }
+                                );
 
-                        // update players info
-                        playersData[index] = {
-                            ...playersData[index],
-                            villagesData: villagesData,
-                        };
-                    },
-                    function () {
-                        if (DEBUG) {
-                            console.debug(
-                                `${scriptInfo} playersData`,
-                                playersData
+                                villagesData.push({
+                                    villageId: currentVillageId,
+                                    villageName: currentVillageName,
+                                    villageCoords: currentVillageCoords,
+                                    troops: villageTroops,
+                                });
+                            }
+                        } catch (error) {
+                            UI.ErrorMessage(
+                                twSDK.tt(
+                                    'Error fetching player incomings!'
+                                )
+                            );
+                            console.error(
+                                `${scriptInfo} Error:`,
+                                error
                             );
                         }
+                    });
+                }
 
-                        // build user interface
-                        buildUI();
+                // Atualiza as informações dos jogadores
+                playersData[index] = {
+                    ...playersData[index],
+                    villagesData: villagesData,
+                };
+            },
+            function () {
+                if (DEBUG) {
+                    console.debug(
+                        `${scriptInfo} playersData`,
+                        playersData
+                    );
+                }
 
-                        // register action handlers
-                        handleCalculateStackPlans(playersData);
-                        handleBacklineStacks(playersData);
-                        handleExport();
-                    },
-                    function () {
-                        UI.ErrorMessage(
-                            twSDK.tt('Error fetching player incomings!')
-                        );
-                    }
-                );
-            } else {
+                // Mapeia as tropas e extrai os dados
+                const troopMap = mapTroopColumns();
+                const villagesData = extractTroopData(troopMap);
+
+                if (DEBUG) {
+                    console.log('Mapped Troop Columns:', troopMap);
+                    console.log('Extracted Villages Data:', villagesData);
+                }
+
+                // build user interface
+                buildUI();
+
+                // register action handlers
+                handleCalculateStackPlans(playersData);
+                handleBacklineStacks(playersData);
+                handleExport();
+            },
+            function () {
                 UI.ErrorMessage(
-                    twSDK.tt(
-                        'Tribe members have not shared their troop counts with tribe leadership!'
-                    )
+                    twSDK.tt('Error fetching player incomings!')
                 );
             }
-        }
+        );
+    } else {
+        UI.ErrorMessage(
+            twSDK.tt(
+                'Tribe members have not shared their troop counts with tribe leadership!'
+            )
+        );
+    }
+}
 
         // Render: Build the user interface
         function buildUI() {
