@@ -196,13 +196,10 @@ $.getScript(
                                             game_data.units.length
                                         );
 
-                                        let villageTroops = [];
+                                        let villageTroops = {};
                                         game_data.units.forEach(
                                             (unit, index) => {
-                                                villageTroops = {
-                                                    ...villageTroops,
-                                                    [unit]: villageData[index],
-                                                };
+                                                villageTroops[unit] = villageData[index] || 0;
                                             }
                                         );
 
@@ -700,7 +697,7 @@ $.getScript(
                 thUnits += `
                     <th class="ra-text-center">
                         <label for="unit_${unit}" class="ra-unit-type">
-                            <img src="/graphic/unit/unit_${unit}.png">
+                            <img src="/graphic/unit/unit_${unit}.png" alt="${unit}" title="${unit}">
                         </label>
                     </th>
                 `;
@@ -744,6 +741,22 @@ $.getScript(
                     mapOverlay.mapHandler.spawnSector;
             }
 
+            // Mapeamento de ícones das tropas
+            const unitIcons = {
+                spear: '/graphic/unit/unit_spear.png',
+                sword: '/graphic/unit/unit_sword.png',
+                archer: '/graphic/unit/unit_archer.png',
+                spy: '/graphic/unit/unit_spy.png',
+                heavy: '/graphic/unit/unit_heavy.png',
+                light: '/graphic/unit/unit_light.png',
+                marcher: '/graphic/unit/unit_marcher.png',
+                ram: '/graphic/unit/unit_ram.png',
+                catapult: '/graphic/unit/unit_catapult.png',
+                knight: '/graphic/unit/unit_knight.png',
+                snob: '/graphic/unit/unit_snob.png',
+                // Adicione outros tipos de tropas conforme necessário
+            };
+
             TWMap.mapHandler.spawnSector = function (data, sector) {
                 // Override Map Sector Spawn
                 mapOverlay.mapHandler._spawnSector(data, sector);
@@ -775,27 +788,49 @@ $.getScript(
                                     (obj) => obj.villageCoords == vCoords
                                 );
 
-                                const villageDef = intToString(
-                                    currentVillage.pop
-                                );
+                                // **Início das Modificações**
+                                // Formatar a string com as contagens de cada tropa e seus ícones
+                                const troops = currentVillage.troops;
+                                let villageTroopsHTML = '';
+
+                                for (let [unit, count] of Object.entries(troops)) {
+                                    if (count > 0 && unitIcons[unit]) {
+                                        villageTroopsHTML += `
+                                            <div style="display: flex; align-items: center; justify-content: center; gap: 2px;">
+                                                <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 16px; height: 16px;">
+                                                <span style="font-size: 10px;">${count}</span>
+                                            </div>
+                                        `;
+                                    }
+                                }
+
+                                // Se não houver tropas, exibe "0"
+                                if (villageTroopsHTML === '') {
+                                    villageTroopsHTML = '0';
+                                }
+
+                                // **Fim das Modificações**
 
                                 const eleDIV = $('<div></div>')
                                     .css({
                                         position: 'absolute',
                                         display: 'flex',
+                                        flexDirection: 'column',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                         gap: '2px',
-                                        padding: '1px',
+                                        padding: '2px',
                                         backgroundColor: 'rgba(0, 0, 0, 0.6)',
                                         color: '#fff',
-                                        width: '50px',
-                                        height: '35px',
+                                        width: '60px', // Aumentado para acomodar mais conteúdo
+                                        height: '60px', // Aumentado para acomodar mais conteúdo
                                         zIndex: '10',
                                         fontSize: '10px',
+                                        lineHeight: '1.2',
+                                        overflow: 'hidden', // Evita que o conteúdo ultrapasse o div
                                     })
                                     .attr('id', 'dsm' + v.id)
-                                    .html(villageDef);
+                                    .html(villageTroopsHTML); // Alterado para exibir as tropas com ícones
 
                                 sector.appendElement(
                                     eleDIV[0],
@@ -859,10 +894,7 @@ $.getScript(
                     !nonScalingUnits.includes(key)
                 ) {
                     let troopsDifference = troops[key] - troopsAfterScalingDown;
-                    missingTroops = {
-                        ...missingTroops,
-                        [key]: Math.abs(troopsDifference),
-                    };
+                    missingTroops[key] = Math.abs(troopsDifference);
                 }
             }
 
@@ -890,7 +922,6 @@ $.getScript(
                 2
             );
             let tribePlayers = getTribeMembersById(chosenTribeIds);
-
             let enemyTribeCoordinates = filterVillagesByPlayerIds(tribePlayers);
 
             // filter villages by radius
@@ -963,7 +994,6 @@ $.getScript(
         // Helper: Calculate total pop
         function calculatePop(units) {
             let total = 0;
-            let total2 = units;
 
             for (let [key, value] of Object.entries(units)) {
                 if (value) {
@@ -974,8 +1004,7 @@ $.getScript(
                     total += unitPopAmount * value;
                 }
             }
-            console.log(total2)
-            console.log(units)
+            console.log(units);
             return total;
         }
 
