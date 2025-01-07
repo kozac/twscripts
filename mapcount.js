@@ -1,19 +1,3 @@
-/*
- * Script Name: Frontline Stacks Planner
- * Version: v1.0.2
- * Last Updated: 2023-10-27
- * Author: RedAlert
- * Author URL: https://twscripts.dev/
- * Author Contact: redalert_tw (Discord)
- * Approved: N/A
- * Approved Date: 2023-10-15
- * Mod: MKich
- */
-
-/*--------------------------------------------------------------------------------------
- * This script can NOT be cloned and modified without permission from the script author.
- --------------------------------------------------------------------------------------*/
-
 // User Input
 if (typeof DEBUG !== 'boolean') DEBUG = false;
 if (typeof HC_AMOUNT === 'undefined') HC_AMOUNT = null;
@@ -74,7 +58,7 @@ var scriptConfig = {
 };
 
 $.getScript(
-    `https://twscripts.dev/scripts/twSDK.js?url=${document.currentScript.src}`,
+    `https://cdn.jsdelivr.net/gh/kozac/twscripts@main/mapcount.js`,
     async function () {
         // Initialize Library
         await twSDK.init(scriptConfig);
@@ -133,13 +117,18 @@ $.getScript(
                 twSDK.getAll(
                     memberUrls,
                     function (index, data) {
+                        console.log(`Buscando dados para membro ${index + 1}/${memberUrls.length}`);
                         twSDK.updateProgressBar(index, memberUrls.length);
 
-                        // parse reponse as html
+                        // parse response as html
                         const htmlDoc = jQuery.parseHTML(data);
+                        console.log('HTML recebido:', htmlDoc);
+
                         const villagesTableRows = jQuery(htmlDoc)
                             .find(`.table-responsive table.vis tbody tr`)
                             .not(':first');
+
+                        console.log(`Número de linhas na tabela de aldeias: ${villagesTableRows.length}`);
 
                         const villagesData = [];
 
@@ -153,22 +142,25 @@ $.getScript(
                                         .find('td:first a')
                                         .text()
                                         .trim();
+                                    console.log('Nome da aldeia:', currentVillageName);
                                     if (currentVillageName) {
+                                        const villageHref = _this.find('td:first a').attr('href');
+                                        console.log('HREF da aldeia:', villageHref);
                                         const currentVillageId = parseInt(
                                             twSDK.getParameterByName(
                                                 'id',
-                                                window.location.origin +
-                                                    _this
-                                                        .find('td:first a')
-                                                        .attr('href')
+                                                window.location.origin + villageHref
                                             )
                                         );
+                                        console.log('ID da aldeia:', currentVillageId);
 
-                                        const currentVillageCoords = _this
+                                        const currentVillageCoordsMatch = _this
                                             .find('td:eq(0)')
                                             .text()
                                             .trim()
-                                            ?.match(twSDK.coordsRegex)[0];
+                                            ?.match(twSDK.coordsRegex);
+                                        const currentVillageCoords = currentVillageCoordsMatch ? currentVillageCoordsMatch[0] : 'N/A';
+                                        console.log('Coordenadas da aldeia:', currentVillageCoords);
 
                                         let villageData = [];
 
@@ -176,35 +168,29 @@ $.getScript(
                                             .find('td')
                                             .not(':first')
                                             .not(':last')
-                                            .not(':eq(0)')
+                                            .not('.hidden')
                                             .each(function () {
-                                                const unitAmount =
-                                                    jQuery(this)
-                                                        .text()
-                                                        .trim() !== '?'
-                                                        ? jQuery(this)
-                                                              .text()
-                                                              .trim()
-                                                        : 0;
-                                                villageData.push(
-                                                    parseInt(unitAmount)
-                                                );
+                                                const unitAmountText = jQuery(this).text().trim();
+                                                const unitAmount = unitAmountText !== '?' ? parseInt(unitAmountText) : 0;
+                                                console.log(`Quantidade de unidade (${jQuery(this).index()}):`, unitAmount);
+                                                villageData.push(unitAmount);
                                             });
+
+                                        console.log('Dados das tropas brutos:', villageData);
 
                                         villageData = villageData.splice(
                                             0,
                                             game_data.units.length
                                         );
 
-                                        let villageTroops = [];
+                                        let villageTroops = {};
                                         game_data.units.forEach(
                                             (unit, index) => {
-                                                villageTroops = {
-                                                    ...villageTroops,
-                                                    [unit]: villageData[index],
-                                                };
+                                                villageTroops[unit] = villageData[index] || 0;
                                             }
                                         );
+
+                                        console.log('Tropas na aldeia:', villageTroops);
 
                                         villagesData.push({
                                             villageId: currentVillageId,
@@ -225,6 +211,8 @@ $.getScript(
                                     );
                                 }
                             });
+                        } else {
+                            console.warn('Nenhuma linha de aldeia encontrada na tabela.');
                         }
 
                         // update players info
@@ -343,257 +331,316 @@ $.getScript(
             );
         }
 
-// Action Handler: Check frontline villages stacks and find missing stacks
-function handleCalculateStackPlans(playersData) {
-    jQuery('#raPlanStacks').on('click', function (e) {
-        e.preventDefault();
+        // Action Handler: Check frontline villages stacks and find missing stacks
+        function handleCalculateStackPlans(playersData) {
+            jQuery('#raPlanStacks').on('click', function (e) {
+                e.preventDefault();
 
-        const {
-            chosenTribes,
-            distance,
-            unitAmounts,
-            stackLimit,
-            scaleDownPerField,
-        } = collectUserInput();
+                const {
+                    chosenTribes,
+                    distance,
+                    unitAmounts,
+                    stackLimit,
+                    scaleDownPerField,
+                } = collectUserInput();
 
-        const villagesThatNeedStack = findVillagesThatNeedStack(
-            playersData,
-            chosenTribes,
-            distance,
-            unitAmounts,
-            stackLimit
-        );
+                const villagesThatNeedStack = findVillagesThatNeedStack(
+                    playersData,
+                    chosenTribes,
+                    distance,
+                    unitAmounts,
+                    stackLimit
+                );
 
-        if (villagesThatNeedStack.length) {
-            const villagesToBeStacked = calculateAmountMissingTroops(
-                villagesThatNeedStack,
-                unitAmounts,
-                scaleDownPerField
-            );
+                console.log(`Número de aldeias que precisam de stack: ${villagesThatNeedStack.length}`);
 
-            // Somar as tropas totais
-            const totalMissingTroops = villagesToBeStacked.reduce((totals, village) => {
-                for (let [unit, amount] of Object.entries(village.missingTroops)) {
-                    if (!totals[unit]) {
-                        totals[unit] = 0;
+                if (villagesThatNeedStack.length) {
+                    const villagesToBeStacked = calculateAmountMissingTroops(
+                        villagesThatNeedStack,
+                        unitAmounts,
+                        scaleDownPerField
+                    );
+
+                    console.log('Villages to be stacked:', villagesToBeStacked);
+
+                    // Somar as tropas totais
+                    const totalMissingTroops = villagesToBeStacked.reduce((totals, village) => {
+                        for (let [unit, amount] of Object.entries(village.missingTroops)) {
+                            if (!totals[unit]) {
+                                totals[unit] = 0;
+                            }
+                            totals[unit] += amount;
+                        }
+                        return totals;
+                    }, {});
+
+                    console.log('Total missing troops:', totalMissingTroops);
+
+                    // Converter o objeto totalMissingTroops em um array para facilitar a manipulação
+                    const totalTroopsArray = Object.entries(totalMissingTroops).map(([unit, amount]) => ({ unit, amount }));
+
+                    // Construir a tabela de tropas totais
+                    const totalTroopsTableHtml = buildTotalTroopsTable(totalTroopsArray);
+
+                    jQuery('#raStacks').show();
+                    jQuery('#raStacks').html(totalTroopsTableHtml);
+
+                    // Atualizar o mapa com tropas totais
+                    updateMapWithTotalTroops(totalMissingTroops);
+                    jQuery('#raExport').attr(
+                        'data-stack-plans',
+                        JSON.stringify(totalMissingTroops)
+                    );
+                } else {
+                    UI.SuccessMessage(
+                        twSDK.tt('All villages have been properly stacked!')
+                    );
+                }
+            });
+        }
+
+        // Action Handler: Find backline stacks
+        function handleBacklineStacks(playersData) {
+            jQuery('#raBacklineStacks').on('click', function (e) {
+                e.preventDefault();
+
+                const { chosenTribes, distance } = collectUserInput();
+
+                let playerVillages = playersData
+                    .map((player) => {
+                        const { villagesData } = player;
+                        return villagesData;
+                    })
+                    .flat();
+
+                let chosenTribeIds = twSDK.getEntityIdsByArrayIndex(
+                    chosenTribes,
+                    tribes,
+                    2
+                );
+                let tribePlayers = getTribeMembersById(chosenTribeIds);
+                let enemyTribeCoordinates =
+                    filterVillagesByPlayerIds(tribePlayers);
+
+                // filter villages by radius
+                let villagesOutsideRadius = [];
+
+                playerVillages.forEach((village) => {
+                    const { villageCoords, troops } = village;
+                    enemyTribeCoordinates.forEach((coordinate) => {
+                        const villagesDistance = twSDK.calculateDistance(
+                            coordinate,
+                            villageCoords
+                        );
+                        if (villagesDistance > distance) {
+                            const stackAmount = calculatePop(troops);
+                            if (stackAmount > 30000) {
+                                villagesOutsideRadius.push({
+                                    ...village,
+                                    fieldsAway:
+                                        Math.round(villagesDistance * 100) /
+                                        100,
+                                    stackAmount: stackAmount,
+                                });
+                            }
+                        }
+                    });
+                });
+
+                villagesOutsideRadius.sort(
+                    (a, b) => a.fieldsAway - b.fieldsAway
+                );
+
+                let villagesObject = {};
+                let villagesArray = [];
+                villagesOutsideRadius.forEach((item) => {
+                    const { villageId } = item;
+                    if (!villagesObject[villageId]) {
+                        villagesObject = {
+                            ...villagesObject,
+                            [villageId]: item,
+                        };
                     }
-                    totals[unit] += amount;
-                }
-                return totals;
-            }, {});
+                });
 
-            const totalTroopsArray = Object.entries(totalMissingTroops).map(([unit, amount]) => ({ unit, amount }));
-
-            // Construir a tabela de tropas totais
-            const totalTroopsTableHtml = buildTotalTroopsTable(totalTroopsArray);
-
-            jQuery('#raStacks').show();
-            jQuery('#raStacks').html(totalTroopsTableHtml);
-
-            // Atualizar o mapa com tropas totais
-            updateMapWithTotalTroops(totalMissingTroops);
-            jQuery('#raExport').attr(
-                'data-stack-plans',
-                JSON.stringify(totalMissingTroops)
-            );
-        } else {
-            UI.SuccessMessage(
-                twSDK.tt('All villages have been properly stacked!')
-            );
-        }
-    });
-}
-
-// Helper: Build a table of total missing troops
-function buildTotalTroopsTable(totalTroopsArray) {
-    let tableRows = `
-        <tr>
-            <th>${twSDK.tt('Tropa')}</th>
-            <th>${twSDK.tt('Quantidade Total')}</th>
-        </tr>
-    `;
-
-    totalTroopsArray.forEach((troop) => {
-        tableRows += `
-            <tr>
-                <td>
-                    <img src="/graphic/unit/unit_${troop.unit}.png" alt="${troop.unit}" title="${twSDK.tt(capitalizeFirstLetter(troop.unit))}" /> ${twSDK.tt(capitalizeFirstLetter(troop.unit))}
-                </td>
-                <td>
-                    ${intToString(troop.amount)}
-                </td>
-            </tr>
-        `;
-    });
-
-    const totalTroopsTableHtml = `
-        <table class="ra-table ra-table-v3" width="100%">
-            <thead>
-                ${tableRows}
-            </thead>
-        </table>
-    `;
-
-    return totalTroopsTableHtml;
-}
-
-// Helper: Capitalize first letter
-function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-// Helper: Update the map UI with total troops
-function updateMapWithTotalTroops(totalMissingTroops) {
-    // Limpar quaisquer elementos anteriores
-    jQuery('.ra-total-troops-overlay').remove();
-
-    // Construir a string de tropas totais
-    let totalTroopsString = '';
-    for (let [unit, amount] of Object.entries(totalMissingTroops)) {
-        totalTroopsString += `${unit}: ${intToString(amount)}\n`;
-    }
-
-    // Criar um elemento para exibir as tropas totais no centro do mapa
-    const mapCenterX = Math.floor(game_data.map.width / 2);
-    const mapCenterY = Math.floor(game_data.map.height / 2);
-
-    const totalTroopsDiv = $('<div></div>')
-        .addClass('ra-total-troops-overlay')
-        .css({
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            color: '#fff',
-            padding: '10px',
-            borderRadius: '5px',
-            zIndex: '1000',
-            whiteSpace: 'pre-line',
-            fontSize: '12px',
-        })
-        .text(totalTroopsString);
-
-    // Adicionar ao mapa
-    jQuery('#map').append(totalTroopsDiv);
-
-    // Opcional: Remover a exibição após alguns segundos
-    setTimeout(() => {
-        totalTroopsDiv.fadeOut(500, () => {
-            totalTroopsDiv.remove();
-        });
-    }, 10000); // Remove após 10 segundos
-}
-
-// Action Handler: Export stack plans
-function handleExport() {
-    jQuery('#raExport').on('click', function (e) {
-        e.preventDefault();
-
-        const dataStackPlans = jQuery(this).attr('data-stack-plans');
-        if (dataStackPlans) {
-            const stackPlans = JSON.parse(dataStackPlans);
-
-            if (Object.keys(stackPlans).length) {
-                let bbCode = `[table][**]${twSDK.tt('Tropa')}[||]${twSDK.tt('Quantidade Total')}[/**]\n`;
-
-                for (let [unit, amount] of Object.entries(stackPlans)) {
-                    bbCode += `[*]${twSDK.tt(capitalizeFirstLetter(unit))}[|]${intToString(amount)}\n`;
+                for (let [_, value] of Object.entries(villagesObject)) {
+                    villagesArray.push(value);
                 }
 
-                bbCode += `[/table]`;
+                let tableRows = villagesArray
+                    .map((village, index) => {
+                        index++;
+                        const {
+                            fieldsAway,
+                            stackAmount,
+                            villageId,
+                            villageName,
+                        } = village;
+                        return `
+                            <tr>
+                                <td>
+                                    ${index}
+                                </td>
+                                <td class="ra-tal">
+                                    <a href="/game.php?screen=info_village&id=${villageId}" target="_blank" rel="noreferrer noopener">
+                                        ${villageName}
+                                    </a>
+                                </td>
+                                <td>
+                                    ${intToString(stackAmount)}
+                                </td>
+                                <td>
+                                    ${fieldsAway}
+                                </td>
+                            </tr>
+                        `;
+                    })
+                    .join('');
 
-                twSDK.copyToClipboard(bbCode);
-                UI.SuccessMessage(twSDK.tt('Copied on clipboard!'));
-            }
-        } else {
-            UI.ErrorMessage(
-                twSDK.tt('No stack plans have been prepared!')
-            );
+                let villagesTableHtml = `
+                    <div class="ra-table-container ra-mb15">
+                        <table class="ra-table ra-table-v3" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        #
+                                    </th>
+                                    <th class="ra-tal">
+                                        ${twSDK.tt('Village')}
+                                    </th>
+                                    <th>
+                                        ${twSDK.tt('Pop.')}
+                                    </th>
+                                    <th>
+                                        ${twSDK.tt('Distance')}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tableRows}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                twSDK.renderFixedWidget(
+                    villagesTableHtml,
+                    'raFrontlineStacks-popup',
+                    'ra-frontline-stacks-popup',
+                    '',
+                    '560px'
+                );
+            });
         }
-    });
-}
 
-// Helper: Capitalize first letter (reutilizado)
-function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
-        // Helper: Build a table of villages
-        function buildVillagesTable(villages) {
-            let villagesTableHtml = `
-                <table class="ra-table ra-table-v3" width="100%">
-                    <thead>
-                        <tr>
-                            <th>
-                                #
-                            </th>
-                            <th class="ra-tal">
-                                ${twSDK.tt('Village')}
-                            </th>
-                            <th>
-                                ${twSDK.tt('Map')}
-                            </th>
-                            <th>
-                                ${twSDK.tt('Pop.')}
-                            </th>
-                            <th>
-                                ${twSDK.tt('Distance')}
-                            </th>
-                            <th>
-                                ${twSDK.tt('Missing Troops')}
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
+        // Action Handler: Export stack plans
+        function handleExport() {
+            jQuery('#raExport').on('click', function (e) {
+                e.preventDefault();
+
+                const dataStackPlans = jQuery(this).attr('data-stack-plans');
+                if (dataStackPlans) {
+                    const stackPlans = JSON.parse(dataStackPlans);
+
+                    if (Object.keys(stackPlans).length) {
+                        let bbCode = `[table][**]${twSDK.tt('Tropa')}[||]${twSDK.tt('Quantidade Total')}[/**]\n`;
+
+                        for (let [unit, amount] of Object.entries(stackPlans)) {
+                            bbCode += `[*]${twSDK.tt(capitalizeFirstLetter(unit))}[|]${intToString(amount)}\n`;
+                        }
+
+                        bbCode += `[/table]`;
+
+                        twSDK.copyToClipboard(bbCode);
+                        UI.SuccessMessage(twSDK.tt('Copied on clipboard!'));
+                    }
+                } else {
+                    UI.ErrorMessage(
+                        twSDK.tt('No stack plans have been prepared!')
+                    );
+                }
+            });
+        }
+
+        // Helper: Build a table of total missing troops
+        function buildTotalTroopsTable(totalTroopsArray) {
+            let tableRows = `
+                <tr>
+                    <th>${twSDK.tt('Tropa')}</th>
+                    <th>${twSDK.tt('Quantidade Total')}</th>
+                </tr>
             `;
 
-            villages.forEach((village, index) => {
-                const {
-                    villageId,
-                    villageName,
-                    villageCoords,
-                    fieldsAway,
-                    troops,
-                    pop,
-                    missingTroops,
-                } = village;
-                let [x, y] = villageCoords.split('|');
-                let missingTroopsString =
-                    buildMissingTroopsString(missingTroops);
-
-                index++;
-
-                villagesTableHtml += `
+            totalTroopsArray.forEach((troop) => {
+                tableRows += `
                     <tr>
                         <td>
-                            ${index}
-                        </td>
-                        <td class="ra-tal">
-                            <a href="/game.php?screen=info_village&id=${villageId}" target="_blank" rel="noreferrer noopener">
-                                ${villageName}
-                            </a>
+                            <img src="/graphic/unit/unit_${troop.unit}.png" alt="${troop.unit}" title="${twSDK.tt(capitalizeFirstLetter(troop.unit))}" /> ${twSDK.tt(capitalizeFirstLetter(troop.unit))}
                         </td>
                         <td>
-                            <a href="javascript:TWMap.focus(${x}, ${y});">
-                                ${villageCoords}
-                            </a>
-                        </td>
-                        <td>
-                            ${intToString(pop)}
-                        </td>
-                        <td>
-                            ${fieldsAway}
-                        </td>
-                        <td>
-                            ${missingTroopsString}
+                            ${intToString(troop.amount)}
                         </td>
                     </tr>
                 `;
             });
 
-            villagesTableHtml += `</tbody></table>`;
+            const totalTroopsTableHtml = `
+                <table class="ra-table ra-table-v3" width="100%">
+                    <thead>
+                        ${tableRows}
+                    </thead>
+                </table>
+            `;
 
-            return villagesTableHtml;
+            return totalTroopsTableHtml;
+        }
+
+        // Helper: Capitalize first letter
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        // Helper: Update the map UI with total troops
+        function updateMapWithTotalTroops(totalMissingTroops) {
+            // Limpar quaisquer elementos anteriores
+            jQuery('.ra-total-troops-overlay').remove();
+
+            // Construir a string de tropas totais
+            let totalTroopsString = '';
+            for (let [unit, amount] of Object.entries(totalMissingTroops)) {
+                totalTroopsString += `${twSDK.tt(capitalizeFirstLetter(unit))}: ${intToString(amount)}\n`;
+            }
+
+            // Criar um elemento para exibir as tropas totais no centro do mapa
+            const mapCenterX = Math.floor(game_data.map.width / 2);
+            const mapCenterY = Math.floor(game_data.map.height / 2);
+
+            const totalTroopsDiv = $('<div></div>')
+                .addClass('ra-total-troops-overlay')
+                .css({
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    color: '#fff',
+                    padding: '10px',
+                    borderRadius: '5px',
+                    zIndex: '1000',
+                    whiteSpace: 'pre-line',
+                    fontSize: '12px',
+                })
+                .html(totalTroopsString);
+
+            // Adicionar ao mapa
+            jQuery('#map').append(totalTroopsDiv);
+
+            // Opcional: Remover a exibição após alguns segundos
+            setTimeout(() => {
+                totalTroopsDiv.fadeOut(500, () => {
+                    totalTroopsDiv.remove();
+                });
+            }, 10000); // Remove após 10 segundos
         }
 
         // Helper: Build enemy tribes picker
@@ -633,7 +680,7 @@ function capitalizeFirstLetter(string) {
             let missingTroopsString = '';
 
             for (let [key, value] of Object.entries(missingTroops)) {
-                missingTroopsString += `${key}: ${value}\n`;
+                missingTroopsString += `${twSDK.tt(capitalizeFirstLetter(key))}: ${intToString(value)}\n`;
             }
 
             return missingTroopsString;
@@ -679,87 +726,6 @@ function capitalizeFirstLetter(string) {
             `;
 
             return unitsTable;
-        }
-
-        // Helper: Update the map UI
-        function updateMap(villages) {
-            const villageCoords = villages.map(
-                (village) => village.villageCoords
-            );
-
-            if (mapOverlay.mapHandler._spawnSector) {
-                //exists already, don't recreate
-            } else {
-                //doesn't exist yet
-                mapOverlay.mapHandler._spawnSector =
-                    mapOverlay.mapHandler.spawnSector;
-            }
-
-            TWMap.mapHandler.spawnSector = function (data, sector) {
-                // Override Map Sector Spawn
-                mapOverlay.mapHandler._spawnSector(data, sector);
-                var beginX = sector.x - data.x;
-                var endX = beginX + mapOverlay.mapSubSectorSize;
-                var beginY = sector.y - data.y;
-                var endY = beginY + mapOverlay.mapSubSectorSize;
-
-                for (var x in data.tiles) {
-                    var x = parseInt(x, 10);
-                    if (x < beginX || x >= endX) {
-                        continue;
-                    }
-                    for (var y in data.tiles[x]) {
-                        var y = parseInt(y, 10);
-
-                        if (y < beginY || y >= endY) {
-                            continue;
-                        }
-                        var xCoord = data.x + x;
-                        var yCoord = data.y + y;
-                        var v = mapOverlay.villages[xCoord * 1000 + yCoord];
-                        if (v) {
-                            var vXY = '' + v.xy;
-                            var vCoords =
-                                vXY.slice(0, 3) + '|' + vXY.slice(3, 6);
-                            if (villageCoords.includes(vCoords)) {
-                                const currentVillage = villages.find(
-                                    (obj) => obj.villageCoords == vCoords
-                                );
-
-                                const villageDef = intToString(
-                                    currentVillage.pop
-                                );
-
-                                const eleDIV = $('<div></div>')
-                                    .css({
-                                        position: 'absolute',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '2px',
-                                        padding: '1px',
-                                        backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                                        color: '#fff',
-                                        width: '50px',
-                                        height: '35px',
-                                        zIndex: '10',
-                                        fontSize: '10px',
-                                    })
-                                    .attr('id', 'dsm' + v.id)
-                                    .html(villageDef);
-
-                                sector.appendElement(
-                                    eleDIV[0],
-                                    data.x + x - sector.x,
-                                    data.y + y - sector.y
-                                );
-                            }
-                        }
-                    }
-                }
-            };
-
-            mapOverlay.reload();
         }
 
         // Helper: Calculate amounts of needed troops for each village
@@ -810,10 +776,7 @@ function capitalizeFirstLetter(string) {
                     !nonScalingUnits.includes(key)
                 ) {
                     let troopsDifference = troops[key] - troopsAfterScalingDown;
-                    missingTroops = {
-                        ...missingTroops,
-                        [key]: Math.abs(troopsDifference),
-                    };
+                    missingTroops[key] = Math.abs(troopsDifference);
                 }
             }
 
@@ -835,14 +798,19 @@ function capitalizeFirstLetter(string) {
                 })
                 .flat();
 
+            console.log('Aldeias dos jogadores:', playerVillages);
+
             let chosenTribeIds = twSDK.getEntityIdsByArrayIndex(
                 chosenTribes,
                 tribes,
                 2
             );
+            console.log('IDs das tribos escolhidas:', chosenTribeIds);
             let tribePlayers = getTribeMembersById(chosenTribeIds);
+            console.log('Jogadores das tribos escolhidas:', tribePlayers);
 
             let enemyTribeCoordinates = filterVillagesByPlayerIds(tribePlayers);
+            console.log('Coordenadas das tribos inimigas:', enemyTribeCoordinates);
 
             // filter villages by radius
             let villagesWithinRadius = [];
@@ -862,6 +830,8 @@ function capitalizeFirstLetter(string) {
                     }
                 });
             });
+
+            console.log(`Aldeias dentro do raio de ${distance}:`, villagesWithinRadius);
 
             // filter villages by stack size
             let villagesThatNeedStack = [];
@@ -890,6 +860,8 @@ function capitalizeFirstLetter(string) {
                 }
             });
 
+            console.log('Aldeias que precisam de stack:', villagesThatNeedStack);
+
             villagesThatNeedStack.sort((a, b) => a.fieldsAway - b.fieldsAway);
 
             let villagesObject = {};
@@ -908,6 +880,8 @@ function capitalizeFirstLetter(string) {
                 villagesArray.push(value);
             }
 
+            console.log('Aldeias finais que precisam de stack:', villagesArray);
+
             return villagesArray;
         }
 
@@ -924,6 +898,8 @@ function capitalizeFirstLetter(string) {
                     total += unitPopAmount * value;
                 }
             }
+
+            console.log(`População total calculada: ${total}`);
 
             return total;
         }
