@@ -1,7 +1,7 @@
 /*
  * Script Name: Frontline Stacks Planner
- * Version: v1.0.5
- * Last Updated: 2025-01-07
+ * Version: v1.0.6
+ * Last Updated: 2025-01-08
  * Author: RedAlert
  * Author URL: https://twscripts.dev/
  * Author Contact: redalert_tw (Discord)
@@ -15,7 +15,7 @@
  --------------------------------------------------------------------------------------*/
 
 // **Ativação do Modo de Depuração**
-if (typeof DEBUG !== 'boolean') DEBUG = false; // Defina como true para ativar logs de depuração
+if (typeof DEBUG !== 'boolean') DEBUG = true; // Defina como true para ativar logs de depuração
 if (typeof HC_AMOUNT === 'undefined') HC_AMOUNT = null; // Valor fornecido pelo jogador
 
 // **Configuração do Script**
@@ -23,7 +23,7 @@ var scriptConfig = {
     scriptData: {
         prefix: 'frontlineStacksPlanner',
         name: `Frontline Stacks Planner`,
-        version: 'v1.0.5',
+        version: 'v1.0.6',
         author: 'RedAlert',
         authorUrl: 'https://twscripts.dev/',
         helpLink:
@@ -64,6 +64,9 @@ var scriptConfig = {
             'No stack plans have been prepared!':
                 'No stack plans have been prepared!',
             'Copied on clipboard!': 'Copied on clipboard!',
+            'Select Troop Type': 'Select Troop Type',
+            Defensiva: 'Defensive',
+            Atacante: 'Attacking',
         },
     },
     allowedMarkets: [],
@@ -117,6 +120,12 @@ $.getScript(
             'snob',
             'militia',
         ];
+
+        // **Definição dos Tipos de Tropas**
+        const TROOP_TYPES = {
+            def: ['spear', 'sword', 'heavy'],
+            atk: ['axe', 'light', 'ram'],
+        };
 
         // **Ponto de Entrada**
         (function () {
@@ -183,7 +192,7 @@ $.getScript(
 
                     // Adiciona os dados da aldeia
                     villagesData.push({
-                        villageName: villageName, // **Alterado de 'name' para 'villageName'**
+                        villageName: villageName, // **Propriedade Atualizada para 'villageName'**
                         points: points,
                         troops: troops,
                         villageCoords: extractCoordsFromName(villageName), // Função para extrair coordenadas
@@ -266,6 +275,9 @@ $.getScript(
                         handleCalculateStackPlans(playersData);
                         handleBacklineStacks(playersData);
                         handleExport();
+
+                        // Registrar manipulador para mudança de tipo de tropa
+                        handleTroopTypeChange(allVillagesData);
                     },
                     function () {
                         UI.ErrorMessage(
@@ -306,6 +318,7 @@ $.getScript(
         function buildUI() {
             const enemyTribePickerHtml = buildEnemyTribePicker(tribes, 'Tribes');
             const troopAmountsHtml = buildUnitsChooserTable();
+            const troopTypeSelectorHtml = buildTroopTypeSelector(); // **Adicionado: Selector de Tipo de Tropa**
 
             const content = `
                 <div class="ra-mb15">
@@ -341,6 +354,9 @@ $.getScript(
                         ${troopAmountsHtml}
                     </div>
                 </div>
+                <div class="ra-mb15">
+                    ${troopTypeSelectorHtml} <!-- **Adicionado: Selector de Tipo de Tropa** -->
+                </div>
                 <div>
                     <a href="javascript:void(0);" id="raPlanStacks" class="btn">
                         ${twSDK.tt('Calculate Stacks')}
@@ -362,6 +378,8 @@ $.getScript(
                 .ra-input { width: 100% !important; padding: 5px; font-size: 14px; line-height: 1; }
                 .ra-label { margin-bottom: 6px; font-weight: 600; display: block; }
                 .ra-text-center .ra-input { text-align: center; }
+                .ra-troop-type-selector { display: flex; gap: 10px; align-items: center; }
+                .ra-troop-type-selector label { font-weight: 600; }
             `;
 
             twSDK.renderBoxWidget(
@@ -370,6 +388,30 @@ $.getScript(
                 'ra-frontline-stacks',
                 customStyle
             );
+        }
+
+        // **Helper: Construir Selector de Tipo de Tropa**
+        function buildTroopTypeSelector() {
+            const content = `
+                <div class="ra-troop-type-selector">
+                    <label for="raTroopType">${twSDK.tt('Select Troop Type')}:</label>
+                    <label>
+                        <input type="radio" name="raTroopType" value="def" checked>
+                        ${twSDK.tt('Defensiva')}
+                    </label>
+                    <label>
+                        <input type="radio" name="raTroopType" value="atk">
+                        ${twSDK.tt('Atacante')}
+                    </label>
+                </div>
+            `;
+
+            // **Log de Depuração: Selector de Tipo de Tropa Construído**
+            if (DEBUG) {
+                console.log('Troop Type Selector HTML:', content);
+            }
+
+            return content;
         }
 
         // **Action Handler: Calcular Planos de Stacks**
@@ -608,6 +650,30 @@ $.getScript(
                     );
                 }
             });
+        }
+
+        // **Helper: Construir Selector de Tipo de Tropa**
+        function buildTroopTypeSelector() {
+            const content = `
+                <div class="ra-troop-type-selector">
+                    <label for="raTroopType">${twSDK.tt('Select Troop Type')}:</label>
+                    <label>
+                        <input type="radio" name="raTroopType" value="def" checked>
+                        ${twSDK.tt('Defensiva')}
+                    </label>
+                    <label>
+                        <input type="radio" name="raTroopType" value="atk">
+                        ${twSDK.tt('Atacante')}
+                    </label>
+                </div>
+            `;
+
+            // **Log de Depuração: Selector de Tipo de Tropa Construído**
+            if (DEBUG) {
+                console.log('Troop Type Selector HTML:', content);
+            }
+
+            return content;
         }
 
         // **Helper: Construir Tabela de Aldeias**
@@ -859,28 +925,34 @@ $.getScript(
                                     continue;
                                 }
 
+                                // **Obter Tipo de Tropa Selecionado**
+                                const selectedTroopType = jQuery('input[name="raTroopType"]:checked').val();
+
+                                let troopsToDisplay = [];
+                                if (selectedTroopType === 'def') {
+                                    troopsToDisplay = TROOP_TYPES.def;
+                                } else if (selectedTroopType === 'atk') {
+                                    troopsToDisplay = TROOP_TYPES.atk;
+                                }
+
                                 // **Início das Modificações**
                                 // Formatar a string com as contagens de cada tropa e seus ícones
                                 const troops = currentVillage.troops;
                                 let villageTroopsHTML = '';
 
-                                for (let i = 0; i < TROOP_ORDER.length; i++) {
-                                    const unit = TROOP_ORDER[i];
+                                troopsToDisplay.forEach((unit) => {
                                     const count = troops[unit];
                                     if (count > 0 && unitIcons[unit]) {
                                         villageTroopsHTML += `
                                             <div style="display: flex; align-items: center; justify-content: center; gap: 2px; flex: 1;">
-                                                <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 9px; height: 9px;">
-                                                <span style="font-size: 6px;">${count}</span>
+                                                <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 12px; height: 12px;">
+                                                <span style="font-size: 8px;">${count}</span>
                                             </div>
                                         `;
-                                        // Opcional: Limitar o número de tropas exibidas
-                                        // Por exemplo, apenas as 5 primeiras tropas
-                                        if (i >= 4) break;
                                     }
-                                }
+                                });
 
-                                // Se não houver tropas, exibe "0"
+                                // Se não houver tropas para exibir, exibe "0"
                                 if (villageTroopsHTML === '') {
                                     villageTroopsHTML = '0';
                                 }
@@ -902,7 +974,7 @@ $.getScript(
                                         width: '50px', // Mantido conforme solicitado
                                         height: '35px', // Mantido conforme solicitado
                                         zIndex: '10',
-                                        fontSize: '6px', // Reduzido para melhor legibilidade
+                                        fontSize: '8px', // Reduzido para melhor legibilidade
                                         overflow: 'hidden', // Evita que o conteúdo ultrapasse o div
                                     })
                                     .attr('id', 'dsm' + v.id)
@@ -1246,6 +1318,20 @@ $.getScript(
                 UI.ErrorMessage(error);
                 console.error(`${scriptInfo} Error:`, error);
             }
+        }
+
+        // **Helper: Registrar Manipulador para Mudança de Tipo de Tropa**
+        function handleTroopTypeChange(allVillagesData) {
+            jQuery('input[name="raTroopType"]').on('change', function () {
+                const selectedTroopType = jQuery(this).val();
+
+                if (DEBUG) {
+                    console.log(`Troop Type Changed to: ${selectedTroopType}`);
+                }
+
+                // Atualizar o mapa com base no novo tipo de tropa selecionado
+                updateMap(allVillagesData);
+            });
         }
     }
 );
