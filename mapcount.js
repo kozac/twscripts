@@ -15,7 +15,7 @@
  --------------------------------------------------------------------------------------*/
 
 // **Ativação do Modo de Depuração**
-if (typeof DEBUG !== 'boolean') DEBUG = true; // Defina como true para ativar logs de depuração
+if (typeof DEBUG !== 'boolean') DEBUG = false; // Defina como true para ativar logs de depuração
 if (typeof HC_AMOUNT === 'undefined') HC_AMOUNT = null; // Valor fornecido pelo jogador
 
 // **Configuração do Script**
@@ -945,7 +945,7 @@ $.getScript(
                                     if (count > 0 && unitIcons[unit]) {
                                         villageTroopsHTML += `
                                             <div style="display: flex; align-items: center; justify-content: center; gap: 2px; flex: 1;">
-                                                <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 12px; height: 12px;">
+                                                <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 15px; height: 15px;">
                                                 <span style="font-size: 8px;">${count}</span>
                                             </div>
                                         `;
