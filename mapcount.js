@@ -18,6 +18,23 @@
 if (typeof DEBUG !== 'boolean') DEBUG = false;
 if (typeof HC_AMOUNT === 'undefined') HC_AMOUNT = null;
 
+// Mapeamento de ícones das tropas com URLs completas (Definido Globalmente)
+const unitIcons = {
+    spear: 'https://dsbr.innogamescdn.com/asset/61bc21fc/graphic/unit/unit_spear.png',
+    sword: 'https://dsbr.innogamescdn.com/asset/61bc21fc/graphic/unit/unit_sword.png',
+    archer: 'https://dsbr.innogamescdn.com/asset/61bc21fc/graphic/unit/unit_archer.png',
+    spy: 'https://dsbr.innogamescdn.com/asset/61bc21fc/graphic/unit/unit_spy.png',
+    heavy: 'https://dsbr.innogamescdn.com/asset/61bc21fc/graphic/unit/unit_heavy.png',
+    light: 'https://dsbr.innogamescdn.com/asset/61bc21fc/graphic/unit/unit_light.png',
+    marcher: 'https://dsbr.innogamescdn.com/asset/61bc21fc/graphic/unit/unit_marcher.png',
+    ram: 'https://dsbr.innogamescdn.com/asset/61bc21fc/graphic/unit/unit_ram.png',
+    catapult: 'https://dsbr.innogamescdn.com/asset/61bc21fc/graphic/unit/unit_catapult.png',
+    knight: 'https://dsbr.innogamescdn.com/asset/61bc21fc/graphic/unit/unit_knight.png',
+    snob: 'https://dsbr.innogamescdn.com/asset/61bc21fc/graphic/unit/unit_snob.png',
+    militia: 'https://dsbr.innogamescdn.com/asset/61bc21fc/graphic/unit/unit_militia.png',
+    // Adicione outros tipos de tropas conforme necessário
+};
+
 // Script Config
 var scriptConfig = {
     scriptData: {
@@ -119,251 +136,273 @@ $.getScript(
             }
         })();
 
-// Função para mapear os índices das colunas às tropas
-function mapTroopColumns() {
-    const troopMap = {};
-    jQuery('table.vis.w100 thead tr th img').each(function(index) {
-        const title = jQuery(this).attr('title').toLowerCase(); // Nome da tropa
-        switch(title) {
-            case 'lanceiro':
-                troopMap['spear'] = index;
-                break;
-            case 'espadachim':
-                troopMap['sword'] = index;
-                break;
-            case 'bárbaro':
-                troopMap['axe'] = index;
-                break;
-            case 'explorador':
-                troopMap['spy'] = index;
-                break;
-            case 'cavalaria leve':
-                troopMap['light'] = index;
-                break;
-            case 'cavalaria pesada':
-                troopMap['heavy'] = index;
-                break;
-            case 'aríete':
-                troopMap['ram'] = index;
-                break;
-            case 'catapulta':
-                troopMap['catapult'] = index;
-                break;
-            case 'paladino':
-                troopMap['knight'] = index;
-                break;
-            case 'nobre':
-                troopMap['snob'] = index;
-                break;
-            case 'milícia':
-                troopMap['militia'] = index;
-                break;
-            // Adicione outros casos conforme necessário
-            default:
-                break;
-        }
-    });
-    return troopMap;
-}
+        // Função para mapear os índices das colunas às tropas
+        function mapTroopColumns() {
+            const troopMap = {};
+            jQuery('table.vis.w100 thead tr th img').each(function(index) {
+                const title = jQuery(this).attr('title')?.toLowerCase(); // Nome da tropa em minúsculas
+                const alt = jQuery(this).attr('alt')?.toLowerCase(); // Nome alternativo da tropa em minúsculas
 
-// Função para extrair os dados das tropas
-function extractTroopData(troopMap) {
-    const villagesData = [];
-    
-    jQuery('table.vis.w100 tbody tr').each(function() {
-        const row = jQuery(this);
-        const cells = row.find('td');
-        
-        // Verifica se a linha corresponde a um membro (possui links para aldeias)
-        const villageLink = row.find('a[href*="screen=info_village&id="]');
-        if(villageLink.length > 0) {
-            const villageName = villageLink.text().trim();
-            const points = row.find('td').eq(1).text().trim().replace(/\./g, '');
-            
-            // Troca de rowspan para pegar a segunda linha referente à mesma aldeia
-            const defenseRow = row.next('tr');
-            const defenseCells = defenseRow.find('td');
-            
-            const troops = {};
-            
-            for(const [unit, index] of Object.entries(troopMap)) {
-                const cell = cells.eq(index);
-                let count = cell.text().trim();
-                if(count === '') {
-                    // Tenta pegar da linha de defesa (a caminho)
-                    const defenseCell = defenseCells.eq(index);
-                    count = defenseCell.text().trim();
+                // Use 'alt' se 'title' não estiver disponível
+                const troopName = title || alt;
+
+                switch(troopName) {
+                    case 'lanceiro':
+                    case 'spear':
+                        troopMap['spear'] = index;
+                        break;
+                    case 'espadachim':
+                    case 'sword':
+                        troopMap['sword'] = index;
+                        break;
+                    case 'bárbaro':
+                    case 'axe':
+                        troopMap['axe'] = index;
+                        break;
+                    case 'explorador':
+                    case 'spy':
+                        troopMap['spy'] = index;
+                        break;
+                    case 'cavalaria leve':
+                    case 'light':
+                        troopMap['light'] = index;
+                        break;
+                    case 'cavalaria pesada':
+                    case 'heavy':
+                        troopMap['heavy'] = index;
+                        break;
+                    case 'aríete':
+                    case 'ram':
+                        troopMap['ram'] = index;
+                        break;
+                    case 'catapulta':
+                    case 'catapult':
+                        troopMap['catapult'] = index;
+                        break;
+                    case 'paladino':
+                    case 'knight':
+                        troopMap['knight'] = index;
+                        break;
+                    case 'nobre':
+                    case 'snob':
+                        troopMap['snob'] = index;
+                        break;
+                    case 'milícia':
+                    case 'militia':
+                        troopMap['militia'] = index;
+                        break;
+                    // Adicione outros casos conforme necessário
+                    default:
+                        console.warn(`Tropa não mapeada: ${troopName}`);
+                        break;
                 }
-                // Converte para número, tratando possíveis strings vazias
-                count = parseInt(count) || 0;
-                troops[unit] = count;
-            }
-            
-            // Adiciona os dados da aldeia
-            villagesData.push({
-                name: villageName,
-                points: parseInt(points),
-                troops: troops
             });
+            console.log('Mapeamento de Tropas:', troopMap); // Log para verificar o mapeamento
+            return troopMap;
         }
-    });
-    
-    return villagesData;
-}
 
-// Função de inicialização do script
-async function initScript() {
-    const playersToFetch = await getTribeMembersList();
+        // Função para extrair os dados das tropas
+        function extractTroopData(troopMap) {
+            const villagesData = [];
+            
+            jQuery('table.vis.w100 tbody tr').each(function() {
+                const row = jQuery(this);
+                const cells = row.find('td');
+                
+                // Verifica se a linha corresponde a um membro (possui links para aldeias)
+                const villageLink = row.find('a[href*="screen=info_village&id="]');
+                if(villageLink.length > 0) {
+                    const villageName = villageLink.text().trim();
+                    const points = row.find('td').eq(1).text().trim().replace(/\./g, '');
+                    
+                    // Troca de rowspan para pegar a segunda linha referente à mesma aldeia
+                    const defenseRow = row.next('tr');
+                    const defenseCells = defenseRow.find('td');
+                    
+                    const troops = {};
+                    
+                    for(const [unit, index] of Object.entries(troopMap)) {
+                        const cell = cells.eq(index);
+                        let count = cell.text().trim();
+                        if(count === '') {
+                            // Tenta pegar da linha de defesa (a caminho)
+                            const defenseCell = defenseCells.eq(index);
+                            count = defenseCell.text().trim();
+                        }
+                        // Converte para número, tratando possíveis strings vazias
+                        count = parseInt(count) || 0;
+                        troops[unit] = count;
+                    }
+                    
+                    // Adiciona os dados da aldeia
+                    villagesData.push({
+                        name: villageName,
+                        points: parseInt(points),
+                        troops: troops
+                    });
 
-    if (playersToFetch.length) {
-        const playersData = [...playersToFetch];
-        const memberUrls = playersToFetch.map((item) => item.url);
+                    if (DEBUG) {
+                        console.log(`Aldeia: ${villageName}, Pontos: ${points}, Tropas:`, troops);
+                    }
+                }
+            });
+            
+            return villagesData;
+        }
 
-        // Show progress bar and notify user
-        twSDK.startProgressBar(memberUrls.length);
+        // Função de inicialização do script
+        async function initScript() {
+            const playersToFetch = await getTribeMembersList();
 
-        twSDK.getAll(
-            memberUrls,
-            function (index, data) {
-                twSDK.updateProgressBar(index, memberUrls.length);
+            if (playersToFetch.length) {
+                const playersData = [...playersToFetch];
+                const memberUrls = playersToFetch.map((item) => item.url);
 
-                // parse reponse as html
-                const htmlDoc = jQuery.parseHTML(data);
-                const villagesTableRows = jQuery(htmlDoc)
-                    .find(`.table-responsive table.vis tbody tr`)
-                    .not(':first');
+                // Show progress bar and notify user
+                twSDK.startProgressBar(memberUrls.length);
 
-                const villagesData = [];
+                twSDK.getAll(
+                    memberUrls,
+                    function (index, data) {
+                        twSDK.updateProgressBar(index, memberUrls.length);
 
-                // mapear as tropas corretamente
-                const troopMap = mapTroopColumns();
+                        // parse response as html
+                        const htmlDoc = jQuery.parseHTML(data);
+                        const villagesTableRows = jQuery(htmlDoc)
+                            .find(`.table-responsive table.vis tbody tr`)
+                            .not(':first');
 
-                // parse player information
-                if (villagesTableRows && villagesTableRows.length) {
-                    villagesTableRows.each(function () {
-                        try {
-                            const _this = jQuery(this);
+                        const villagesData = [];
 
-                            const currentVillageName = _this
-                                .find('td:first a')
-                                .text()
-                                .trim();
-                            if (currentVillageName) {
-                                const currentVillageId = parseInt(
-                                    twSDK.getParameterByName(
-                                        'id',
-                                        window.location.origin +
-                                            _this
-                                                .find('td:first a')
-                                                .attr('href')
-                                    )
-                                );
+                        // mapear as tropas corretamente
+                        const troopMap = mapTroopColumns();
 
-                                const currentVillageCoords = _this
-                                    .find('td:eq(0)')
-                                    .text()
-                                    .trim()
-                                    ?.match(twSDK.coordsRegex)[0];
+                        // parse player information
+                        if (villagesTableRows && villagesTableRows.length) {
+                            villagesTableRows.each(function () {
+                                try {
+                                    const _this = jQuery(this);
 
-                                let villageData = [];
-
-                                _this
-                                    .find('td')
-                                    .not(':first')
-                                    .not(':last')
-                                    .not(':eq(0)')
-                                    .each(function () {
-                                        const unitAmount =
-                                            jQuery(this)
-                                                .text()
-                                                .trim() !== '?'
-                                                ? jQuery(this)
-                                                      .text()
-                                                      .trim()
-                                                : 0;
-                                        villageData.push(
-                                            parseInt(unitAmount)
+                                    const currentVillageName = _this
+                                        .find('td:first a')
+                                        .text()
+                                        .trim();
+                                    if (currentVillageName) {
+                                        const currentVillageId = parseInt(
+                                            twSDK.getParameterByName(
+                                                'id',
+                                                window.location.origin +
+                                                    _this
+                                                        .find('td:first a')
+                                                        .attr('href')
+                                            )
                                         );
-                                    });
 
-                                villageData = villageData.splice(
-                                    0,
-                                    game_data.units.length
-                                );
+                                        const currentVillageCoords = _this
+                                            .find('td:eq(0)')
+                                            .text()
+                                            .trim()
+                                            ?.match(twSDK.coordsRegex)[0];
 
-                                let villageTroops = {};
-                                game_data.units.forEach(
-                                    (unit, index) => {
-                                        villageTroops[unit] = villageData[index] || 0;
+                                        let villageData = [];
+
+                                        _this
+                                            .find('td')
+                                            .not(':first')
+                                            .not(':last')
+                                            .not(':eq(0)')
+                                            .each(function () {
+                                                const unitAmount =
+                                                    jQuery(this)
+                                                        .text()
+                                                        .trim() !== '?'
+                                                        ? jQuery(this)
+                                                              .text()
+                                                              .trim()
+                                                        : 0;
+                                                villageData.push(
+                                                    parseInt(unitAmount)
+                                                );
+                                            });
+
+                                        villageData = villageData.splice(
+                                            0,
+                                            game_data.units.length
+                                        );
+
+                                        let villageTroops = {};
+                                        game_data.units.forEach(
+                                            (unit, index) => {
+                                                villageTroops[unit] = villageData[index] || 0;
+                                            }
+                                        );
+
+                                        villagesData.push({
+                                            villageId: currentVillageId,
+                                            villageName: currentVillageName,
+                                            villageCoords: currentVillageCoords,
+                                            troops: villageTroops,
+                                        });
                                     }
-                                );
+                                } catch (error) {
+                                    UI.ErrorMessage(
+                                        twSDK.tt(
+                                            'Error fetching player incomings!'
+                                        )
+                                    );
+                                    console.error(
+                                        `${scriptInfo} Error:`,
+                                        error
+                                    );
+                                }
+                            });
+                        }
 
-                                villagesData.push({
-                                    villageId: currentVillageId,
-                                    villageName: currentVillageName,
-                                    villageCoords: currentVillageCoords,
-                                    troops: villageTroops,
-                                });
-                            }
-                        } catch (error) {
-                            UI.ErrorMessage(
-                                twSDK.tt(
-                                    'Error fetching player incomings!'
-                                )
-                            );
-                            console.error(
-                                `${scriptInfo} Error:`,
-                                error
+                        // Atualiza as informações dos jogadores
+                        playersData[index] = {
+                            ...playersData[index],
+                            villagesData: villagesData,
+                        };
+                    },
+                    function () {
+                        if (DEBUG) {
+                            console.debug(
+                                `${scriptInfo} playersData`,
+                                playersData
                             );
                         }
-                    });
-                }
 
-                // Atualiza as informações dos jogadores
-                playersData[index] = {
-                    ...playersData[index],
-                    villagesData: villagesData,
-                };
-            },
-            function () {
-                if (DEBUG) {
-                    console.debug(
-                        `${scriptInfo} playersData`,
-                        playersData
-                    );
-                }
+                        // Mapeia as tropas e extrai os dados
+                        const troopMap = mapTroopColumns();
+                        const villagesData = extractTroopData(troopMap);
 
-                // Mapeia as tropas e extrai os dados
-                const troopMap = mapTroopColumns();
-                const villagesData = extractTroopData(troopMap);
+                        if (DEBUG) {
+                            console.log('Mapped Troop Columns:', troopMap);
+                            console.log('Extracted Villages Data:', villagesData);
+                        }
 
-                if (DEBUG) {
-                    console.log('Mapped Troop Columns:', troopMap);
-                    console.log('Extracted Villages Data:', villagesData);
-                }
+                        // build user interface
+                        buildUI();
 
-                // build user interface
-                buildUI();
-
-                // register action handlers
-                handleCalculateStackPlans(playersData);
-                handleBacklineStacks(playersData);
-                handleExport();
-            },
-            function () {
+                        // register action handlers
+                        handleCalculateStackPlans(playersData);
+                        handleBacklineStacks(playersData);
+                        handleExport();
+                    },
+                    function () {
+                        UI.ErrorMessage(
+                            twSDK.tt('Error fetching player incomings!')
+                        );
+                    }
+                );
+            } else {
                 UI.ErrorMessage(
-                    twSDK.tt('Error fetching player incomings!')
+                    twSDK.tt(
+                        'Tribe members have not shared their troop counts with tribe leadership!'
+                    )
                 );
             }
-        );
-    } else {
-        UI.ErrorMessage(
-            twSDK.tt(
-                'Tribe members have not shared their troop counts with tribe leadership!'
-            )
-        );
-    }
-}
+        }
 
         // Render: Build the user interface
         function buildUI() {
@@ -795,13 +834,14 @@ async function initScript() {
             let thUnits = ``;
             let tableRow = ``;
 
-            const defTroopTypes = ['spear', 'sword', 'archer', 'spy', 'heavy'];
+            // Definir apenas as tropas relevantes na ordem de prioridade
+            const defTroopTypes = ['spear', 'sword', 'heavy', 'spy', 'axe', 'light'];
 
             defTroopTypes.forEach((unit) => {
                 thUnits += `
                     <th class="ra-text-center">
                         <label for="unit_${unit}" class="ra-unit-type">
-                            <img src="/graphic/unit/unit_${unit}.png" alt="${unit}" title="${unit}">
+                            <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}">
                         </label>
                     </th>
                 `;
@@ -831,136 +871,119 @@ async function initScript() {
             return unitsTable;
         }
 
-// Helper: Update the map UI
-function updateMap(villages) {
-    const villageCoords = villages.map(
-        (village) => village.villageCoords
-    );
+        // Helper: Update the map UI
+        function updateMap(villages) {
+            const villageCoords = villages.map(
+                (village) => village.villageCoords
+            );
 
-    if (mapOverlay.mapHandler._spawnSector) {
-        //exists already, don't recreate
-    } else {
-        //doesn't exist yet
-        mapOverlay.mapHandler._spawnSector =
-            mapOverlay.mapHandler.spawnSector;
-    }
-
-    // Mapeamento de ícones das tropas
-    const unitIcons = {
-        spear: '/graphic/unit/unit_spear.png',
-        sword: '/graphic/unit/unit_sword.png',
-        archer: '/graphic/unit/unit_archer.png',
-        spy: '/graphic/unit/unit_spy.png',
-        heavy: '/graphic/unit/unit_heavy.png',
-        light: '/graphic/unit/unit_light.png',
-        marcher: '/graphic/unit/unit_marcher.png',
-        ram: '/graphic/unit/unit_ram.png',
-        catapult: '/graphic/unit/unit_catapult.png',
-        knight: '/graphic/unit/unit_knight.png',
-        snob: '/graphic/unit/unit_snob.png',
-        militia: '/graphic/unit/unit_militia.png',
-        // Adicione outros tipos de tropas conforme necessário
-    };
-
-    // Definir a ordem de prioridade das tropas
-    const troopPriority = ['spear', 'sword', 'heavy', 'spy', 'axe', 'light', 'archer', 'ram', 'catapult', 'knight', 'snob', 'militia'];
-
-    TWMap.mapHandler.spawnSector = function (data, sector) {
-        // Override Map Sector Spawn
-        mapOverlay.mapHandler._spawnSector(data, sector);
-        var beginX = sector.x - data.x;
-        var endX = beginX + mapOverlay.mapSubSectorSize;
-        var beginY = sector.y - data.y;
-        var endY = beginY + mapOverlay.mapSubSectorSize;
-
-        for (var x in data.tiles) {
-            var x = parseInt(x, 10);
-            if (x < beginX || x >= endX) {
-                continue;
+            if (mapOverlay.mapHandler._spawnSector) {
+                //exists already, don't recreate
+            } else {
+                //doesn't exist yet
+                mapOverlay.mapHandler._spawnSector =
+                    mapOverlay.mapHandler.spawnSector;
             }
-            for (var y in data.tiles[x]) {
-                var y = parseInt(y, 10);
 
-                if (y < beginY || y >= endY) {
-                    continue;
-                }
-                var xCoord = data.x + x;
-                var yCoord = data.y + y;
-                var v = mapOverlay.villages[xCoord * 1000 + yCoord];
-                if (v) {
-                    var vXY = '' + v.xy;
-                    var vCoords =
-                        vXY.slice(0, 3) + '|' + vXY.slice(3, 6);
-                    if (villageCoords.includes(vCoords)) {
-                        const currentVillage = villages.find(
-                            (obj) => obj.villageCoords == vCoords
-                        );
+            // Definir a ordem de prioridade das tropas
+            const troopPriority = ['spear', 'sword', 'heavy', 'spy', 'axe', 'light', 'archer', 'ram', 'catapult', 'knight', 'snob', 'militia'];
 
-                        if (!currentVillage) continue; // Segurança
+            TWMap.mapHandler.spawnSector = function (data, sector) {
+                // Override Map Sector Spawn
+                mapOverlay.mapHandler._spawnSector(data, sector);
+                var beginX = sector.x - data.x;
+                var endX = beginX + mapOverlay.mapSubSectorSize;
+                var beginY = sector.y - data.y;
+                var endY = beginY + mapOverlay.mapSubSectorSize;
 
-                        // **Início das Modificações**
-                        // Formatar a string com as contagens de cada tropa na ordem de prioridade
-                        const troops = currentVillage.troops;
-                        let villageTroopsHTML = '';
+                for (var x in data.tiles) {
+                    var x = parseInt(x, 10);
+                    if (x < beginX || x >= endX) {
+                        continue;
+                    }
+                    for (var y in data.tiles[x]) {
+                        var y = parseInt(y, 10);
 
-                        // Definir a ordem de prioridade
-                        const troopPriority = ['spear', 'sword', 'heavy', 'spy', 'axe', 'light', 'archer', 'ram', 'catapult', 'knight', 'snob', 'militia'];
-
-                        // Iterar sobre o array de prioridade
-                        troopPriority.forEach((unit) => {
-                            const count = troops[unit];
-                            if (count > 0 && unitIcons[unit]) {
-                                villageTroopsHTML += `
-                                    <div style="display: flex; align-items: center; justify-content: center; gap: 2px; flex: 1;">
-                                        <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 12px; height: 12px;">
-                                        <span style="font-size: 8px;">${count}</span>
-                                    </div>
-                                `;
-                            }
-                        });
-
-                        // Se não houver tropas, exibe "0"
-                        if (villageTroopsHTML === '') {
-                            villageTroopsHTML = '0';
+                        if (y < beginY || y >= endY) {
+                            continue;
                         }
+                        var xCoord = data.x + x;
+                        var yCoord = data.y + y;
+                        var v = mapOverlay.villages[xCoord * 1000 + yCoord];
+                        if (v) {
+                            var vXY = '' + v.xy;
+                            var vCoords =
+                                vXY.slice(0, 3) + '|' + vXY.slice(3, 6);
+                            if (villageCoords.includes(vCoords)) {
+                                const currentVillage = villages.find(
+                                    (obj) => obj.villageCoords == vCoords
+                                );
 
-                        // **Fim das Modificações**
+                                if (!currentVillage) continue; // Segurança
 
-                        const eleDIV = $('<div></div>')
-                            .css({
-                                position: 'absolute',
-                                display: 'flex',
-                                flexDirection: 'row',
-                                flexWrap: 'wrap',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '1px',
-                                padding: '2px',
-                                backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                                color: '#fff',
-                                width: '50px', // Mantido conforme solicitado
-                                height: '35px', // Mantido conforme solicitado
-                                zIndex: '10',
-                                fontSize: '8px', // Reduzido para melhor legibilidade
-                                overflow: 'hidden', // Evita que o conteúdo ultrapasse o div
-                            })
-                            .attr('id', 'dsm' + v.id)
-                            .html(villageTroopsHTML); // Alterado para exibir as tropas com ícones e texto reduzido
+                                // **Início das Modificações**
+                                // Formatar a string com as contagens de cada tropa na ordem de prioridade
+                                const troops = currentVillage.troops;
+                                let villageTroopsHTML = '';
 
-                        sector.appendElement(
-                            eleDIV[0],
-                            data.x + x - sector.x,
-                            data.y + y - sector.y
-                        );
+                                // Iterar sobre o array de prioridade
+                                troopPriority.forEach((unit) => {
+                                    const count = troops[unit];
+                                    if (count > 0 && unitIcons[unit]) {
+                                        villageTroopsHTML += `
+                                            <div style="display: flex; align-items: center; justify-content: center; gap: 2px; flex: 1;">
+                                                <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 12px; height: 12px;">
+                                                <span style="font-size: 8px;">${count}</span>
+                                            </div>
+                                        `;
+                                    }
+                                });
+
+                                // Se não houver tropas, exibe "0"
+                                if (villageTroopsHTML === '') {
+                                    villageTroopsHTML = '0';
+                                }
+
+                                // **Fim das Modificações**
+
+                                const eleDIV = $('<div></div>')
+                                    .css({
+                                        position: 'absolute',
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        flexWrap: 'wrap',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '1px',
+                                        padding: '2px',
+                                        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                                        color: '#fff',
+                                        width: '50px', // Mantido conforme solicitado
+                                        height: '35px', // Mantido conforme solicitado
+                                        zIndex: '10',
+                                        fontSize: '8px', // Reduzido para melhor legibilidade
+                                        overflow: 'hidden', // Evita que o conteúdo ultrapasse o div
+                                    })
+                                    .attr('id', 'dsm' + v.id)
+                                    .html(villageTroopsHTML); // Alterado para exibir as tropas com ícones e texto reduzido
+
+                                sector.appendElement(
+                                    eleDIV[0],
+                                    data.x + x - sector.x,
+                                    data.y + y - sector.y
+                                );
+
+                                if (DEBUG) {
+                                    console.log(`Aldeia: ${currentVillage.name}, Tropas exibidas:`, troops);
+                                }
+                            }
+                        }
                     }
                 }
-            }
+            };
+
+            mapOverlay.reload();
         }
-    };
-
-    mapOverlay.reload();
-}
-
 
         // Helper: Calculate amounts of needed troops for each village
         function calculateAmountMissingTroops(
@@ -1038,12 +1061,13 @@ function updateMap(villages) {
                 2
             );
             let tribePlayers = getTribeMembersById(chosenTribeIds);
-            let enemyTribeCoordinates = filterVillagesByPlayerIds(tribePlayers);
+            let enemyTribeCoordinates =
+                filterVillagesByPlayerIds(tribePlayers);
 
             // filter villages by radius
             let villagesWithinRadius = [];
             playerVillages.forEach((village) => {
-                const { villageCoords } = village;
+                const { villageCoords, troops } = village;
                 enemyTribeCoordinates.forEach((coordinate) => {
                     const villagesDistance = twSDK.calculateDistance(
                         coordinate,
