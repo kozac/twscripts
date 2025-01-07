@@ -73,7 +73,6 @@ var scriptConfig = {
     enableCountApi: true,
 };
 
-// Importação do TW SDK
 $.getScript(
     `https://twscripts.dev/scripts/twSDK.js?url=${document.currentScript.src}`,
     async function () {
@@ -180,8 +179,20 @@ $.getScript(
                         points: points,
                         troops: troops,
                     });
+
+                    // **Log de Depuração: Dados Extraídos por Aldeia**
+                    if (DEBUG) {
+                        console.log(`Aldeia: ${villageName}`);
+                        console.log(`Pontos: ${points}`);
+                        console.log('Tropas:', troops);
+                    }
                 }
             });
+
+            // **Log de Depuração: Dados Completos das Aldeias**
+            if (DEBUG) {
+                console.log('Dados Extraídos das Aldeias:', villagesData);
+            }
 
             return villagesData;
         }
@@ -210,6 +221,11 @@ $.getScript(
 
                         const villagesData = extractTroopData();
 
+                        // **Log de Depuração: Dados das Aldeias por Jogador**
+                        if (DEBUG) {
+                            console.log(`Dados da Aldeia para Jogador ${index + 1}:`, villagesData);
+                        }
+
                         // Atualiza as informações dos jogadores
                         playersData[index] = {
                             ...playersData[index],
@@ -225,7 +241,7 @@ $.getScript(
                         const villagesData = extractTroopData();
 
                         if (DEBUG) {
-                            console.log('Extracted Villages Data:', villagesData);
+                            console.log('Dados Extraídos das Aldeias após fetchAll:', villagesData);
                         }
 
                         // build user interface
@@ -237,7 +253,9 @@ $.getScript(
                         handleExport();
                     },
                     function () {
-                        UI.ErrorMessage(twSDK.tt('Error fetching player incomings!'));
+                        UI.ErrorMessage(
+                            twSDK.tt('Error fetching player incomings!')
+                        );
                     }
                 );
             } else {
@@ -361,6 +379,11 @@ $.getScript(
                         'data-stack-plans',
                         JSON.stringify(villagesToBeStacked)
                     );
+
+                    // **Log de Depuração: Villages To Be Stacked**
+                    if (DEBUG) {
+                        console.log('Villages to be stacked:', villagesToBeStacked);
+                    }
                 } else {
                     UI.SuccessMessage(
                         twSDK.tt('All villages have been properly stacked!')
@@ -500,6 +523,11 @@ $.getScript(
                     '',
                     '560px'
                 );
+
+                // **Log de Depuração: Villages Outside Radius**
+                if (DEBUG) {
+                    console.log('Villages Outside Radius:', villagesOutsideRadius);
+                }
             });
         }
 
@@ -533,6 +561,11 @@ $.getScript(
 
                         twSDK.copyToClipboard(bbCode);
                         UI.SuccessMessage(twSDK.tt('Copied on clipboard!'));
+
+                        // **Log de Depuração: BBCode Exportado**
+                        if (DEBUG) {
+                            console.log('BBCode Exportado:', bbCode);
+                        }
                     }
                 } else {
                     UI.ErrorMessage(
@@ -617,6 +650,11 @@ $.getScript(
 
             villagesTableHtml += `</tbody></table>`;
 
+            // **Log de Depuração: Tabela de Aldeias Construída**
+            if (DEBUG) {
+                console.log('Tabela de Aldeias:', villagesTableHtml);
+            }
+
             return villagesTableHtml;
         }
 
@@ -649,6 +687,11 @@ $.getScript(
 
             dropdown += '</datalist>';
 
+            // **Log de Depuração: Picker de Tribos Construído**
+            if (DEBUG) {
+                console.log('Picker de Tribos HTML:', dropdown);
+            }
+
             return dropdown;
         }
 
@@ -658,6 +701,11 @@ $.getScript(
 
             for (let [key, value] of Object.entries(missingTroops)) {
                 missingTroopsString += `${key}: ${value}\n`;
+            }
+
+            // **Log de Depuração: String de Tropas Faltantes**
+            if (DEBUG) {
+                console.log('Tropas Faltantes:', missingTroopsString);
             }
 
             return missingTroopsString;
@@ -701,6 +749,11 @@ $.getScript(
                     </tbody>
                 </table>
             `;
+
+            // **Log de Depuração: Tabela de Seleção de Tropas Construída**
+            if (DEBUG) {
+                console.log('Tabela de Seleção de Tropas HTML:', unitsTable);
+            }
 
             return unitsTable;
         }
@@ -820,6 +873,12 @@ $.getScript(
                                     data.x + x - sector.x,
                                     data.y + y - sector.y
                                 );
+
+                                // **Log de Depuração: Atualização do Mapa para Aldeia**
+                                if (DEBUG) {
+                                    console.log(`Atualizando Mapa para Aldeia: ${currentVillage.name}`);
+                                    console.log('Tropas no Mapa:', troops);
+                                }
                             }
                         }
                     }
@@ -851,6 +910,11 @@ $.getScript(
                     ...village,
                     missingTroops: missingTroops,
                 });
+
+                // **Log de Depuração: Troops Calculated for Village**
+                if (DEBUG) {
+                    console.log(`Troops Calculated for Village ${village.name}:`, missingTroops);
+                }
             });
 
             return villagesToBeStacked;
@@ -879,6 +943,11 @@ $.getScript(
                     let troopsDifference = troops[key] - troopsAfterScalingDown;
                     missingTroops[key] = Math.abs(troopsDifference);
                 }
+            }
+
+            // **Log de Depuração: Missing Troops Calculated**
+            if (DEBUG) {
+                console.log('Missing Troops:', missingTroops);
             }
 
             return missingTroops;
@@ -939,6 +1008,11 @@ $.getScript(
                                 pop: villagePop,
                                 fieldsAway: Math.round(villagesDistance * 100) / 100,
                             });
+
+                            // **Log de Depuração: Village Needs Stack**
+                            if (DEBUG) {
+                                console.log(`Village Needs Stack: ${village.name}`, village);
+                            }
                         }
                     }
                 });
@@ -962,6 +1036,11 @@ $.getScript(
                 villagesArray.push(value);
             }
 
+            // **Log de Depuração: Villages That Need Stack Array**
+            if (DEBUG) {
+                console.log('Villages That Need Stack:', villagesArray);
+            }
+
             return villagesArray;
         }
 
@@ -978,7 +1057,7 @@ $.getScript(
                     total += unitPopAmount * value;
                 }
             }
-            console.log(units);
+            console.log('Total Pop Calculation:', units, total);
             return total;
         }
 
@@ -1007,6 +1086,17 @@ $.getScript(
                     };
                 }
             });
+
+            // **Log de Depuração: Coleta de Entrada do Usuário**
+            if (DEBUG) {
+                console.log('User Input Collected:', {
+                    chosenTribes,
+                    distance,
+                    stackLimit,
+                    scaleDownPerField,
+                    unitAmounts,
+                });
+            }
 
             return {
                 chosenTribes,
@@ -1094,6 +1184,11 @@ $.getScript(
                     });
                 }
             });
+
+            // **Log de Depuração: Lista de Membros para Buscar**
+            if (DEBUG) {
+                console.log('Members to Fetch:', membersToFetch);
+            }
 
             return membersToFetch;
         }
