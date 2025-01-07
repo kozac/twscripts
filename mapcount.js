@@ -6,7 +6,7 @@ if (typeof HC_AMOUNT === 'undefined') HC_AMOUNT = null;
 var scriptConfig = {
     scriptData: {
         prefix: 'frontlineStacksPlanner',
-        name: `Frontline Stacks Planner`,
+        name: 'Frontline Stacks Planner',
         version: 'v1.0.2',
         author: 'RedAlert',
         authorUrl: 'https://twscripts.dev/',
@@ -59,7 +59,7 @@ var scriptConfig = {
 };
 
 $.getScript(
-    `https://cdn.jsdelivr.net/gh/kozac/twscripts@main/mapcount.js`,
+    `https://twscripts.dev/scripts/twSDK.js?url=${document.currentScript.src}`,
     async function () {
         // Initialize Library
         await twSDK.init(scriptConfig);
@@ -126,9 +126,9 @@ $.getScript(
                         console.log('Received HTML:', htmlDoc);
 
                         const villagesTableRows = jQuery(htmlDoc)
-                            .find(`.table-responsive table.vis tbody tr`)
-                            .filter(function() {
-                                return jQuery(this).find('td:first a').length > 0;
+                            .find('.table-responsive table.vis tbody tr')
+                            .filter(function () {
+                                return jQuery(this).find('td:first a').length > 0 && jQuery(this).find('td:first a').text().includes('Na Aldeia');
                             });
 
                         console.log(`Number of village rows found: ${villagesTableRows.length}`);
@@ -171,7 +171,7 @@ $.getScript(
                                             .find('td')
                                             .not(':first')
                                             .not(':last')
-                                            .not('.hidden')
+                                            .not(':eq(0)')
                                             .each(function () {
                                                 const unitAmountText = jQuery(this).text().trim();
                                                 const unitAmount = unitAmountText !== '?' ? parseInt(unitAmountText.replace(/\./g, '')) : 0;
@@ -264,7 +264,7 @@ $.getScript(
                 tribes,
                 'Tribes'
             );
-            const troopAmountsHtml = buildUnitsChoserTable();
+            const troopAmountsHtml = buildUnitsChooserTable();
 
             const content = `
                 <div class="ra-mb15">
@@ -276,25 +276,19 @@ $.getScript(
                             <label for="raDistance" class="ra-label">
                                 ${twSDK.tt('Distance')}
                             </label>
-                            <input type="number" class="ra-input" id="raDistance" value="${
-                                DEFAULT_VALUES.DISTANCE
-                            }">
+                            <input type="number" class="ra-input" id="raDistance" value="${DEFAULT_VALUES.DISTANCE}">
                         </div>
                         <div>
                             <label for="raStack" class="ra-label">
                                 ${twSDK.tt('Stack Limit')}
                             </label>
-                            <input type="number" class="ra-input" id="raStack" value="${
-                                DEFAULT_VALUES.STACK
-                            }">
+                            <input type="number" class="ra-input" id="raStack" value="${DEFAULT_VALUES.STACK}">
                         </div>
                         <div>
                             <label for="raScalePerField" class="ra-label">
                                 ${twSDK.tt('Scale down per field (k)')}
                             </label>
-                            <input type="number" class="ra-input" id="raScalePerField" value="${
-                                DEFAULT_VALUES.SCALE_PER_FIELD
-                            }">
+                            <input type="number" class="ra-input" id="raScalePerField" value="${DEFAULT_VALUES.SCALE_PER_FIELD}">
                         </div>
                     </div>
                 </div>
@@ -375,8 +369,8 @@ $.getScript(
 
                     console.log('Villages to be stacked:', villagesToBeStacked);
 
-                    // Sum the total missing troops
-                    const totalMissingTroops = villagesToBeStacked.reduce((totals, village) => {
+                    // Sum the total troops per unit type
+                    const totalTroops = villagesToBeStacked.reduce((totals, village) => {
                         for (let [unit, amount] of Object.entries(village.missingTroops)) {
                             if (!totals[unit]) {
                                 totals[unit] = 0;
@@ -386,10 +380,10 @@ $.getScript(
                         return totals;
                     }, {});
 
-                    console.log('Total missing troops:', totalMissingTroops);
+                    console.log('Total troops to stack:', totalTroops);
 
-                    // Convert the totalMissingTroops object to an array for easier manipulation
-                    const totalTroopsArray = Object.entries(totalMissingTroops).map(([unit, amount]) => ({ unit, amount }));
+                    // Convert the totalTroops object to an array for easier manipulation
+                    const totalTroopsArray = Object.entries(totalTroops).map(([unit, amount]) => ({ unit, amount }));
 
                     // Build the total troops table
                     const totalTroopsTableHtml = buildTotalTroopsTable(totalTroopsArray);
@@ -398,10 +392,10 @@ $.getScript(
                     jQuery('#raStacks').html(totalTroopsTableHtml);
 
                     // Update the map with total troops
-                    updateMapWithTotalTroops(totalMissingTroops);
+                    updateMapWithTotalTroops(totalTroops);
                     jQuery('#raExport').attr(
                         'data-stack-plans',
-                        JSON.stringify(totalMissingTroops)
+                        JSON.stringify(totalTroops)
                     );
                 } else {
                     UI.SuccessMessage(
@@ -689,14 +683,14 @@ $.getScript(
             let missingTroopsString = '';
 
             for (let [key, value] of Object.entries(missingTroops)) {
-                missingTroopsString += `${twSDK.tt(capitalizeFirstLetter(key))}: ${intToString(value)}\n`;
+                missingTroopsString += `${twSDK.tt(capitalizeFirstLetter(key))}: ${value}\n`;
             }
 
             return missingTroopsString;
         }
 
         // Helper: Build table of units and unit amounts
-        function buildUnitsChoserTable() {
+        function buildUnitsChooserTable() {
             let unitsTable = ``;
             let thUnits = ``;
             let tableRow = ``;
@@ -714,7 +708,7 @@ $.getScript(
 
                 tableRow += `
                     <td class="ra-text-center">
-                        <input name="ra_unit_amounts" type="text" id="unit_${unit}" data-unit="${unit}" class="ra-input" value="0" />
+                        <input name="ra_unit_amounts" type="number" id="unit_${unit}" data-unit="${unit}" class="ra-input" value="0" min="0" />
                     </td>
                 `;
             });
@@ -785,7 +779,9 @@ $.getScript(
                     !nonScalingUnits.includes(key)
                 ) {
                     let troopsDifference = troops[key] - troopsAfterScalingDown;
-                    missingTroops[key] = Math.abs(troopsDifference);
+                    if (troopsDifference > 0) {
+                        missingTroops[key] = troopsDifference;
+                    }
                 }
             }
 
@@ -846,7 +842,7 @@ $.getScript(
             let villagesThatNeedStack = [];
             villagesWithinRadius.forEach((village) => {
                 const { troops } = village;
-                const villagePop = calculatePop(troops);
+                const villageTroopTotal = Object.values(troops).reduce((sum, val) => sum + val, 0);
                 const realStackLimit = stackLimit * 1000;
 
                 let shouldAdd = false;
@@ -854,17 +850,18 @@ $.getScript(
                 for (let [key, value] of Object.entries(unitAmount)) {
                     if (troops[key] < value) {
                         shouldAdd = true;
+                        break;
                     }
                 }
 
-                if (villagePop < realStackLimit) {
+                if (villageTroopTotal < realStackLimit) {
                     shouldAdd = true;
                 }
 
                 if (shouldAdd) {
                     villagesThatNeedStack.push({
                         ...village,
-                        pop: villagePop,
+                        troopTotal: villageTroopTotal,
                     });
                 }
             });
@@ -1007,7 +1004,7 @@ $.getScript(
 
             const membersToFetch = [];
 
-            options.map(function (_, option) {
+            options.each(function (_, option) {
                 let url =
                     '/game.php?screen=ally&mode=members_defense&player_id=' +
                     option.value +
