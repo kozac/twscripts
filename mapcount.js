@@ -1,6 +1,6 @@
 /*
  * Script Name: Frontline Stacks Planner
- * Version: v1.1.0
+ * Version: v1.1.1
  * Last Updated: 2025-01-07
  * Author: RedAlert (Modificado por MKich)
  * Author URL: https://twscripts.dev/
@@ -15,13 +15,14 @@
 
 // Configurações Iniciais
 if (typeof DEBUG !== 'boolean') DEBUG = false;
+if (typeof HC_AMOUNT === 'undefined') HC_AMOUNT = null;
 
 // Configuração do Script
 const scriptConfig = {
     scriptData: {
         prefix: 'frontlineStacksPlanner',
         name: `Frontline Stacks Planner`,
-        version: 'v1.1.0',
+        version: 'v1.1.1',
         author: 'RedAlert',
         authorUrl: 'https://twscripts.dev/',
         helpLink: 'https://forum.tribalwars.net/index.php?threads/frontline-stacks-planner.291478/',
@@ -36,8 +37,23 @@ const scriptConfig = {
     enableCountApi: true,
 };
 
-// Inicialização do Script
-(function () {
+// Função para Carregar o twSDK
+function loadTwSDK(callback) {
+    $.getScript(`https://twscripts.dev/scripts/twSDK.js?url=${document.currentScript.src}`, function () {
+        if (typeof twSDK !== 'undefined') {
+            callback();
+        } else {
+            UI.ErrorMessage('Erro ao carregar o twSDK!');
+            console.error('twSDK não foi carregado corretamente.');
+        }
+    }).fail(function () {
+        UI.ErrorMessage('Falha ao carregar o twSDK!');
+        console.error('Falha ao carregar o twSDK.');
+    });
+}
+
+// Inicialização do Script após Carregar o twSDK
+loadTwSDK(function () {
     try {
         // Verifica se a localização atual é válida
         if (twSDK.checkValidLocation('screen', scriptConfig.allowedScreens) && 
@@ -52,7 +68,7 @@ const scriptConfig = {
         UI.ErrorMessage(twSDK.tt('There was an error!'));
         console.error(`${scriptConfig.scriptData.name} Error:`, error);
     }
-})();
+});
 
 // Função Principal de Inicialização
 async function initScript() {
@@ -202,113 +218,116 @@ async function fetchPlayersData(membersToFetch) {
     const playersData = [...membersToFetch];
     const memberUrls = membersToFetch.map(item => item.url);
 
-    twSDK.getAll(
-        memberUrls,
-        function (index, data) {
-            twSDK.updateProgressBar(index, memberUrls.length);
+    return new Promise((resolve, reject) => {
+        twSDK.getAll(
+            memberUrls,
+            function (index, data) {
+                twSDK.updateProgressBar(index, memberUrls.length);
 
-            // Parseia a resposta como HTML
-            const htmlDoc = jQuery.parseHTML(data);
-            const villagesTableRows = jQuery(htmlDoc)
-                .find(`.table-responsive table.vis tbody tr`)
-                .not(':first');
+                // Parseia a resposta como HTML
+                const htmlDoc = jQuery.parseHTML(data);
+                const villagesTableRows = jQuery(htmlDoc)
+                    .find(`.table-responsive table.vis tbody tr`)
+                    .not(':first');
 
-            const villagesData = [];
-            const troopMap = mapTroopColumns();
+                const villagesData = [];
+                const troopMap = mapTroopColumns();
 
-            // Parseia informações do jogador
-            if (villagesTableRows && villagesTableRows.length) {
-                villagesTableRows.each(function () {
-                    try {
-                        const _this = jQuery(this);
+                // Parseia informações do jogador
+                if (villagesTableRows && villagesTableRows.length) {
+                    villagesTableRows.each(function () {
+                        try {
+                            const _this = jQuery(this);
 
-                        const currentVillageName = _this.find('td:first a').text().trim();
-                        if (currentVillageName) {
-                            const currentVillageId = parseInt(
-                                twSDK.getParameterByName(
-                                    'id',
-                                    window.location.origin +
-                                        _this.find('td:first a').attr('href')
-                                )
-                            );
+                            const currentVillageName = _this.find('td:first a').text().trim();
+                            if (currentVillageName) {
+                                const currentVillageId = parseInt(
+                                    twSDK.getParameterByName(
+                                        'id',
+                                        window.location.origin +
+                                            _this.find('td:first a').attr('href')
+                                    )
+                                );
 
-                            const currentVillageCoords = _this
-                                .find('td:eq(0)')
-                                .text()
-                                .trim()
-                                ?.match(twSDK.coordsRegex)[0];
+                                const currentVillageCoords = _this
+                                    .find('td:eq(0)')
+                                    .text()
+                                    .trim()
+                                    ?.match(twSDK.coordsRegex)[0];
 
-                            let villageData = [];
+                                let villageData = [];
 
-                            _this.find('td')
-                                .not(':first')
-                                .not(':last')
-                                .not(':eq(0)')
-                                .each(function () {
-                                    const unitAmount = jQuery(this).text().trim() !== '?' 
-                                        ? parseInt(jQuery(this).text().trim()) 
-                                        : 0;
-                                    villageData.push(unitAmount);
+                                _this.find('td')
+                                    .not(':first')
+                                    .not(':last')
+                                    .not(':eq(0)')
+                                    .each(function () {
+                                        const unitAmount = jQuery(this).text().trim() !== '?' 
+                                            ? parseInt(jQuery(this).text().trim()) 
+                                            : 0;
+                                        villageData.push(unitAmount);
+                                    });
+
+                                villageData = villageData.splice(0, Object.keys(troopMap).length);
+
+                                let villageTroops = {};
+                                Object.keys(troopMap).forEach((unit, idx) => {
+                                    villageTroops[unit] = villageData[idx] || 0;
                                 });
 
-                            villageData = villageData.splice(0, Object.keys(troopMap).length);
-
-                            let villageTroops = {};
-                            Object.keys(troopMap).forEach((unit, idx) => {
-                                villageTroops[unit] = villageData[idx] || 0;
-                            });
-
-                            villagesData.push({
-                                villageId: currentVillageId,
-                                villageName: currentVillageName,
-                                villageCoords: currentVillageCoords,
-                                troops: villageTroops,
-                            });
+                                villagesData.push({
+                                    villageId: currentVillageId,
+                                    villageName: currentVillageName,
+                                    villageCoords: currentVillageCoords,
+                                    troops: villageTroops,
+                                });
+                            }
+                        } catch (error) {
+                            UI.ErrorMessage(twSDK.tt('Error fetching player incomings!'));
+                            console.error(`${scriptConfig.scriptData.name} Error:`, error);
                         }
-                    } catch (error) {
-                        UI.ErrorMessage(twSDK.tt('Error fetching player incomings!'));
-                        console.error(`${scriptConfig.scriptData.name} Error:`, error);
-                    }
-                });
+                    });
+                }
+
+                // Atualiza as informações dos jogadores
+                playersData[index] = {
+                    ...playersData[index],
+                    villagesData: villagesData,
+                };
+            },
+            function () {
+                if (DEBUG) {
+                    console.debug(`${scriptConfig.scriptData.name} playersData`, playersData);
+                }
+
+                // Mapeia as tropas e extrai os dados
+                const troopMap = mapTroopColumns();
+                const villagesData = extractTroopData(troopMap);
+
+                if (DEBUG) {
+                    console.log('Mapped Troop Columns:', troopMap);
+                    console.log('Extracted Villages Data:', villagesData);
+                }
+
+                // Construção da Interface de Usuário
+                buildUI();
+
+                // Inserção dos dados nos quadradinhos do mapa
+                displayTroopDataOnMap(villagesData);
+
+                // Registro de handlers para ações adicionais
+                handleCalculateStackPlans(playersData);
+                handleBacklineStacks(playersData);
+                handleExport();
+
+                resolve(playersData);
+            },
+            function () {
+                UI.ErrorMessage(twSDK.tt('Error fetching player incomings!'));
+                reject('Error fetching player incomings!');
             }
-
-            // Atualiza as informações dos jogadores
-            playersData[index] = {
-                ...playersData[index],
-                villagesData: villagesData,
-            };
-        },
-        function () {
-            if (DEBUG) {
-                console.debug(`${scriptConfig.scriptData.name} playersData`, playersData);
-            }
-
-            // Mapeia as tropas e extrai os dados
-            const troopMap = mapTroopColumns();
-            const villagesData = extractTroopData(troopMap);
-
-            if (DEBUG) {
-                console.log('Mapped Troop Columns:', troopMap);
-                console.log('Extracted Villages Data:', villagesData);
-            }
-
-            // Construção da Interface de Usuário
-            buildUI();
-
-            // Inserção dos dados nos quadradinhos do mapa
-            displayTroopDataOnMap(villagesData);
-
-            // Registro de handlers para ações adicionais
-            handleCalculateStackPlans(playersData);
-            handleBacklineStacks(playersData);
-            handleExport();
-        },
-        function () {
-            UI.ErrorMessage(twSDK.tt('Error fetching player incomings!'));
-        }
-    );
-
-    return playersData;
+        );
+    });
 }
 
 // Função para Construir a Interface de Usuário
@@ -442,6 +461,10 @@ function displayTroopDataOnMap(villagesData) {
 
             // Adiciona o elemento no mapa
             TWMap.mapHandler.spawnElement(troopDiv[0], x, y);
+
+            if (DEBUG) {
+                console.log(`Aldeia: ${village.name}, Tropas exibidas:`, troops);
+            }
         }
     });
 }
@@ -810,13 +833,13 @@ function buildUnitsChooserTable() {
     return unitsTable;
 }
 
-// Função Auxiliar para Calcular a População Total
+// Função para Calcular a População Total
 function calculatePop(units) {
     let total = 0;
 
     for (let [key, value] of Object.entries(units)) {
         if (value) {
-            const unitPopAmount = key !== 'heavy' ? twSDK.unitsFarmSpace[key] : hcPopAmount;
+            const unitPopAmount = key !== 'heavy' ? twSDK.unitsFarmSpace[key] : HC_AMOUNT;
             total += unitPopAmount * value;
         }
     }
@@ -929,7 +952,9 @@ function calculateMissingTroops(troops, unitAmounts, distance, scaleDownPerField
         let troopsAfterScalingDown = value - parseInt(distance) * scaleDownPerField * 1000;
         if (troopsAfterScalingDown > 0 && !nonScalingUnits.includes(key)) {
             let troopsDifference = troops[key] - troopsAfterScalingDown;
-            missingTroops[key] = Math.abs(troopsDifference);
+            if (troopsDifference < 0) { // Faltando tropas
+                missingTroops[key] = Math.abs(troopsDifference);
+            }
         }
     }
 
@@ -1016,6 +1041,7 @@ function updateMap(villages) {
         // Adicione outros tipos de tropas conforme necessário
     };
 
+    // Itera sobre cada aldeia e insere os dados no mapa
     villages.forEach(village => {
         const { villageCoords, troops } = village;
         const coordsMatch = villageCoords.match(/(\d+)\|(\d+)/);
@@ -1065,4 +1091,203 @@ function updateMap(villages) {
             }
         }
     });
+}
+
+// Função para Registrar Handlers das Ações
+function handleCalculateStackPlans(playersData) {
+    jQuery('#raPlanStacks').on('click', function (e) {
+        e.preventDefault();
+
+        const { chosenTribes, distance, unitAmounts, stackLimit, scaleDownPerField } = collectUserInput();
+
+        const villagesThatNeedStack = findVillagesThatNeedStack(playersData, chosenTribes, distance, unitAmounts, stackLimit);
+
+        if (villagesThatNeedStack.length) {
+            const villagesToBeStacked = calculateAmountMissingTroops(villagesThatNeedStack, unitAmounts, scaleDownPerField);
+            villagesToBeStacked.sort((a, b) => a.fieldsAway - b.fieldsAway);
+
+            const villagesTableHtml = buildVillagesTable(villagesToBeStacked);
+            jQuery('#raStacks').show().html(villagesTableHtml);
+
+            updateMap(villagesToBeStacked);
+            jQuery('#raExport').attr('data-stack-plans', JSON.stringify(villagesToBeStacked));
+        } else {
+            UI.SuccessMessage(twSDK.tt('All villages have been properly stacked!'));
+        }
+    });
+}
+
+function handleBacklineStacks(playersData) {
+    jQuery('#raBacklineStacks').on('click', function (e) {
+        e.preventDefault();
+
+        const { chosenTribes, distance } = collectUserInput();
+
+        let playerVillages = playersData.flatMap(player => player.villagesData);
+        let chosenTribeIds = twSDK.getEntityIdsByArrayIndex(chosenTribes, tribes, 2);
+        let tribePlayers = getTribeMembersById(chosenTribeIds);
+        let enemyTribeCoordinates = filterVillagesByPlayerIds(tribePlayers);
+
+        // Filtra aldeias fora do raio
+        let villagesOutsideRadius = [];
+        playerVillages.forEach(village => {
+            const { villageCoords, troops } = village;
+            enemyTribeCoordinates.forEach(coordinate => {
+                const villagesDistance = twSDK.calculateDistance(coordinate, villageCoords);
+                if (villagesDistance > distance) {
+                    const stackAmount = calculatePop(troops);
+                    if (stackAmount > 30000) {
+                        villagesOutsideRadius.push({
+                            ...village,
+                            fieldsAway: Math.round(villagesDistance * 100) / 100,
+                            stackAmount: stackAmount,
+                        });
+                    }
+                }
+            });
+        });
+
+        villagesOutsideRadius.sort((a, b) => a.fieldsAway - b.fieldsAway);
+
+        // Remove duplicatas
+        let villagesObject = {};
+        villagesOutsideRadius.forEach(item => {
+            if (!villagesObject[item.villageId]) {
+                villagesObject[item.villageId] = item;
+            }
+        });
+
+        let villagesArray = Object.values(villagesObject);
+
+        // Constrói as linhas da tabela
+        let tableRows = villagesArray.map((village, index) => {
+            return `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td class="ra-tal">
+                        <a href="/game.php?screen=info_village&id=${village.villageId}" target="_blank" rel="noreferrer noopener">
+                            ${village.villageName}
+                        </a>
+                    </td>
+                    <td>${intToString(village.stackAmount)}</td>
+                    <td>${village.fieldsAway}</td>
+                </tr>
+            `;
+        }).join('');
+
+        let villagesTableHtml = `
+            <div class="ra-table-container ra-mb15">
+                <table class="ra-table ra-table-v3" width="100%">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th class="ra-tal">${twSDK.tt('Village')}</th>
+                            <th>${twSDK.tt('Pop.')}</th>
+                            <th>${twSDK.tt('Distance')}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRows}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        twSDK.renderFixedWidget(
+            villagesTableHtml,
+            'raFrontlineStacks-popup',
+            'ra-frontline-stacks-popup',
+            '',
+            '560px'
+        );
+    });
+}
+
+function handleExport() {
+    jQuery('#raExport').on('click', function (e) {
+        e.preventDefault();
+
+        const dataStackPlans = jQuery(this).attr('data-stack-plans');
+        if (dataStackPlans) {
+            const stackPlans = JSON.parse(dataStackPlans);
+
+            if (stackPlans.length) {
+                let bbCode = `[table][**]#[||]${twSDK.tt('Village')}[||]${twSDK.tt('Missing Troops')}[||]${twSDK.tt('Distance')}[/**]\n`;
+
+                stackPlans.forEach((stackPlan, index) => {
+                    const { villageCoords, missingTroops, fieldsAway } = stackPlan;
+                    const missingTroopsString = buildMissingTroopsString(missingTroops);
+                    bbCode += `[*]${index + 1}[|] ${villageCoords} [|]${missingTroopsString}[|]${fieldsAway}\n`;
+                });
+
+                bbCode += `[/table]`;
+
+                twSDK.copyToClipboard(bbCode);
+                UI.SuccessMessage(twSDK.tt('Copied on clipboard!'));
+            }
+        } else {
+            UI.ErrorMessage(twSDK.tt('No stack plans have been prepared!'));
+        }
+    });
+}
+
+// Função Auxiliar para Construir a Tabela de Aldeias
+function buildVillagesTable(villages) {
+    let villagesTableHtml = `
+        <table class="ra-table ra-table-v3" width="100%">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th class="ra-tal">${twSDK.tt('Village')}</th>
+                    <th>${twSDK.tt('Map')}</th>
+                    <th>${twSDK.tt('Pop.')}</th>
+                    <th>${twSDK.tt('Distance')}</th>
+                    <th>${twSDK.tt('Missing Troops')}</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    villages.forEach((village, index) => {
+        const { villageId, villageName, villageCoords, fieldsAway, missingTroops, pop } = village;
+        const [x, y] = villageCoords.split('|');
+        const missingTroopsString = buildMissingTroopsString(missingTroops);
+
+        villagesTableHtml += `
+            <tr>
+                <td>${index + 1}</td>
+                <td class="ra-tal">
+                    <a href="/game.php?screen=info_village&id=${villageId}" target="_blank" rel="noreferrer noopener">
+                        ${villageName}
+                    </a>
+                </td>
+                <td>
+                    <a href="javascript:TWMap.focus(${x}, ${y});">
+                        ${villageCoords}
+                    </a>
+                </td>
+                <td>${intToString(pop)}</td>
+                <td>${fieldsAway}</td>
+                <td>${missingTroopsString}</td>
+            </tr>
+        `;
+    });
+
+    villagesTableHtml += `
+            </tbody>
+        </table>
+    `;
+
+    return villagesTableHtml;
+}
+
+// Função Auxiliar para Construir a String das Tropas Faltantes
+function buildMissingTroopsString(missingTroops) {
+    let missingTroopsString = '';
+
+    for (let [key, value] of Object.entries(missingTroops)) {
+        missingTroopsString += `${key}: ${value}\n`;
+    }
+
+    return missingTroopsString;
 }
