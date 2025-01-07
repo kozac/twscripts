@@ -15,7 +15,7 @@
  --------------------------------------------------------------------------------------*/
 
 // User Input
-if (typeof DEBUG !== 'boolean') DEBUG = false;
+if (typeof DEBUG !== 'boolean') DEBUG = true;
 if (typeof HC_AMOUNT === 'undefined') HC_AMOUNT = null;
 
 // Script Config
