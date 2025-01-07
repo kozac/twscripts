@@ -15,7 +15,7 @@
  --------------------------------------------------------------------------------------*/
 
 // **Ativação do Modo de Depuração**
-if (typeof DEBUG !== 'boolean') DEBUG = true; // Defina como true para ativar logs de depuração
+if (typeof DEBUG !== 'boolean') DEBUG = false; // Defina como true para ativar logs de depuração
 if (typeof HC_AMOUNT === 'undefined') HC_AMOUNT = null; // Valor fornecido pelo jogador
 
 // **Configuração do Script**
