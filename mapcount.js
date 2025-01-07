@@ -974,7 +974,7 @@ $.getScript(
                     total += unitPopAmount * value;
                 }
             }
-
+console.log(total2)
             return total2;
         }
 
