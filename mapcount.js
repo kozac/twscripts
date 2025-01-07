@@ -870,8 +870,8 @@ $.getScript(
                                     if (count > 0 && unitIcons[unit]) {
                                         villageTroopsHTML += `
                                             <div style="display: flex; align-items: center; justify-content: center; gap: 2px; flex: 1;">
-                                                <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 12px; height: 12px;">
-                                                <span style="font-size: 8px;">${count}</span>
+                                                <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 9px; height: 9px;">
+                                                <span style="font-size: 6px;">${count}</span>
                                             </div>
                                         `;
                                         // Opcional: Limitar o número de tropas exibidas
@@ -902,7 +902,7 @@ $.getScript(
                                         width: '50px', // Mantido conforme solicitado
                                         height: '35px', // Mantido conforme solicitado
                                         zIndex: '10',
-                                        fontSize: '8px', // Reduzido para melhor legibilidade
+                                        fontSize: '6px', // Reduzido para melhor legibilidade
                                         overflow: 'hidden', // Evita que o conteúdo ultrapasse o div
                                     })
                                     .attr('id', 'dsm' + v.id)
