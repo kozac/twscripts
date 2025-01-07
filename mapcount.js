@@ -831,130 +831,136 @@ async function initScript() {
             return unitsTable;
         }
 
-        // Helper: Update the map UI
-        function updateMap(villages) {
-            const villageCoords = villages.map(
-                (village) => village.villageCoords
-            );
+// Helper: Update the map UI
+function updateMap(villages) {
+    const villageCoords = villages.map(
+        (village) => village.villageCoords
+    );
 
-            if (mapOverlay.mapHandler._spawnSector) {
-                //exists already, don't recreate
-            } else {
-                //doesn't exist yet
-                mapOverlay.mapHandler._spawnSector =
-                    mapOverlay.mapHandler.spawnSector;
+    if (mapOverlay.mapHandler._spawnSector) {
+        //exists already, don't recreate
+    } else {
+        //doesn't exist yet
+        mapOverlay.mapHandler._spawnSector =
+            mapOverlay.mapHandler.spawnSector;
+    }
+
+    // Mapeamento de ícones das tropas
+    const unitIcons = {
+        spear: '/graphic/unit/unit_spear.png',
+        sword: '/graphic/unit/unit_sword.png',
+        archer: '/graphic/unit/unit_archer.png',
+        spy: '/graphic/unit/unit_spy.png',
+        heavy: '/graphic/unit/unit_heavy.png',
+        light: '/graphic/unit/unit_light.png',
+        marcher: '/graphic/unit/unit_marcher.png',
+        ram: '/graphic/unit/unit_ram.png',
+        catapult: '/graphic/unit/unit_catapult.png',
+        knight: '/graphic/unit/unit_knight.png',
+        snob: '/graphic/unit/unit_snob.png',
+        militia: '/graphic/unit/unit_militia.png',
+        // Adicione outros tipos de tropas conforme necessário
+    };
+
+    // Definir a ordem de prioridade das tropas
+    const troopPriority = ['spear', 'sword', 'heavy', 'spy', 'axe', 'light', 'archer', 'ram', 'catapult', 'knight', 'snob', 'militia'];
+
+    TWMap.mapHandler.spawnSector = function (data, sector) {
+        // Override Map Sector Spawn
+        mapOverlay.mapHandler._spawnSector(data, sector);
+        var beginX = sector.x - data.x;
+        var endX = beginX + mapOverlay.mapSubSectorSize;
+        var beginY = sector.y - data.y;
+        var endY = beginY + mapOverlay.mapSubSectorSize;
+
+        for (var x in data.tiles) {
+            var x = parseInt(x, 10);
+            if (x < beginX || x >= endX) {
+                continue;
             }
+            for (var y in data.tiles[x]) {
+                var y = parseInt(y, 10);
 
-            // Mapeamento de ícones das tropas
-            const unitIcons = {
-                spear: '/graphic/unit/unit_spear.png',
-                sword: '/graphic/unit/unit_sword.png',
-                archer: '/graphic/unit/unit_archer.png',
-                spy: '/graphic/unit/unit_spy.png',
-                heavy: '/graphic/unit/unit_heavy.png',
-                light: '/graphic/unit/unit_light.png',
-                marcher: '/graphic/unit/unit_marcher.png',
-                ram: '/graphic/unit/unit_ram.png',
-                catapult: '/graphic/unit/unit_catapult.png',
-                knight: '/graphic/unit/unit_knight.png',
-                snob: '/graphic/unit/unit_snob.png',
-                // Adicione outros tipos de tropas conforme necessário
-            };
+                if (y < beginY || y >= endY) {
+                    continue;
+                }
+                var xCoord = data.x + x;
+                var yCoord = data.y + y;
+                var v = mapOverlay.villages[xCoord * 1000 + yCoord];
+                if (v) {
+                    var vXY = '' + v.xy;
+                    var vCoords =
+                        vXY.slice(0, 3) + '|' + vXY.slice(3, 6);
+                    if (villageCoords.includes(vCoords)) {
+                        const currentVillage = villages.find(
+                            (obj) => obj.villageCoords == vCoords
+                        );
 
-            TWMap.mapHandler.spawnSector = function (data, sector) {
-                // Override Map Sector Spawn
-                mapOverlay.mapHandler._spawnSector(data, sector);
-                var beginX = sector.x - data.x;
-                var endX = beginX + mapOverlay.mapSubSectorSize;
-                var beginY = sector.y - data.y;
-                var endY = beginY + mapOverlay.mapSubSectorSize;
+                        if (!currentVillage) continue; // Segurança
 
-                for (var x in data.tiles) {
-                    var x = parseInt(x, 10);
-                    if (x < beginX || x >= endX) {
-                        continue;
-                    }
-                    for (var y in data.tiles[x]) {
-                        var y = parseInt(y, 10);
+                        // **Início das Modificações**
+                        // Formatar a string com as contagens de cada tropa na ordem de prioridade
+                        const troops = currentVillage.troops;
+                        let villageTroopsHTML = '';
 
-                        if (y < beginY || y >= endY) {
-                            continue;
-                        }
-                        var xCoord = data.x + x;
-                        var yCoord = data.y + y;
-                        var v = mapOverlay.villages[xCoord * 1000 + yCoord];
-                        if (v) {
-                            var vXY = '' + v.xy;
-                            var vCoords =
-                                vXY.slice(0, 3) + '|' + vXY.slice(3, 6);
-                            if (villageCoords.includes(vCoords)) {
-                                const currentVillage = villages.find(
-                                    (obj) => obj.villageCoords == vCoords
-                                );
+                        // Definir a ordem de prioridade
+                        const troopPriority = ['spear', 'sword', 'heavy', 'spy', 'axe', 'light', 'archer', 'ram', 'catapult', 'knight', 'snob', 'militia'];
 
-                                // **Início das Modificações**
-                                // Formatar a string com as contagens de cada tropa e seus ícones
-                                const troops = currentVillage.troops;
-                                let villageTroopsHTML = '';
-
-                                // Contador de linhas para organizar as tropas
-                                let lineCount = 0;
-
-                                for (let [unit, count] of Object.entries(troops)) {
-                                    if (count > 0 && unitIcons[unit]) {
-                                        villageTroopsHTML += `
-                                            <div style="display: flex; align-items: center; justify-content: center; gap: 2px; flex: 1;">
-                                                <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 12px; height: 12px;">
-                                                <span style="font-size: 8px;">${count}</span>
-                                            </div>
-                                        `;
-                                        lineCount++;
-                                        // Limita a 2 linhas de informações
-                                        if (lineCount === 4) break; // 2 linhas com 2 tropas cada
-                                    }
-                                }
-
-                                // Se não houver tropas, exibe "0"
-                                if (villageTroopsHTML === '') {
-                                    villageTroopsHTML = '0';
-                                }
-
-                                // **Fim das Modificações**
-
-                                const eleDIV = $('<div></div>')
-                                    .css({
-                                        position: 'absolute',
-                                        display: 'flex',
-                                        flexDirection: 'row',
-                                        flexWrap: 'wrap',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '1px',
-                                        padding: '2px',
-                                        backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                                        color: '#fff',
-                                        width: '50px', // Mantido conforme solicitado
-                                        height: '35px', // Mantido conforme solicitado
-                                        zIndex: '10',
-                                        fontSize: '8px', // Reduzido para melhor legibilidade
-                                        overflow: 'hidden', // Evita que o conteúdo ultrapasse o div
-                                    })
-                                    .attr('id', 'dsm' + v.id)
-                                    .html(villageTroopsHTML); // Alterado para exibir as tropas com ícones e texto reduzido
-
-                                sector.appendElement(
-                                    eleDIV[0],
-                                    data.x + x - sector.x,
-                                    data.y + y - sector.y
-                                );
+                        // Iterar sobre o array de prioridade
+                        troopPriority.forEach((unit) => {
+                            const count = troops[unit];
+                            if (count > 0 && unitIcons[unit]) {
+                                villageTroopsHTML += `
+                                    <div style="display: flex; align-items: center; justify-content: center; gap: 2px; flex: 1;">
+                                        <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 12px; height: 12px;">
+                                        <span style="font-size: 8px;">${count}</span>
+                                    </div>
+                                `;
                             }
+                        });
+
+                        // Se não houver tropas, exibe "0"
+                        if (villageTroopsHTML === '') {
+                            villageTroopsHTML = '0';
                         }
+
+                        // **Fim das Modificações**
+
+                        const eleDIV = $('<div></div>')
+                            .css({
+                                position: 'absolute',
+                                display: 'flex',
+                                flexDirection: 'row',
+                                flexWrap: 'wrap',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '1px',
+                                padding: '2px',
+                                backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                                color: '#fff',
+                                width: '50px', // Mantido conforme solicitado
+                                height: '35px', // Mantido conforme solicitado
+                                zIndex: '10',
+                                fontSize: '8px', // Reduzido para melhor legibilidade
+                                overflow: 'hidden', // Evita que o conteúdo ultrapasse o div
+                            })
+                            .attr('id', 'dsm' + v.id)
+                            .html(villageTroopsHTML); // Alterado para exibir as tropas com ícones e texto reduzido
+
+                        sector.appendElement(
+                            eleDIV[0],
+                            data.x + x - sector.x,
+                            data.y + y - sector.y
+                        );
                     }
                 }
-            };
-
-            mapOverlay.reload();
+            }
         }
+    };
+
+    mapOverlay.reload();
+}
+
 
         // Helper: Calculate amounts of needed troops for each village
         function calculateAmountMissingTroops(
