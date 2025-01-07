@@ -548,7 +548,7 @@ $.getScript(
                             const missingTroopsString =
                                 buildMissingTroopsString(missingTroops);
 
-                            bbCode += `[*]${index}[|] ${villageCoords} [|]${missingTroopsString}[|]${fieldsAway}`;
+                            bbCode += `[*]${index}[|] ${villageCoords} [|]${missingTroopsString}[|]${fieldsAway}\n`;
                         });
 
                         bbCode += `[/table]`;
@@ -793,14 +793,20 @@ $.getScript(
                                 const troops = currentVillage.troops;
                                 let villageTroopsHTML = '';
 
+                                // Contador de linhas para organizar as tropas
+                                let lineCount = 0;
+
                                 for (let [unit, count] of Object.entries(troops)) {
                                     if (count > 0 && unitIcons[unit]) {
                                         villageTroopsHTML += `
-                                            <div style="display: flex; align-items: center; justify-content: center; gap: 2px;">
-                                                <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 16px; height: 16px;">
-                                                <span style="font-size: 10px;">${count}</span>
+                                            <div style="display: flex; align-items: center; justify-content: center; gap: 2px; flex: 1;">
+                                                <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 12px; height: 12px;">
+                                                <span style="font-size: 8px;">${count}</span>
                                             </div>
                                         `;
+                                        lineCount++;
+                                        // Limita a 2 linhas de informações
+                                        if (lineCount === 4) break; // 2 linhas com 2 tropas cada
                                     }
                                 }
 
@@ -815,22 +821,22 @@ $.getScript(
                                     .css({
                                         position: 'absolute',
                                         display: 'flex',
-                                        flexDirection: 'column',
+                                        flexDirection: 'row',
+                                        flexWrap: 'wrap',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        gap: '2px',
+                                        gap: '1px',
                                         padding: '2px',
                                         backgroundColor: 'rgba(0, 0, 0, 0.6)',
                                         color: '#fff',
-                                        width: '60px', // Aumentado para acomodar mais conteúdo
-                                        height: '60px', // Aumentado para acomodar mais conteúdo
+                                        width: '50px', // Mantido conforme solicitado
+                                        height: '35px', // Mantido conforme solicitado
                                         zIndex: '10',
-                                        fontSize: '10px',
-                                        lineHeight: '1.2',
+                                        fontSize: '8px', // Reduzido para melhor legibilidade
                                         overflow: 'hidden', // Evita que o conteúdo ultrapasse o div
                                     })
                                     .attr('id', 'dsm' + v.id)
-                                    .html(villageTroopsHTML); // Alterado para exibir as tropas com ícones
+                                    .html(villageTroopsHTML); // Alterado para exibir as tropas com ícones e texto reduzido
 
                                 sector.appendElement(
                                     eleDIV[0],
