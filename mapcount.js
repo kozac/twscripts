@@ -40,7 +40,6 @@ var scriptConfig = {
             Village: 'Village',
             Map: 'Map',
             'Pop.': 'Pop.',
-            Distance: 'Distance',
             'Missing Troops': 'Missing Troops',
             'All villages have been properly stacked!':
                 'All villages have been properly stacked!',
@@ -48,6 +47,8 @@ var scriptConfig = {
             'No stack plans have been prepared!':
                 'No stack plans have been prepared!',
             'Copied on clipboard!': 'Copied on clipboard!',
+            'Tropa': 'Troop',
+            'Quantidade Total': 'Total Amount',
         },
     },
     allowedMarkets: [],
@@ -117,18 +118,20 @@ $.getScript(
                 twSDK.getAll(
                     memberUrls,
                     function (index, data) {
-                        console.log(`Buscando dados para membro ${index + 1}/${memberUrls.length}`);
+                        console.log(`Fetching data for member ${index + 1}/${memberUrls.length}`);
                         twSDK.updateProgressBar(index, memberUrls.length);
 
                         // parse response as html
                         const htmlDoc = jQuery.parseHTML(data);
-                        console.log('HTML recebido:', htmlDoc);
+                        console.log('Received HTML:', htmlDoc);
 
                         const villagesTableRows = jQuery(htmlDoc)
                             .find(`.table-responsive table.vis tbody tr`)
-                            .not(':first');
+                            .filter(function() {
+                                return jQuery(this).find('td:first a').length > 0;
+                            });
 
-                        console.log(`Número de linhas na tabela de aldeias: ${villagesTableRows.length}`);
+                        console.log(`Number of village rows found: ${villagesTableRows.length}`);
 
                         const villagesData = [];
 
@@ -142,25 +145,25 @@ $.getScript(
                                         .find('td:first a')
                                         .text()
                                         .trim();
-                                    console.log('Nome da aldeia:', currentVillageName);
+                                    console.log('Village Name:', currentVillageName);
                                     if (currentVillageName) {
                                         const villageHref = _this.find('td:first a').attr('href');
-                                        console.log('HREF da aldeia:', villageHref);
+                                        console.log('Village HREF:', villageHref);
                                         const currentVillageId = parseInt(
                                             twSDK.getParameterByName(
                                                 'id',
                                                 window.location.origin + villageHref
                                             )
                                         );
-                                        console.log('ID da aldeia:', currentVillageId);
+                                        console.log('Village ID:', currentVillageId);
 
                                         const currentVillageCoordsMatch = _this
                                             .find('td:eq(0)')
                                             .text()
                                             .trim()
-                                            ?.match(twSDK.coordsRegex);
+                                            .match(twSDK.coordsRegex);
                                         const currentVillageCoords = currentVillageCoordsMatch ? currentVillageCoordsMatch[0] : 'N/A';
-                                        console.log('Coordenadas da aldeia:', currentVillageCoords);
+                                        console.log('Village Coordinates:', currentVillageCoords);
 
                                         let villageData = [];
 
@@ -171,12 +174,14 @@ $.getScript(
                                             .not('.hidden')
                                             .each(function () {
                                                 const unitAmountText = jQuery(this).text().trim();
-                                                const unitAmount = unitAmountText !== '?' ? parseInt(unitAmountText) : 0;
-                                                console.log(`Quantidade de unidade (${jQuery(this).index()}):`, unitAmount);
+                                                const unitAmount = unitAmountText !== '?' ? parseInt(unitAmountText.replace(/\./g, '')) : 0;
+                                                if (isNaN(unitAmount)) {
+                                                    console.warn(`Invalid unit amount in cell ${jQuery(this).index()}: "${unitAmountText}"`);
+                                                }
                                                 villageData.push(unitAmount);
                                             });
 
-                                        console.log('Dados das tropas brutos:', villageData);
+                                        console.log('Raw troop data:', villageData);
 
                                         villageData = villageData.splice(
                                             0,
@@ -190,7 +195,7 @@ $.getScript(
                                             }
                                         );
 
-                                        console.log('Tropas na aldeia:', villageTroops);
+                                        console.log('Village Troops:', villageTroops);
 
                                         villagesData.push({
                                             villageId: currentVillageId,
@@ -212,7 +217,7 @@ $.getScript(
                                 }
                             });
                         } else {
-                            console.warn('Nenhuma linha de aldeia encontrada na tabela.');
+                            console.warn('No village rows found in the table.');
                         }
 
                         // update players info
@@ -237,10 +242,11 @@ $.getScript(
                         handleBacklineStacks(playersData);
                         handleExport();
                     },
-                    function () {
+                    function (error) {
                         UI.ErrorMessage(
                             twSDK.tt('Error fetching player incomings!')
                         );
+                        console.error(`${scriptInfo} Error:`, error);
                     }
                 );
             } else {
@@ -321,6 +327,12 @@ $.getScript(
                 .ra-input { width: 100% !important; padding: 5px; font-size: 14px; line-height: 1; }
                 .ra-label { margin-bottom: 6px; font-weight: 600; display: block; }
                 .ra-text-center .ra-input { text-align: center; }
+                .ra-total-troops-overlay img {
+                    width: 16px;
+                    height: 16px;
+                    vertical-align: middle;
+                    margin-right: 4px;
+                }
             `;
 
             twSDK.renderBoxWidget(
@@ -352,7 +364,7 @@ $.getScript(
                     stackLimit
                 );
 
-                console.log(`Número de aldeias que precisam de stack: ${villagesThatNeedStack.length}`);
+                console.log(`Number of villages needing stack: ${villagesThatNeedStack.length}`);
 
                 if (villagesThatNeedStack.length) {
                     const villagesToBeStacked = calculateAmountMissingTroops(
@@ -363,7 +375,7 @@ $.getScript(
 
                     console.log('Villages to be stacked:', villagesToBeStacked);
 
-                    // Somar as tropas totais
+                    // Sum the total missing troops
                     const totalMissingTroops = villagesToBeStacked.reduce((totals, village) => {
                         for (let [unit, amount] of Object.entries(village.missingTroops)) {
                             if (!totals[unit]) {
@@ -376,16 +388,16 @@ $.getScript(
 
                     console.log('Total missing troops:', totalMissingTroops);
 
-                    // Converter o objeto totalMissingTroops em um array para facilitar a manipulação
+                    // Convert the totalMissingTroops object to an array for easier manipulation
                     const totalTroopsArray = Object.entries(totalMissingTroops).map(([unit, amount]) => ({ unit, amount }));
 
-                    // Construir a tabela de tropas totais
+                    // Build the total troops table
                     const totalTroopsTableHtml = buildTotalTroopsTable(totalTroopsArray);
 
                     jQuery('#raStacks').show();
                     jQuery('#raStacks').html(totalTroopsTableHtml);
 
-                    // Atualizar o mapa com tropas totais
+                    // Update the map with total troops
                     updateMapWithTotalTroops(totalMissingTroops);
                     jQuery('#raExport').attr(
                         'data-stack-plans',
@@ -602,19 +614,16 @@ $.getScript(
 
         // Helper: Update the map UI with total troops
         function updateMapWithTotalTroops(totalMissingTroops) {
-            // Limpar quaisquer elementos anteriores
+            // Clear any previous elements
             jQuery('.ra-total-troops-overlay').remove();
 
-            // Construir a string de tropas totais
+            // Build the total troops string
             let totalTroopsString = '';
             for (let [unit, amount] of Object.entries(totalMissingTroops)) {
                 totalTroopsString += `${twSDK.tt(capitalizeFirstLetter(unit))}: ${intToString(amount)}\n`;
             }
 
-            // Criar um elemento para exibir as tropas totais no centro do mapa
-            const mapCenterX = Math.floor(game_data.map.width / 2);
-            const mapCenterY = Math.floor(game_data.map.height / 2);
-
+            // Create an element to display the total troops in the center of the map
             const totalTroopsDiv = $('<div></div>')
                 .addClass('ra-total-troops-overlay')
                 .css({
@@ -632,15 +641,15 @@ $.getScript(
                 })
                 .html(totalTroopsString);
 
-            // Adicionar ao mapa
+            // Add to the map
             jQuery('#map').append(totalTroopsDiv);
 
-            // Opcional: Remover a exibição após alguns segundos
+            // Optional: Remove the display after some seconds
             setTimeout(() => {
                 totalTroopsDiv.fadeOut(500, () => {
                     totalTroopsDiv.remove();
                 });
-            }, 10000); // Remove após 10 segundos
+            }, 10000); // Remove after 10 seconds
         }
 
         // Helper: Build enemy tribes picker
@@ -798,19 +807,19 @@ $.getScript(
                 })
                 .flat();
 
-            console.log('Aldeias dos jogadores:', playerVillages);
+            console.log('Player villages:', playerVillages);
 
             let chosenTribeIds = twSDK.getEntityIdsByArrayIndex(
                 chosenTribes,
                 tribes,
                 2
             );
-            console.log('IDs das tribos escolhidas:', chosenTribeIds);
+            console.log('Chosen tribe IDs:', chosenTribeIds);
             let tribePlayers = getTribeMembersById(chosenTribeIds);
-            console.log('Jogadores das tribos escolhidas:', tribePlayers);
+            console.log('Players in chosen tribes:', tribePlayers);
 
             let enemyTribeCoordinates = filterVillagesByPlayerIds(tribePlayers);
-            console.log('Coordenadas das tribos inimigas:', enemyTribeCoordinates);
+            console.log('Enemy tribe coordinates:', enemyTribeCoordinates);
 
             // filter villages by radius
             let villagesWithinRadius = [];
@@ -831,7 +840,7 @@ $.getScript(
                 });
             });
 
-            console.log(`Aldeias dentro do raio de ${distance}:`, villagesWithinRadius);
+            console.log(`Villages within radius of ${distance}:`, villagesWithinRadius);
 
             // filter villages by stack size
             let villagesThatNeedStack = [];
@@ -860,14 +869,14 @@ $.getScript(
                 }
             });
 
-            console.log('Aldeias que precisam de stack:', villagesThatNeedStack);
+            console.log('Villages that need stack:', villagesThatNeedStack);
 
             villagesThatNeedStack.sort((a, b) => a.fieldsAway - b.fieldsAway);
 
             let villagesObject = {};
             let villagesArray = [];
             villagesThatNeedStack.forEach((item) => {
-                const { villageId, fieldsAway } = item;
+                const { villageId } = item;
                 if (!villagesObject[villageId]) {
                     villagesObject = {
                         ...villagesObject,
@@ -880,7 +889,7 @@ $.getScript(
                 villagesArray.push(value);
             }
 
-            console.log('Aldeias finais que precisam de stack:', villagesArray);
+            console.log('Final villages that need stack:', villagesArray);
 
             return villagesArray;
         }
@@ -899,7 +908,7 @@ $.getScript(
                 }
             }
 
-            console.log(`População total calculada: ${total}`);
+            console.log(`Total population calculated: ${total}`);
 
             return total;
         }
