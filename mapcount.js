@@ -1,3 +1,19 @@
+/*
+ * Script Name: Frontline Stacks Planner
+ * Version: v1.0.2
+ * Last Updated: 2023-10-27
+ * Author: RedAlert
+ * Author URL: https://twscripts.dev/
+ * Author Contact: redalert_tw (Discord)
+ * Approved: N/A
+ * Approved Date: 2023-10-15
+ * Mod: MKich
+ */
+
+/*--------------------------------------------------------------------------------------
+ * This script can NOT be cloned and modified without permission from the script author.
+ --------------------------------------------------------------------------------------*/
+
 // User Input
 if (typeof DEBUG !== 'boolean') DEBUG = false;
 if (typeof HC_AMOUNT === 'undefined') HC_AMOUNT = null;
@@ -6,7 +22,7 @@ if (typeof HC_AMOUNT === 'undefined') HC_AMOUNT = null;
 var scriptConfig = {
     scriptData: {
         prefix: 'frontlineStacksPlanner',
-        name: 'Frontline Stacks Planner',
+        name: `Frontline Stacks Planner`,
         version: 'v1.0.2',
         author: 'RedAlert',
         authorUrl: 'https://twscripts.dev/',
@@ -40,6 +56,7 @@ var scriptConfig = {
             Village: 'Village',
             Map: 'Map',
             'Pop.': 'Pop.',
+            Distance: 'Distance',
             'Missing Troops': 'Missing Troops',
             'All villages have been properly stacked!':
                 'All villages have been properly stacked!',
@@ -47,8 +64,6 @@ var scriptConfig = {
             'No stack plans have been prepared!':
                 'No stack plans have been prepared!',
             'Copied on clipboard!': 'Copied on clipboard!',
-            'Tropa': 'Troop',
-            'Quantidade Total': 'Total Amount',
         },
     },
     allowedMarkets: [],
@@ -118,20 +133,13 @@ $.getScript(
                 twSDK.getAll(
                     memberUrls,
                     function (index, data) {
-                        console.log(`Fetching data for member ${index + 1}/${memberUrls.length}`);
                         twSDK.updateProgressBar(index, memberUrls.length);
 
-                        // parse response as html
+                        // parse reponse as html
                         const htmlDoc = jQuery.parseHTML(data);
-                        console.log('Received HTML:', htmlDoc);
-
                         const villagesTableRows = jQuery(htmlDoc)
-                            .find('.table-responsive table.vis tbody tr')
-                            .filter(function () {
-                                return jQuery(this).find('td:first a').length > 0 && jQuery(this).find('td:first a').text().includes('Na Aldeia');
-                            });
-
-                        console.log(`Number of village rows found: ${villagesTableRows.length}`);
+                            .find(`.table-responsive table.vis tbody tr`)
+                            .not(':first');
 
                         const villagesData = [];
 
@@ -145,25 +153,22 @@ $.getScript(
                                         .find('td:first a')
                                         .text()
                                         .trim();
-                                    console.log('Village Name:', currentVillageName);
                                     if (currentVillageName) {
-                                        const villageHref = _this.find('td:first a').attr('href');
-                                        console.log('Village HREF:', villageHref);
                                         const currentVillageId = parseInt(
                                             twSDK.getParameterByName(
                                                 'id',
-                                                window.location.origin + villageHref
+                                                window.location.origin +
+                                                    _this
+                                                        .find('td:first a')
+                                                        .attr('href')
                                             )
                                         );
-                                        console.log('Village ID:', currentVillageId);
 
-                                        const currentVillageCoordsMatch = _this
+                                        const currentVillageCoords = _this
                                             .find('td:eq(0)')
                                             .text()
                                             .trim()
-                                            .match(twSDK.coordsRegex);
-                                        const currentVillageCoords = currentVillageCoordsMatch ? currentVillageCoordsMatch[0] : 'N/A';
-                                        console.log('Village Coordinates:', currentVillageCoords);
+                                            ?.match(twSDK.coordsRegex)[0];
 
                                         let villageData = [];
 
@@ -173,29 +178,33 @@ $.getScript(
                                             .not(':last')
                                             .not(':eq(0)')
                                             .each(function () {
-                                                const unitAmountText = jQuery(this).text().trim();
-                                                const unitAmount = unitAmountText !== '?' ? parseInt(unitAmountText.replace(/\./g, '')) : 0;
-                                                if (isNaN(unitAmount)) {
-                                                    console.warn(`Invalid unit amount in cell ${jQuery(this).index()}: "${unitAmountText}"`);
-                                                }
-                                                villageData.push(unitAmount);
+                                                const unitAmount =
+                                                    jQuery(this)
+                                                        .text()
+                                                        .trim() !== '?'
+                                                        ? jQuery(this)
+                                                              .text()
+                                                              .trim()
+                                                        : 0;
+                                                villageData.push(
+                                                    parseInt(unitAmount)
+                                                );
                                             });
-
-                                        console.log('Raw troop data:', villageData);
 
                                         villageData = villageData.splice(
                                             0,
                                             game_data.units.length
                                         );
 
-                                        let villageTroops = {};
+                                        let villageTroops = [];
                                         game_data.units.forEach(
                                             (unit, index) => {
-                                                villageTroops[unit] = villageData[index] || 0;
+                                                villageTroops = {
+                                                    ...villageTroops,
+                                                    [unit]: villageData[index],
+                                                };
                                             }
                                         );
-
-                                        console.log('Village Troops:', villageTroops);
 
                                         villagesData.push({
                                             villageId: currentVillageId,
@@ -216,8 +225,6 @@ $.getScript(
                                     );
                                 }
                             });
-                        } else {
-                            console.warn('No village rows found in the table.');
                         }
 
                         // update players info
@@ -242,11 +249,10 @@ $.getScript(
                         handleBacklineStacks(playersData);
                         handleExport();
                     },
-                    function (error) {
+                    function () {
                         UI.ErrorMessage(
                             twSDK.tt('Error fetching player incomings!')
                         );
-                        console.error(`${scriptInfo} Error:`, error);
                     }
                 );
             } else {
@@ -264,7 +270,7 @@ $.getScript(
                 tribes,
                 'Tribes'
             );
-            const troopAmountsHtml = buildUnitsChooserTable();
+            const troopAmountsHtml = buildUnitsChoserTable();
 
             const content = `
                 <div class="ra-mb15">
@@ -276,19 +282,25 @@ $.getScript(
                             <label for="raDistance" class="ra-label">
                                 ${twSDK.tt('Distance')}
                             </label>
-                            <input type="number" class="ra-input" id="raDistance" value="${DEFAULT_VALUES.DISTANCE}">
+                            <input type="number" class="ra-input" id="raDistance" value="${
+                                DEFAULT_VALUES.DISTANCE
+                            }">
                         </div>
                         <div>
                             <label for="raStack" class="ra-label">
                                 ${twSDK.tt('Stack Limit')}
                             </label>
-                            <input type="number" class="ra-input" id="raStack" value="${DEFAULT_VALUES.STACK}">
+                            <input type="number" class="ra-input" id="raStack" value="${
+                                DEFAULT_VALUES.STACK
+                            }">
                         </div>
                         <div>
                             <label for="raScalePerField" class="ra-label">
                                 ${twSDK.tt('Scale down per field (k)')}
                             </label>
-                            <input type="number" class="ra-input" id="raScalePerField" value="${DEFAULT_VALUES.SCALE_PER_FIELD}">
+                            <input type="number" class="ra-input" id="raScalePerField" value="${
+                                DEFAULT_VALUES.SCALE_PER_FIELD
+                            }">
                         </div>
                     </div>
                 </div>
@@ -321,12 +333,6 @@ $.getScript(
                 .ra-input { width: 100% !important; padding: 5px; font-size: 14px; line-height: 1; }
                 .ra-label { margin-bottom: 6px; font-weight: 600; display: block; }
                 .ra-text-center .ra-input { text-align: center; }
-                .ra-total-troops-overlay img {
-                    width: 16px;
-                    height: 16px;
-                    vertical-align: middle;
-                    margin-right: 4px;
-                }
             `;
 
             twSDK.renderBoxWidget(
@@ -358,8 +364,6 @@ $.getScript(
                     stackLimit
                 );
 
-                console.log(`Number of villages needing stack: ${villagesThatNeedStack.length}`);
-
                 if (villagesThatNeedStack.length) {
                     const villagesToBeStacked = calculateAmountMissingTroops(
                         villagesThatNeedStack,
@@ -367,35 +371,20 @@ $.getScript(
                         scaleDownPerField
                     );
 
-                    console.log('Villages to be stacked:', villagesToBeStacked);
+                    villagesToBeStacked.sort(
+                        (a, b) => a.fieldsAway - b.fieldsAway
+                    );
 
-                    // Sum the total troops per unit type
-                    const totalTroops = villagesToBeStacked.reduce((totals, village) => {
-                        for (let [unit, amount] of Object.entries(village.missingTroops)) {
-                            if (!totals[unit]) {
-                                totals[unit] = 0;
-                            }
-                            totals[unit] += amount;
-                        }
-                        return totals;
-                    }, {});
-
-                    console.log('Total troops to stack:', totalTroops);
-
-                    // Convert the totalTroops object to an array for easier manipulation
-                    const totalTroopsArray = Object.entries(totalTroops).map(([unit, amount]) => ({ unit, amount }));
-
-                    // Build the total troops table
-                    const totalTroopsTableHtml = buildTotalTroopsTable(totalTroopsArray);
+                    const villagesTableHtml =
+                        buildVillagesTable(villagesToBeStacked);
 
                     jQuery('#raStacks').show();
-                    jQuery('#raStacks').html(totalTroopsTableHtml);
+                    jQuery('#raStacks').html(villagesTableHtml);
 
-                    // Update the map with total troops
-                    updateMapWithTotalTroops(totalTroops);
+                    updateMap(villagesToBeStacked);
                     jQuery('#raExport').attr(
                         'data-stack-plans',
-                        JSON.stringify(totalTroops)
+                        JSON.stringify(villagesToBeStacked)
                     );
                 } else {
                     UI.SuccessMessage(
@@ -548,12 +537,22 @@ $.getScript(
                 if (dataStackPlans) {
                     const stackPlans = JSON.parse(dataStackPlans);
 
-                    if (Object.keys(stackPlans).length) {
-                        let bbCode = `[table][**]${twSDK.tt('Tropa')}[||]${twSDK.tt('Quantidade Total')}[/**]\n`;
+                    if (stackPlans.length) {
+                        let bbCode = `[table][**]#[||]${twSDK.tt(
+                            'Village'
+                        )}[||]${twSDK.tt('Missing Troops')}[||]${twSDK.tt(
+                            'Distance'
+                        )}[/**]\n`;
 
-                        for (let [unit, amount] of Object.entries(stackPlans)) {
-                            bbCode += `[*]${twSDK.tt(capitalizeFirstLetter(unit))}[|]${intToString(amount)}\n`;
-                        }
+                        stackPlans.forEach((stackPlan, index) => {
+                            index++;
+                            const { villageCoords, missingTroops, fieldsAway } =
+                                stackPlan;
+                            const missingTroopsString =
+                                buildMissingTroopsString(missingTroops);
+
+                            bbCode += `[*]${index}[|] ${villageCoords} [|]${missingTroopsString}[|]${fieldsAway}`;
+                        });
 
                         bbCode += `[/table]`;
 
@@ -568,82 +567,82 @@ $.getScript(
             });
         }
 
-        // Helper: Build a table of total missing troops
-        function buildTotalTroopsTable(totalTroopsArray) {
-            let tableRows = `
-                <tr>
-                    <th>${twSDK.tt('Tropa')}</th>
-                    <th>${twSDK.tt('Quantidade Total')}</th>
-                </tr>
+        // Helper: Build a table of villages
+        function buildVillagesTable(villages) {
+            let villagesTableHtml = `
+                <table class="ra-table ra-table-v3" width="100%">
+                    <thead>
+                        <tr>
+                            <th>
+                                #
+                            </th>
+                            <th class="ra-tal">
+                                ${twSDK.tt('Village')}
+                            </th>
+                            <th>
+                                ${twSDK.tt('Map')}
+                            </th>
+                            <th>
+                                ${twSDK.tt('Pop.')}
+                            </th>
+                            <th>
+                                ${twSDK.tt('Distance')}
+                            </th>
+                            <th>
+                                ${twSDK.tt('Missing Troops')}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
             `;
 
-            totalTroopsArray.forEach((troop) => {
-                tableRows += `
+            villages.forEach((village, index) => {
+                const {
+                    villageId,
+                    villageName,
+                    villageCoords,
+                    fieldsAway,
+                    troops,
+                    pop,
+                    missingTroops,
+                } = village;
+                let [x, y] = villageCoords.split('|');
+                let missingTroopsString =
+                    buildMissingTroopsString(missingTroops);
+
+                index++;
+
+                villagesTableHtml += `
                     <tr>
                         <td>
-                            <img src="/graphic/unit/unit_${troop.unit}.png" alt="${troop.unit}" title="${twSDK.tt(capitalizeFirstLetter(troop.unit))}" /> ${twSDK.tt(capitalizeFirstLetter(troop.unit))}
+                            ${index}
+                        </td>
+                        <td class="ra-tal">
+                            <a href="/game.php?screen=info_village&id=${villageId}" target="_blank" rel="noreferrer noopener">
+                                ${villageName}
+                            </a>
                         </td>
                         <td>
-                            ${intToString(troop.amount)}
+                            <a href="javascript:TWMap.focus(${x}, ${y});">
+                                ${villageCoords}
+                            </a>
+                        </td>
+                        <td>
+                            ${intToString(pop)}
+                        </td>
+                        <td>
+                            ${fieldsAway}
+                        </td>
+                        <td>
+                            ${missingTroopsString}
                         </td>
                     </tr>
                 `;
             });
 
-            const totalTroopsTableHtml = `
-                <table class="ra-table ra-table-v3" width="100%">
-                    <thead>
-                        ${tableRows}
-                    </thead>
-                </table>
-            `;
+            villagesTableHtml += `</tbody></table>`;
 
-            return totalTroopsTableHtml;
-        }
-
-        // Helper: Capitalize first letter
-        function capitalizeFirstLetter(string) {
-            return string.charAt(0).toUpperCase() + string.slice(1);
-        }
-
-        // Helper: Update the map UI with total troops
-        function updateMapWithTotalTroops(totalMissingTroops) {
-            // Clear any previous elements
-            jQuery('.ra-total-troops-overlay').remove();
-
-            // Build the total troops string
-            let totalTroopsString = '';
-            for (let [unit, amount] of Object.entries(totalMissingTroops)) {
-                totalTroopsString += `${twSDK.tt(capitalizeFirstLetter(unit))}: ${intToString(amount)}\n`;
-            }
-
-            // Create an element to display the total troops in the center of the map
-            const totalTroopsDiv = $('<div></div>')
-                .addClass('ra-total-troops-overlay')
-                .css({
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                    color: '#fff',
-                    padding: '10px',
-                    borderRadius: '5px',
-                    zIndex: '1000',
-                    whiteSpace: 'pre-line',
-                    fontSize: '12px',
-                })
-                .html(totalTroopsString);
-
-            // Add to the map
-            jQuery('#map').append(totalTroopsDiv);
-
-            // Optional: Remove the display after some seconds
-            setTimeout(() => {
-                totalTroopsDiv.fadeOut(500, () => {
-                    totalTroopsDiv.remove();
-                });
-            }, 10000); // Remove after 10 seconds
+            return villagesTableHtml;
         }
 
         // Helper: Build enemy tribes picker
@@ -683,14 +682,14 @@ $.getScript(
             let missingTroopsString = '';
 
             for (let [key, value] of Object.entries(missingTroops)) {
-                missingTroopsString += `${twSDK.tt(capitalizeFirstLetter(key))}: ${value}\n`;
+                missingTroopsString += `${key}: ${value}\n`;
             }
 
             return missingTroopsString;
         }
 
         // Helper: Build table of units and unit amounts
-        function buildUnitsChooserTable() {
+        function buildUnitsChoserTable() {
             let unitsTable = ``;
             let thUnits = ``;
             let tableRow = ``;
@@ -708,7 +707,7 @@ $.getScript(
 
                 tableRow += `
                     <td class="ra-text-center">
-                        <input name="ra_unit_amounts" type="number" id="unit_${unit}" data-unit="${unit}" class="ra-input" value="0" min="0" />
+                        <input name="ra_unit_amounts" type="text" id="unit_${unit}" data-unit="${unit}" class="ra-input" value="0" />
                     </td>
                 `;
             });
@@ -729,6 +728,87 @@ $.getScript(
             `;
 
             return unitsTable;
+        }
+
+        // Helper: Update the map UI
+        function updateMap(villages) {
+            const villageCoords = villages.map(
+                (village) => village.villageCoords
+            );
+
+            if (mapOverlay.mapHandler._spawnSector) {
+                //exists already, don't recreate
+            } else {
+                //doesn't exist yet
+                mapOverlay.mapHandler._spawnSector =
+                    mapOverlay.mapHandler.spawnSector;
+            }
+
+            TWMap.mapHandler.spawnSector = function (data, sector) {
+                // Override Map Sector Spawn
+                mapOverlay.mapHandler._spawnSector(data, sector);
+                var beginX = sector.x - data.x;
+                var endX = beginX + mapOverlay.mapSubSectorSize;
+                var beginY = sector.y - data.y;
+                var endY = beginY + mapOverlay.mapSubSectorSize;
+
+                for (var x in data.tiles) {
+                    var x = parseInt(x, 10);
+                    if (x < beginX || x >= endX) {
+                        continue;
+                    }
+                    for (var y in data.tiles[x]) {
+                        var y = parseInt(y, 10);
+
+                        if (y < beginY || y >= endY) {
+                            continue;
+                        }
+                        var xCoord = data.x + x;
+                        var yCoord = data.y + y;
+                        var v = mapOverlay.villages[xCoord * 1000 + yCoord];
+                        if (v) {
+                            var vXY = '' + v.xy;
+                            var vCoords =
+                                vXY.slice(0, 3) + '|' + vXY.slice(3, 6);
+                            if (villageCoords.includes(vCoords)) {
+                                const currentVillage = villages.find(
+                                    (obj) => obj.villageCoords == vCoords
+                                );
+
+                                const villageDef = intToString(
+                                    currentVillage.pop
+                                );
+
+                                const eleDIV = $('<div></div>')
+                                    .css({
+                                        position: 'absolute',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '2px',
+                                        padding: '1px',
+                                        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                                        color: '#fff',
+                                        width: '50px',
+                                        height: '35px',
+                                        zIndex: '10',
+                                        fontSize: '10px',
+                                    })
+                                    .attr('id', 'dsm' + v.id)
+                                    .html(villageDef);
+
+                                sector.appendElement(
+                                    eleDIV[0],
+                                    data.x + x - sector.x,
+                                    data.y + y - sector.y
+                                );
+                            }
+                        }
+                    }
+                }
+            };
+
+            mapOverlay.reload();
         }
 
         // Helper: Calculate amounts of needed troops for each village
@@ -779,9 +859,10 @@ $.getScript(
                     !nonScalingUnits.includes(key)
                 ) {
                     let troopsDifference = troops[key] - troopsAfterScalingDown;
-                    if (troopsDifference > 0) {
-                        missingTroops[key] = troopsDifference;
-                    }
+                    missingTroops = {
+                        ...missingTroops,
+                        [key]: Math.abs(troopsDifference),
+                    };
                 }
             }
 
@@ -803,19 +884,14 @@ $.getScript(
                 })
                 .flat();
 
-            console.log('Player villages:', playerVillages);
-
             let chosenTribeIds = twSDK.getEntityIdsByArrayIndex(
                 chosenTribes,
                 tribes,
                 2
             );
-            console.log('Chosen tribe IDs:', chosenTribeIds);
             let tribePlayers = getTribeMembersById(chosenTribeIds);
-            console.log('Players in chosen tribes:', tribePlayers);
 
             let enemyTribeCoordinates = filterVillagesByPlayerIds(tribePlayers);
-            console.log('Enemy tribe coordinates:', enemyTribeCoordinates);
 
             // filter villages by radius
             let villagesWithinRadius = [];
@@ -836,13 +912,11 @@ $.getScript(
                 });
             });
 
-            console.log(`Villages within radius of ${distance}:`, villagesWithinRadius);
-
             // filter villages by stack size
             let villagesThatNeedStack = [];
             villagesWithinRadius.forEach((village) => {
                 const { troops } = village;
-                const villageTroopTotal = Object.values(troops).reduce((sum, val) => sum + val, 0);
+                const villagePop = calculatePop(troops);
                 const realStackLimit = stackLimit * 1000;
 
                 let shouldAdd = false;
@@ -850,30 +924,27 @@ $.getScript(
                 for (let [key, value] of Object.entries(unitAmount)) {
                     if (troops[key] < value) {
                         shouldAdd = true;
-                        break;
                     }
                 }
 
-                if (villageTroopTotal < realStackLimit) {
+                if (villagePop < realStackLimit) {
                     shouldAdd = true;
                 }
 
                 if (shouldAdd) {
                     villagesThatNeedStack.push({
                         ...village,
-                        troopTotal: villageTroopTotal,
+                        pop: villagePop,
                     });
                 }
             });
-
-            console.log('Villages that need stack:', villagesThatNeedStack);
 
             villagesThatNeedStack.sort((a, b) => a.fieldsAway - b.fieldsAway);
 
             let villagesObject = {};
             let villagesArray = [];
             villagesThatNeedStack.forEach((item) => {
-                const { villageId } = item;
+                const { villageId, fieldsAway } = item;
                 if (!villagesObject[villageId]) {
                     villagesObject = {
                         ...villagesObject,
@@ -886,14 +957,13 @@ $.getScript(
                 villagesArray.push(value);
             }
 
-            console.log('Final villages that need stack:', villagesArray);
-
             return villagesArray;
         }
 
         // Helper: Calculate total pop
         function calculatePop(units) {
             let total = 0;
+            let total2 = units
 
             for (let [key, value] of Object.entries(units)) {
                 if (value) {
@@ -905,9 +975,7 @@ $.getScript(
                 }
             }
 
-            console.log(`Total population calculated: ${total}`);
-
-            return total;
+            return total2;
         }
 
         // Helper: Collect user input
@@ -1004,7 +1072,7 @@ $.getScript(
 
             const membersToFetch = [];
 
-            options.each(function (_, option) {
+            options.map(function (_, option) {
                 let url =
                     '/game.php?screen=ally&mode=members_defense&player_id=' +
                     option.value +
