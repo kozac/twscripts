@@ -946,7 +946,7 @@ $.getScript(
                                         villageTroopsHTML += `
                                             <div style="display: flex; align-items: center; justify-content: center; gap: 2px; flex: 1;">
                                                 <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 12px; height: 12px;">
-                                                <span style="font-size: 6px;">${count}</span>
+                                                <span style="font-size: 8px;">${count}</span>
                                             </div>
                                         `;
                                     }
@@ -959,26 +959,26 @@ $.getScript(
 
                                 // **Fim das Modificações**
 
-                                const eleDIV = $('<div></div>')
-                                    .css({
-                                        position: 'absolute',
-                                        display: 'flex',
-                                        flexDirection: 'row',
-                                        flexWrap: 'wrap',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '1px',
-                                        padding: '2px',
-                                        backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                                        color: '#fff',
-                                        width: '50px', // Mantido conforme solicitado
-                                        height: '35px', // Mantido conforme solicitado
-                                        zIndex: '10',
-                                        fontSize: '6px', // Reduzido para melhor legibilidade
-                                        overflow: 'hidden', // Evita que o conteúdo ultrapasse o div
-                                    })
-                                    .attr('id', 'dsm' + v.id)
-                                    .html(villageTroopsHTML); // Alterado para exibir as tropas com ícones e texto reduzido
+const eleDIV = $('<div></div>')
+    .css({
+        position: 'absolute',
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '1px',
+        padding: '2px',
+        backgroundColor: 'rgba(255, 255, 255, 0.6)', // Cor de fundo atualizada para branco semi-transparente
+        color: '#000', // Opcional: Alterar a cor do texto para preto para melhor contraste
+        width: '50px', // Mantido conforme solicitado
+        height: '35px', // Mantido conforme solicitado
+        zIndex: '10',
+        fontSize: '8px', // Reduzido para melhor legibilidade
+        overflow: 'hidden', // Evita que o conteúdo ultrapasse o div
+    })
+    .attr('id', 'dsm' + v.id)
+    .html(villageTroopsHTML); // Alterado para exibir as tropas com ícones e texto reduzido
 
                                 sector.appendElement(
                                     eleDIV[0],
