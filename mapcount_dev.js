@@ -1059,6 +1059,7 @@ $.getScript(
                                 if (buildings) {
                                     const { torre, muralha } = buildings;
                                     const troops = currentVillage.troops;
+                                    console.log("troops: ",troops)
                                     const nobres = troops[snob] || 0; // Mostra 0 se não houver tropas
                                     buildingsHTML = `
                                 <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
