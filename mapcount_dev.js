@@ -1477,7 +1477,7 @@ $.getScript(
                 console.log(selectedCustomTroops)
                 selectedCustomTroops.forEach(unit => {
                     const amount = parseInt(jQuery(`#unit_${unit}`).val()) || 0;
-                    if (amount > 0) {
+                    if (amount >= 0) {
                         unitAmounts = {
                             ...unitAmounts,
                             [unit]: amount,
