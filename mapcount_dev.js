@@ -618,6 +618,7 @@ $.getScript(
                 } = userInput;
 
                 // **Definir TROOP_TYPES.custom se o tipo for 'custom'**
+                console.log(selectedTroopType)
                 if (selectedTroopType === 'custom') {
                     TROOP_TYPES.custom = Object.keys(unitAmounts);
                 } else {
@@ -1454,6 +1455,7 @@ $.getScript(
             let unitAmounts = {};
 
             const selectedTroopType = jQuery('input[name="raTroopType"]:checked').val();
+            console.log(selectedTroopType)
 
             if (selectedTroopType === 'def' || selectedTroopType === 'atk') {
                 jQuery('#raUnitSelector input').each(function () {
