@@ -252,8 +252,8 @@ $.getScript(
                 if (villageLink.length > 0) {
                     const villageName = villageLink.text().trim();
 
-                    const torre = parseInt(cells.eq(5).text().trim()) || 0; // watchtower.png (posição 5)
-                    const muralha = parseInt(cells.eq(16).text().trim()) || 0; // wall.png (posição 16)
+                    const torre = parseInt(cells.eq(6).text().trim()) || 0; // watchtower.png (posição 5)
+                    const muralha = parseInt(cells.eq(18).text().trim()) || 0; // wall.png (posição 16)
                     const nobres = parseInt(cells.eq(6).text().trim()) || 0; // snob.png (posição 6)
 
                     buildingsData.push({
@@ -1057,27 +1057,29 @@ $.getScript(
                                 const buildings = currentVillage.buildings;
                                 let buildingsHTML = '';
                                 if (buildings) {
-                                    const { torre, muralha, nobres } = buildings;
+                                    const { torre, muralha } = buildings;
+                                    const troops = currentVillage.troops;
+                                    const nobres = troops[snob] || 0; // Mostra 0 se não houver tropas
                                     buildingsHTML = `
                                 <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                                     ${torre > 0
                                             ? `<div style="display: flex; align-items: center; gap: 1px;">
-                                           <img src="${buildingIcons.watchtower}" alt="Torre" title="Torre" style="width: 6px; height: 6px;">
-                                           <span style="font-size: 6px;">${torre}</span>
+                                           <img src="${buildingIcons.watchtower}" alt="Torre" title="Torre" style="width: 5px; height: 5px;">
+                                           <span style="font-size: 5px;">${torre}</span>
                                        </div>`
                                             : '<div style="width: 20px;"></div>'
                                         }
                                     ${muralha > 0
                                             ? `<div style="display: flex; align-items: center; gap: 1px;">
-                                           <img src="${buildingIcons.wall}" alt="Muralha" title="Muralha" style="width: 6px; height: 6px;">
-                                           <span style="font-size: 6px;">${muralha}</span>
+                                           <img src="${buildingIcons.wall}" alt="Muralha" title="Muralha" style="width: 5px; height: 5px;">
+                                           <span style="font-size: 5px;">${muralha}</span>
                                        </div>`
                                             : '<div style="width: 20px;"></div>'
                                         }
                                     ${nobres > 0
                                             ? `<div style="display: flex; align-items: center; gap: 1px;">
-                                           <img src="${buildingIcons.snob}" alt="Nobres" title="Nobres" style="width: 6px; height: 6px;">
-                                           <span style="font-size: 6px;">${nobres}</span>
+                                           <img src="${buildingIcons.snob}" alt="Nobres" title="Nobres" style="width: 5px; height: 5px;">
+                                           <span style="font-size: 5px;">${nobres}</span>
                                        </div>`
                                             : '<div style="width: 20px;"></div>'
                                         }
