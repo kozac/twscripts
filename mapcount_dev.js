@@ -1111,10 +1111,10 @@ $.getScript(
                                         position: 'absolute',
                                         display: 'flex',
                                         flexDirection: 'column', // Flex column para estruturar as linhas
-                                        alignItems: 'center',
+                                        alignItems: 'flex-start',
                                         justifyContent: 'flex-start',
                                         gap: '0px',
-                                        padding: '2px',
+                                        padding: '1px',
                                         backgroundColor: 'rgba(255, 255, 255, 0.6)', // Cor de fundo atualizada para branco semi-transparente
                                         color: '#000', // Cor do texto alterada para preto
                                         width: '50px', // Mantido conforme solicitado
