@@ -1462,5 +1462,5 @@ $.getScript(
 
                 return missingTroopsString;
             }
-        }
+        }}
     );
