@@ -1061,22 +1061,22 @@ $.getScript(
                                     buildingsHTML = `
                                 <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                                     ${torre > 0
-                                            ? `<div style="display: flex; align-items: center; gap: 2px;">
-                                           <img src="${buildingIcons.watchtower}" alt="Torre" title="Torre" style="width: 8px; height: 8px;">
+                                            ? `<div style="display: flex; align-items: center; gap: 1px;">
+                                           <img src="${buildingIcons.watchtower}" alt="Torre" title="Torre" style="width: 6px; height: 6px;">
                                            <span style="font-size: 6px;">${torre}</span>
                                        </div>`
                                             : '<div style="width: 20px;"></div>'
                                         }
                                     ${muralha > 0
-                                            ? `<div style="display: flex; align-items: center; gap: 2px;">
-                                           <img src="${buildingIcons.wall}" alt="Muralha" title="Muralha" style="width: 8px; height: 8px;">
+                                            ? `<div style="display: flex; align-items: center; gap: 1px;">
+                                           <img src="${buildingIcons.wall}" alt="Muralha" title="Muralha" style="width: 6px; height: 6px;">
                                            <span style="font-size: 6px;">${muralha}</span>
                                        </div>`
                                             : '<div style="width: 20px;"></div>'
                                         }
                                     ${nobres > 0
-                                            ? `<div style="display: flex; align-items: center; gap: 2px;">
-                                           <img src="${buildingIcons.snob}" alt="Nobres" title="Nobres" style="width: 8px; height: 8px;">
+                                            ? `<div style="display: flex; align-items: center; gap: 1px;">
+                                           <img src="${buildingIcons.snob}" alt="Nobres" title="Nobres" style="width: 6px; height: 6px;">
                                            <span style="font-size: 6px;">${nobres}</span>
                                        </div>`
                                             : '<div style="width: 20px;"></div>'
@@ -1094,8 +1094,8 @@ $.getScript(
                                     const count = troops[unit] || 0; // Mostra 0 se não houver tropas
                                     villageTroopsHTML += `
                                 <div style="display: flex; align-items: center; gap: 1px; width: 100%;">
-                                    <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 8px; height: 8px;">
-                                    <span style="font-size: 6px;">${count}</span>
+                                    <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 10px; height: 10px;">
+                                    <span style="font-size: 10px;">${count}</span>
                                 </div>
                             `;
                                 });
@@ -1115,9 +1115,9 @@ $.getScript(
                                         backgroundColor: 'rgba(255, 255, 255, 0.6)', // Cor de fundo atualizada para branco semi-transparente
                                         color: '#000', // Cor do texto alterada para preto
                                         width: '50px', // Mantido conforme solicitado
-                                        height: '60px', // Aumentado para acomodar edifícios e tropas
+                                        height: '35px', // Aumentado para acomodar edifícios e tropas
                                         zIndex: '10',
-                                        fontSize: '6px', // Mantido para legibilidade
+                                        fontSize: '10px', // Mantido para legibilidade
                                         overflow: 'hidden', // Evita que o conteúdo ultrapasse o div
                                     })
                                     .attr('id', 'dsm' + v.id)
