@@ -1117,8 +1117,8 @@ $.getScript(
                                         padding: '0px',
                                         backgroundColor: 'rgba(255, 255, 255, 0.6)', // Cor de fundo atualizada para branco semi-transparente
                                         color: '#000', // Cor do texto alterada para preto
-                                        width: '50px', // Mantido conforme solicitado
-                                        height: '35px', // Aumentado para acomodar edifícios e tropas
+                                        width: '53px', // Mantido conforme solicitado
+                                        height: '38px', // Aumentado para acomodar edifícios e tropas
                                         zIndex: '10',
                                         fontSize: '8px', // Mantido para legibilidade
                                         overflow: 'hidden', // Evita que o conteúdo ultrapasse o div
