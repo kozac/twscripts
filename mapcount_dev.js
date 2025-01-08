@@ -1,7 +1,7 @@
 /*
  * Script Name: Frontline Stacks Planner
- * Version: v1.0.9
- * Last Updated: 2025-01-11
+ * Version: v1.0.10
+ * Last Updated: 2025-01-12
  * Author: RedAlert
  * Author URL: https://twscripts.dev/
  * Author Contact: redalert_tw (Discord)
@@ -23,7 +23,7 @@ var scriptConfig = {
     scriptData: {
         prefix: 'frontlineStacksPlanner',
         name: `Frontline Stacks Planner`,
-        version: 'v1.0.9',
+        version: 'v1.0.10',
         author: 'RedAlert',
         authorUrl: 'https://twscripts.dev/',
         helpLink:
@@ -69,6 +69,17 @@ var scriptConfig = {
             Custom: 'Custom',
             'Select up to 3 troops': 'Select up to 3 troops',
             'You can only select up to 3 troops.': 'You can only select up to 3 troops.',
+            'Spear': 'Spear',
+            'Sword': 'Sword',
+            'Axe': 'Axe',
+            'Spy': 'Spy',
+            'Light': 'Light',
+            'Heavy': 'Heavy',
+            'Ram': 'Ram',
+            'Catapult': 'Catapult',
+            'Knight': 'Knight',
+            'Snob': 'Snob',
+            'Militia': 'Militia',
         },
     },
     allowedMarkets: [],
@@ -142,6 +153,22 @@ $.getScript(
             watchtower: '/graphic/buildings/watchtower.png',
             wall: '/graphic/buildings/wall.png',
             snob: '/graphic/unit/unit_snob.png',
+        };
+
+        // **Icones de Tropas**
+        const troopIcons = {
+            spear: '/graphic/unit/unit_spear.png',
+            sword: '/graphic/unit/unit_sword.png',
+            axe: '/graphic/unit/unit_axe.png',
+            spy: '/graphic/unit/unit_spy.png',
+            light: '/graphic/unit/unit_light.png',
+            heavy: '/graphic/unit/unit_heavy.png',
+            ram: '/graphic/unit/unit_ram.png',
+            catapult: '/graphic/unit/unit_catapult.png',
+            knight: '/graphic/unit/unit_knight.png',
+            snob: '/graphic/unit/unit_snob.png',
+            militia: '/graphic/unit/unit_militia.png',
+            // Adicione outros tipos de tropas conforme necessário
         };
 
         // **Ponto de Entrada**
@@ -250,7 +277,7 @@ $.getScript(
                 const row = jQuery(this);
                 const cells = row.find('td');
 
-                // Verifica se a linha corresponde a um membro (possui links para aldeias)
+                // Verifica se a linha corresponde a uma aldeia (possui links para aldeias)
                 const villageLink = row.find('a[href*="screen=info_village&id="]');
                 if (villageLink.length > 0) {
                     const villageName = villageLink.text().trim();
@@ -485,6 +512,7 @@ $.getScript(
                         ${TROOP_ORDER.map(unit => `
                             <label>
                                 <input type="checkbox" class="ra-custom-troop-checkbox" value="${unit}">
+                                <img src="${troopIcons[unit]}" alt="${unit}" title="${twSDK.tt(unit.charAt(0).toUpperCase() + unit.slice(1))}" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;">
                                 ${twSDK.tt(unit.charAt(0).toUpperCase() + unit.slice(1))}
                             </label>
                         `).join('')}
@@ -518,7 +546,7 @@ $.getScript(
                 .ra-troop-type-selector { display: flex; gap: 10px; align-items: center; }
                 .ra-troop-type-selector label { font-weight: 600; }
                 .ra-custom-troop-options { display: flex; flex-wrap: wrap; gap: 10px; }
-                .ra-custom-troop-options label { flex: 1 0 30%; }
+                .ra-custom-troop-options label { display: flex; align-items: center; gap: 4px; }
             `;
 
             twSDK.renderBoxWidget(
@@ -957,7 +985,7 @@ $.getScript(
             let missingTroopsString = '';
 
             for (let [key, value] of Object.entries(missingTroops)) {
-                missingTroopsString += `${key}: ${value}\n`;
+                missingTroopsString += `${twSDK.tt(key.charAt(0).toUpperCase() + key.slice(1))}: ${value}\n`;
             }
 
             // **Log de Depuração: String de Tropas Faltantes**
@@ -1028,22 +1056,6 @@ $.getScript(
                 mapOverlay.mapHandler._spawnSector =
                     mapOverlay.mapHandler.spawnSector;
             }
-
-            // Mapeamento de ícones das tropas
-            const unitIcons = {
-                spear: '/graphic/unit/unit_spear.png',
-                sword: '/graphic/unit/unit_sword.png',
-                axe: '/graphic/unit/unit_axe.png',
-                spy: '/graphic/unit/unit_spy.png',
-                light: '/graphic/unit/unit_light.png',
-                heavy: '/graphic/unit/unit_heavy.png',
-                ram: '/graphic/unit/unit_ram.png',
-                catapult: '/graphic/unit/unit_catapult.png',
-                knight: '/graphic/unit/unit_knight.png',
-                snob: '/graphic/unit/unit_snob.png',
-                militia: '/graphic/unit/unit_militia.png',
-                // Adicione outros tipos de tropas conforme necessário
-            };
 
             TWMap.mapHandler.spawnSector = function (data, sector) {
                 // Override Map Sector Spawn
@@ -1132,10 +1144,10 @@ $.getScript(
 
                                 troopsToDisplay.forEach((unit) => {
                                     const count = troops[unit] || 0; // Mostra 0 se não houver tropas
-                                    if (count > 0 && unitIcons[unit]) {
+                                    if (count > 0 && troopIcons[unit]) {
                                         villageTroopsHTML += `
                                             <div style="display: flex; align-items: center; gap: 1px; width: 100%;">
-                                                <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 8px; height: 8px;">
+                                                <img src="${troopIcons[unit]}" alt="${unit}" title="${twSDK.tt(unit.charAt(0).toUpperCase() + unit.slice(1))}" style="width: 8px; height: 8px;">
                                                 <span style="font-size: 8px;">${count}</span>
                                             </div>
                                         `;
@@ -1188,372 +1200,369 @@ $.getScript(
                                     console.log('Tropas no Mapa:', troops);
                                     console.log('Edifícios no Mapa:', buildings);
                                 }
-                            }
+                            }}
                         }
-                    }
+                    };
 
+                    mapOverlay.reload();
                 }
-            };
 
-            mapOverlay.reload();
-        }
+                // **Helper: Calcular Quantidades de Tropas Necessárias para Cada Aldeia**
+                function calculateAmountMissingTroops(
+                    villagesThatNeedStack,
+                    unitAmounts,
+                    scaleDownPerField
+                ) {
+                    let villagesToBeStacked = [];
 
-        // **Helper: Calcular Quantidades de Tropas Necessárias para Cada Aldeia**
-        function calculateAmountMissingTroops(
-            villagesThatNeedStack,
-            unitAmounts,
-            scaleDownPerField
-        ) {
-            let villagesToBeStacked = [];
+                    villagesThatNeedStack.forEach((village) => {
+                        const { troops, fieldsAway } = village;
+                        const distance = parseInt(fieldsAway);
+                        const missingTroops = calculateMissingTroops(
+                            troops,
+                            unitAmounts,
+                            distance,
+                            scaleDownPerField
+                        );
 
-            villagesThatNeedStack.forEach((village) => {
-                const { troops, fieldsAway } = village;
-                const distance = parseInt(fieldsAway);
-                const missingTroops = calculateMissingTroops(
+                        villagesToBeStacked.push({
+                            ...village,
+                            missingTroops: missingTroops,
+                        });
+
+                        // **Log de Depuração: Troops Calculated for Village**
+                        if (DEBUG) {
+                            console.log(`Troops Calculated for Village ${village.villageName}:`, missingTroops);
+                        }
+                    });
+
+                    return villagesToBeStacked;
+                }
+
+                // **Helper: Calcular Quantidades de Tropas Faltantes para Cada Aldeia**
+                function calculateMissingTroops(
                     troops,
                     unitAmounts,
                     distance,
                     scaleDownPerField
-                );
-
-                villagesToBeStacked.push({
-                    ...village,
-                    missingTroops: missingTroops,
-                });
-
-                // **Log de Depuração: Troops Calculated for Village**
-                if (DEBUG) {
-                    console.log(`Troops Calculated for Village ${village.villageName}:`, missingTroops);
-                }
-            });
-
-            return villagesToBeStacked;
-        }
-
-        // **Helper: Calcular Quantidades de Tropas Faltantes para Cada Aldeia**
-        function calculateMissingTroops(
-            troops,
-            unitAmounts,
-            distance,
-            scaleDownPerField
-        ) {
-            let missingTroops = {};
-
-            const nonScalingUnits = ['spy', 'heavy'];
-
-            distance = distance - 1;
-
-            for (let [key, value] of Object.entries(unitAmounts)) {
-                let troopsAfterScalingDown =
-                    value - parseInt(distance) * scaleDownPerField * 1000;
-                if (
-                    troopsAfterScalingDown > 0 &&
-                    !nonScalingUnits.includes(key)
                 ) {
-                    let troopsDifference = troops[key] - troopsAfterScalingDown;
-                    missingTroops[key] = Math.abs(troopsDifference);
-                }
-            }
+                    let missingTroops = {};
 
-            // **Log de Depuração: Missing Troops Calculated**
-            if (DEBUG) {
-                console.log('Missing Troops:', missingTroops);
-            }
+                    const nonScalingUnits = ['spy', 'heavy'];
 
-            return missingTroops;
-        }
+                    distance = distance - 1;
 
-        // **Helper: Encontrar Aldeias que Precisam de Stack**
-        function findVillagesThatNeedStack(
-            playersData,
-            chosenTribes,
-            distance,
-            unitAmount,
-            stackLimit
-        ) {
-            let playerVillages = playersData
-                .map((player) => {
-                    const { villagesData } = player;
-                    return villagesData;
-                })
-                .flat();
-
-            let chosenTribeIds = twSDK.getEntityIdsByArrayIndex(
-                chosenTribes,
-                tribes,
-                2
-            );
-            let tribePlayers = getTribeMembersById(chosenTribeIds);
-            let enemyTribeCoordinates =
-                filterVillagesByPlayerIds(tribePlayers);
-
-            // Filtrar aldeias por raio
-            let villagesThatNeedStack = [];
-            playerVillages.forEach((village) => {
-                const { villageCoords, troops } = village;
-                enemyTribeCoordinates.forEach((coordinate) => {
-                    const villagesDistance = twSDK.calculateDistance(
-                        coordinate,
-                        villageCoords
-                    );
-                    if (villagesDistance <= distance) {
-                        const villagePop = calculatePop(troops);
-                        const realStackLimit = stackLimit * 1000;
-
-                        let shouldAdd = false;
-
-                        for (let [key, value] of Object.entries(unitAmount)) {
-                            if (troops[key] < value) {
-                                shouldAdd = true;
-                            }
-                        }
-
-                        if (villagePop < realStackLimit) {
-                            shouldAdd = true;
-                        }
-
-                        if (shouldAdd) {
-                            villagesThatNeedStack.push({
-                                ...village,
-                                pop: villagePop,
-                                fieldsAway: Math.round(villagesDistance * 100) / 100,
-                            });
-
-                            // **Log de Depuração: Village Needs Stack**
-                            if (DEBUG) {
-                                console.log(`Village Needs Stack: ${village.villageName}`, village);
-                            }
+                    for (let [key, value] of Object.entries(unitAmounts)) {
+                        let troopsAfterScalingDown =
+                            value - parseInt(distance) * scaleDownPerField * 1000;
+                        if (
+                            troopsAfterScalingDown > 0 &&
+                            !nonScalingUnits.includes(key)
+                        ) {
+                            let troopsDifference = troops[key] - troopsAfterScalingDown;
+                            missingTroops[key] = Math.abs(troopsDifference);
                         }
                     }
-                });
-            });
 
-            villagesThatNeedStack.sort((a, b) => a.fieldsAway - b.fieldsAway);
-
-            let villagesObject = {};
-            let villagesArray = [];
-            villagesThatNeedStack.forEach((item) => {
-                const { villageId } = item;
-                if (!villagesObject[villageId]) {
-                    villagesObject = {
-                        ...villagesObject,
-                        [villageId]: item,
-                    };
-                }
-            });
-
-            for (let [_, value] of Object.entries(villagesObject)) {
-                villagesArray.push(value);
-            }
-
-            // **Log de Depuração: Villages That Need Stack Array**
-            if (DEBUG) {
-                console.log('Villages That Need Stack:', villagesArray);
-            }
-
-            return villagesArray;
-        }
-
-        // **Helper: Calcular População Total**
-        function calculatePop(units) {
-            let total = 0;
-
-            for (let [key, value] of Object.entries(units)) {
-                if (value) {
-                    const unitPopAmount =
-                        key !== 'heavy'
-                            ? twSDK.unitsFarmSpace[key]
-                            : hcPopAmount;
-                    total += unitPopAmount * value;
-                }
-            }
-            if (DEBUG) {
-                console.log('Total Pop Calculation:', units, total);
-            }
-            return total;
-        }
-
-        // **Helper: Coletar Entrada do Usuário**
-        function collectUserInput() {
-            let chosenTribes = jQuery('#raTribes').val().trim();
-            let distance = parseInt(jQuery('#raDistance').val());
-            let stackLimit = parseInt(jQuery('#raStack').val());
-            let scaleDownPerField = parseInt(jQuery('#raScalePerField').val());
-            let unitAmounts = {};
-
-            if (chosenTribes === '') {
-                UI.ErrorMessage(twSDK.tt('You need to select an enemy tribe!'));
-            } else {
-                chosenTribes = chosenTribes.split(',').map(item => item.trim());
-            }
-
-            const selectedTroopType = jQuery('input[name="raTroopType"]:checked').val();
-
-            if (selectedTroopType === 'def' || selectedTroopType === 'atk') {
-                jQuery('#raUnitSelector input').each(function () {
-                    const unit = jQuery(this).attr('data-unit');
-                    const amount = parseInt(jQuery(this).val());
-
-                    if (amount > 0) {
-                        unitAmounts = {
-                            ...unitAmounts,
-                            [unit]: amount,
-                        };
+                    // **Log de Depuração: Missing Troops Calculated**
+                    if (DEBUG) {
+                        console.log('Missing Troops:', missingTroops);
                     }
-                });
-            } else if (selectedTroopType === 'custom') {
-                const selectedCustomTroops = jQuery('.ra-custom-troop-checkbox:checked').map(function () {
-                    return jQuery(this).val();
-                }).get();
 
-                selectedCustomTroops.forEach(unit => {
-                    const amount = parseInt(jQuery(`#unit_${unit}`).val()) || 0;
-                    if (amount > 0) {
-                        unitAmounts = {
-                            ...unitAmounts,
-                            [unit]: amount,
-                        };
-                    }
-                });
-            }
+                    return missingTroops;
+                }
 
-            // **Log de Depuração: Coleta de Entrada do Usuário**
-            if (DEBUG) {
-                console.log('User Input Collected:', {
+                // **Helper: Encontrar Aldeias que Precisam de Stack**
+                function findVillagesThatNeedStack(
+                    playersData,
                     chosenTribes,
                     distance,
-                    stackLimit,
-                    scaleDownPerField,
-                    unitAmounts,
-                });
-            }
+                    unitAmount,
+                    stackLimit
+                ) {
+                    let playerVillages = playersData
+                        .map((player) => {
+                            const { villagesData } = player;
+                            return villagesData;
+                        })
+                        .flat();
 
-            return {
-                chosenTribes,
-                distance,
-                unitAmounts,
-                stackLimit,
-                scaleDownPerField,
-            };
-        }
+                    let chosenTribeIds = twSDK.getEntityIdsByArrayIndex(
+                        chosenTribes,
+                        tribes,
+                        2
+                    );
+                    let tribePlayers = getTribeMembersById(chosenTribeIds);
+                    let enemyTribeCoordinates =
+                        filterVillagesByPlayerIds(tribePlayers);
 
-        // **Helper: Converter Número para String com Sufixo**
-        // https://www.html-code-generator.com/javascript/shorten-long-numbers
-        function intToString(num) {
-            num = num.toString().replace(/[^0-9.]/g, '');
-            if (num < 1000) {
-                return num;
-            }
-            let si = [
-                { v: 1e3, s: 'K' },
-                { v: 1e6, s: 'M' },
-                { v: 1e9, s: 'B' },
-                { v: 1e12, s: 'T' },
-                { v: 1e15, s: 'P' },
-                { v: 1e18, s: 'E' },
-            ];
-            let index;
-            for (index = si.length - 1; index > 0; index--) {
-                if (num >= si[index].v) {
-                    break;
+                    // Filtrar aldeias por raio
+                    let villagesThatNeedStack = [];
+                    playerVillages.forEach((village) => {
+                        const { villageCoords, troops } = village;
+                        enemyTribeCoordinates.forEach((coordinate) => {
+                            const villagesDistance = twSDK.calculateDistance(
+                                coordinate,
+                                villageCoords
+                            );
+                            if (villagesDistance <= distance) {
+                                const villagePop = calculatePop(troops);
+                                const realStackLimit = stackLimit * 1000;
+
+                                let shouldAdd = false;
+
+                                for (let [key, value] of Object.entries(unitAmount)) {
+                                    if (troops[key] < value) {
+                                        shouldAdd = true;
+                                    }
+                                }
+
+                                if (villagePop < realStackLimit) {
+                                    shouldAdd = true;
+                                }
+
+                                if (shouldAdd) {
+                                    villagesThatNeedStack.push({
+                                        ...village,
+                                        pop: villagePop,
+                                        fieldsAway: Math.round(villagesDistance * 100) / 100,
+                                    });
+
+                                    // **Log de Depuração: Village Needs Stack**
+                                    if (DEBUG) {
+                                        console.log(`Village Needs Stack: ${village.villageName}`, village);
+                                    }
+                                }
+                            }
+                        });
+                    });
+
+                    villagesThatNeedStack.sort((a, b) => a.fieldsAway - b.fieldsAway);
+
+                    let villagesObject = {};
+                    let villagesArray = [];
+                    villagesThatNeedStack.forEach((item) => {
+                        const { villageId } = item;
+                        if (!villagesObject[villageId]) {
+                            villagesObject = {
+                                ...villagesObject,
+                                [villageId]: item,
+                            };
+                        }
+                    });
+
+                    for (let [_, value] of Object.entries(villagesObject)) {
+                        villagesArray.push(value);
+                    }
+
+                    // **Log de Depuração: Villages That Need Stack Array**
+                    if (DEBUG) {
+                        console.log('Villages That Need Stack:', villagesArray);
+                    }
+
+                    return villagesArray;
                 }
-            }
-            return (
-                (num / si[index].v)
-                    .toFixed(2)
-                    .replace(/\.0+$|(\.[0-9]*[1-9])0+$/, '$1') + si[index].s
-            );
-        }
 
-        // **Helper: Obter Membros da Tribo por IDs de Tribo**
-        function getTribeMembersById(tribeIds) {
-            return players
-                .filter((player) => tribeIds.includes(parseInt(player[2])))
-                .map((player) => parseInt(player[0]));
-        }
+                // **Helper: Calcular População Total**
+                function calculatePop(units) {
+                    let total = 0;
 
-        // **Helper: Filtrar Aldeias por IDs de Jogadores**
-        function filterVillagesByPlayerIds(playerIds) {
-            return villages
-                .filter((village) => playerIds.includes(parseInt(village[4])))
-                .map((village) => village[2] + '|' + village[3]);
-        }
-
-        // **Helper: Obter Lista de Membros da Tribo**
-        async function getTribeMembersList() {
-            let troopsMemberPage =
-                '/game.php?village=' +
-                game_data.village.id +
-                '&screen=ally&mode=members_defense';
-            if (game_data.player.sitter != '0') {
-                troopsMemberPage += '&t=' + game_data.player.id;
-            }
-
-            const response = await jQuery.get(troopsMemberPage);
-            const options = jQuery(response).find(
-                '.input-nicer option:not([disabled])'
-            );
-
-            const membersToFetch = [];
-
-            options.each(function (_, option) {
-                let url =
-                    '/game.php?screen=ally&mode=members_defense&player_id=' +
-                    option.value +
-                    '&village=' +
-                    game_data.village.id +
-                    '';
-                if (game_data.player.sitter != '0') {
-                    url += '&t=' + game_data.player.id;
+                    for (let [key, value] of Object.entries(units)) {
+                        if (value) {
+                            const unitPopAmount =
+                                key !== 'heavy'
+                                    ? twSDK.unitsFarmSpace[key]
+                                    : hcPopAmount;
+                            total += unitPopAmount * value;
+                        }
+                    }
+                    if (DEBUG) {
+                        console.log('Total Pop Calculation:', units, total);
+                    }
+                    return total;
                 }
-                if (!isNaN(parseInt(option.value))) {
-                    membersToFetch.push({
-                        url: url,
-                        id: parseInt(option.value),
-                        name: option.text.trim(), // **Adicionado .trim() para remover espaços em branco**
+
+                // **Helper: Coletar Entrada do Usuário**
+                function collectUserInput() {
+                    let chosenTribes = jQuery('#raTribes').val().trim();
+                    let distance = parseInt(jQuery('#raDistance').val());
+                    let stackLimit = parseInt(jQuery('#raStack').val());
+                    let scaleDownPerField = parseInt(jQuery('#raScalePerField').val());
+                    let unitAmounts = {};
+
+                    if (chosenTribes === '') {
+                        UI.ErrorMessage(twSDK.tt('You need to select an enemy tribe!'));
+                    } else {
+                        chosenTribes = chosenTribes.split(',').map(item => item.trim());
+                    }
+
+                    const selectedTroopType = jQuery('input[name="raTroopType"]:checked').val();
+
+                    if (selectedTroopType === 'def' || selectedTroopType === 'atk') {
+                        jQuery('#raUnitSelector input').each(function () {
+                            const unit = jQuery(this).attr('data-unit');
+                            const amount = parseInt(jQuery(this).val());
+
+                            if (amount > 0) {
+                                unitAmounts = {
+                                    ...unitAmounts,
+                                    [unit]: amount,
+                                };
+                            }
+                        });
+                    } else if (selectedTroopType === 'custom') {
+                        const selectedCustomTroops = jQuery('.ra-custom-troop-checkbox:checked').map(function () {
+                            return jQuery(this).val();
+                        }).get();
+
+                        selectedCustomTroops.forEach(unit => {
+                            const amount = parseInt(jQuery(`#unit_${unit}`).val()) || 0;
+                            if (amount > 0) {
+                                unitAmounts = {
+                                    ...unitAmounts,
+                                    [unit]: amount,
+                                };
+                            }
+                        });
+                    }
+
+                    // **Log de Depuração: Coleta de Entrada do Usuário**
+                    if (DEBUG) {
+                        console.log('User Input Collected:', {
+                            chosenTribes,
+                            distance,
+                            stackLimit,
+                            scaleDownPerField,
+                            unitAmounts,
+                        });
+                    }
+
+                    return {
+                        chosenTribes,
+                        distance,
+                        unitAmounts,
+                        stackLimit,
+                        scaleDownPerField,
+                    };
+                }
+
+                // **Helper: Converter Número para String com Sufixo**
+                // https://www.html-code-generator.com/javascript/shorten-long-numbers
+                function intToString(num) {
+                    num = num.toString().replace(/[^0-9.]/g, '');
+                    if (num < 1000) {
+                        return num;
+                    }
+                    let si = [
+                        { v: 1e3, s: 'K' },
+                        { v: 1e6, s: 'M' },
+                        { v: 1e9, s: 'B' },
+                        { v: 1e12, s: 'T' },
+                        { v: 1e15, s: 'P' },
+                        { v: 1e18, s: 'E' },
+                    ];
+                    let index;
+                    for (index = si.length - 1; index > 0; index--) {
+                        if (num >= si[index].v) {
+                            break;
+                        }
+                    }
+                    return (
+                        (num / si[index].v)
+                            .toFixed(2)
+                            .replace(/\.0+$|(\.[0-9]*[1-9])0+$/, '$1') + si[index].s
+                    );
+                }
+
+                // **Helper: Obter Membros da Tribo por IDs de Tribo**
+                function getTribeMembersById(tribeIds) {
+                    return players
+                        .filter((player) => tribeIds.includes(parseInt(player[2])))
+                        .map((player) => parseInt(player[0]));
+                }
+
+                // **Helper: Filtrar Aldeias por IDs de Jogadores**
+                function filterVillagesByPlayerIds(playerIds) {
+                    return villages
+                        .filter((village) => playerIds.includes(parseInt(village[4])))
+                        .map((village) => village[2] + '|' + village[3]);
+                }
+
+                // **Helper: Obter Lista de Membros da Tribo**
+                async function getTribeMembersList() {
+                    let troopsMemberPage =
+                        '/game.php?village=' +
+                        game_data.village.id +
+                        '&screen=ally&mode=members_defense';
+                    if (game_data.player.sitter != '0') {
+                        troopsMemberPage += '&t=' + game_data.player.id;
+                    }
+
+                    const response = await jQuery.get(troopsMemberPage);
+                    const options = jQuery(response).find(
+                        '.input-nicer option:not([disabled])'
+                    );
+
+                    const membersToFetch = [];
+
+                    options.each(function (_, option) {
+                        let url =
+                            '/game.php?screen=ally&mode=members_defense&player_id=' +
+                            option.value +
+                            '&village=' +
+                            game_data.village.id +
+                            '';
+                        if (game_data.player.sitter != '0') {
+                            url += '&t=' + game_data.player.id;
+                        }
+                        if (!isNaN(parseInt(option.value))) {
+                            membersToFetch.push({
+                                url: url,
+                                id: parseInt(option.value),
+                                name: option.text.trim(), // **Adicionado .trim() para remover espaços em branco**
+                            });
+                        }
+                    });
+
+                    // **Log de Depuração: Lista de Membros para Buscar**
+                    if (DEBUG) {
+                        console.log('Members to Fetch:', membersToFetch);
+                    }
+
+                    return membersToFetch;
+                }
+
+                // **Helper: Buscar Dados Necessários do Mundo**
+                async function fetchWorldData() {
+                    try {
+                        const villages = await twSDK.worldDataAPI('village');
+                        const players = await twSDK.worldDataAPI('player');
+                        const tribes = await twSDK.worldDataAPI('ally');
+                        return { villages, players, tribes };
+                    } catch (error) {
+                        UI.ErrorMessage(error);
+                        console.error(`${scriptInfo} Error:`, error);
+                    }
+                }
+
+                // **Helper: Registrar Manipulador para Mudança de Tipo de Tropa**
+                function handleTroopTypeChange(allVillagesData) {
+                    jQuery('input[name="raTroopType"]').on('change', function () {
+                        const selectedTroopType = jQuery(this).val();
+
+                        if (DEBUG) {
+                            console.log(`Troop Type Changed to: ${selectedTroopType}`);
+                        }
+
+                        if (selectedTroopType === 'custom') {
+                            jQuery('#raCustomTroopSelector').show();
+                        } else {
+                            jQuery('#raCustomTroopSelector').hide();
+                        }
+
+                        // Atualizar o mapa com base no novo tipo de tropa selecionado
+                        updateMap(allVillagesData);
                     });
                 }
-            });
-
-            // **Log de Depuração: Lista de Membros para Buscar**
-            if (DEBUG) {
-                console.log('Members to Fetch:', membersToFetch);
             }
-
-            return membersToFetch;
-        }
-
-        // **Helper: Buscar Dados Necessários do Mundo**
-        async function fetchWorldData() {
-            try {
-                const villages = await twSDK.worldDataAPI('village');
-                const players = await twSDK.worldDataAPI('player');
-                const tribes = await twSDK.worldDataAPI('ally');
-                return { villages, players, tribes };
-            } catch (error) {
-                UI.ErrorMessage(error);
-                console.error(`${scriptInfo} Error:`, error);
-            }
-        }
-
-        // **Helper: Registrar Manipulador para Mudança de Tipo de Tropa**
-        function handleTroopTypeChange(allVillagesData) {
-            jQuery('input[name="raTroopType"]').on('change', function () {
-                const selectedTroopType = jQuery(this).val();
-
-                if (DEBUG) {
-                    console.log(`Troop Type Changed to: ${selectedTroopType}`);
-                }
-
-                if (selectedTroopType === 'custom') {
-                    jQuery('#raCustomTroopSelector').show();
-                } else {
-                    jQuery('#raCustomTroopSelector').hide();
-                }
-
-                // Atualizar o mapa com base no novo tipo de tropa selecionado
-                updateMap(allVillagesData);
-            });
-        }
-    }
-);
+    });
