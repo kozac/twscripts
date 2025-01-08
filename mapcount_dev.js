@@ -1059,24 +1059,30 @@ $.getScript(
                                 if (buildings) {
                                     const { torre, muralha, nobres } = buildings;
                                     buildingsHTML = `
-                                        <div style="display: flex; justify-content: center; align-items: center; gap: 2px; flex: 1;">
-                                            ${torre > 0
-                                            ? `<img src="${buildingIcons.watchtower}" alt="Torre" title="Torre" style="width: 8px; height: 8px;">
-                                               <span style="font-size: 6px;">${torre}</span>`
-                                            : ''
+                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                    ${torre > 0
+                                            ? `<div style="display: flex; align-items: center; gap: 2px;">
+                                           <img src="${buildingIcons.watchtower}" alt="Torre" title="Torre" style="width: 8px; height: 8px;">
+                                           <span style="font-size: 6px;">${torre}</span>
+                                       </div>`
+                                            : '<div style="width: 20px;"></div>'
                                         }
-                                            ${muralha > 0
-                                            ? `<img src="${buildingIcons.wall}" alt="Muralha" title="Muralha" style="width: 8px; height: 8px;">
-                                               <span style="font-size: 6px;">${muralha}</span>`
-                                            : ''
+                                    ${muralha > 0
+                                            ? `<div style="display: flex; align-items: center; gap: 2px;">
+                                           <img src="${buildingIcons.wall}" alt="Muralha" title="Muralha" style="width: 8px; height: 8px;">
+                                           <span style="font-size: 6px;">${muralha}</span>
+                                       </div>`
+                                            : '<div style="width: 20px;"></div>'
                                         }
-                                            ${nobres > 0
-                                            ? `<img src="${buildingIcons.snob}" alt="Nobres" title="Nobres" style="width: 8px; height: 8px;">
-                                               <span style="font-size: 6px;">${nobres}</span>`
-                                            : ''
+                                    ${nobres > 0
+                                            ? `<div style="display: flex; align-items: center; gap: 2px;">
+                                           <img src="${buildingIcons.snob}" alt="Nobres" title="Nobres" style="width: 8px; height: 8px;">
+                                           <span style="font-size: 6px;">${nobres}</span>
+                                       </div>`
+                                            : '<div style="width: 20px;"></div>'
                                         }
-                                        </div>
-                                    `;
+                                </div>
+                            `;
                                 }
                                 // **Fim das Modificações**
 
@@ -1085,21 +1091,15 @@ $.getScript(
                                 let villageTroopsHTML = '';
 
                                 troopsToDisplay.forEach((unit) => {
-                                    const count = troops[unit];
-                                    if (count > 0 && unitIcons[unit]) {
-                                        villageTroopsHTML += `
-                                            <div style="display: flex; align-items: center; justify-content: center; gap: 1px; flex: 1;">
-                                                <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 8px; height: 8px;">
-                                                <span style="font-size: 6px;">${count}</span>
-                                            </div>
-                                        `;
-                                    }
+                                    const count = troops[unit] || 0; // Mostra 0 se não houver tropas
+                                    villageTroopsHTML += `
+                                <div style="display: flex; align-items: center; gap: 1px; width: 100%;">
+                                    <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 8px; height: 8px;">
+                                    <span style="font-size: 6px;">${count}</span>
+                                </div>
+                            `;
                                 });
 
-                                // Se não houver tropas para exibir, exibe "0"
-                                if (villageTroopsHTML === '') {
-                                    villageTroopsHTML = '0';
-                                }
                                 // **Fim das Modificações**
 
                                 // **Início das Modificações: Estrutura do Quadradinho**
@@ -1122,12 +1122,12 @@ $.getScript(
                                     })
                                     .attr('id', 'dsm' + v.id)
                                     .html(`
-                                        ${buildingsHTML}
-                                        <hr style="width: 100%; border: none; border-top: 1px solid #ccc; margin: 1px 0;">
-                                        <div style="display: flex; flex-direction: column; gap: 1px; width: 100%;">
-                                            ${villageTroopsHTML}
-                                        </div>
-                                    `); // Estrutura ajustada para incluir uma linha separadora
+                                ${buildingsHTML}
+                                <hr style="width: 100%; border: none; border-top: 1px solid #ccc; margin: 1px 0;">
+                                <div style="display: flex; flex-direction: column; gap: 1px; width: 100%;">
+                                    ${villageTroopsHTML}
+                                </div>
+                            `); // Estrutura ajustada para incluir uma linha separadora
 
                                 // **Fim das Modificações**
 
