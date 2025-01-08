@@ -1114,7 +1114,7 @@ $.getScript(
                                         alignItems: 'flex-start',
                                         justifyContent: 'flex-start',
                                         gap: '0px',
-                                        padding: '1px',
+                                        padding: '0px',
                                         backgroundColor: 'rgba(255, 255, 255, 0.6)', // Cor de fundo atualizada para branco semi-transparente
                                         color: '#000', // Cor do texto alterada para preto
                                         width: '50px', // Mantido conforme solicitado
