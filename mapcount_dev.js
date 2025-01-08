@@ -1096,9 +1096,9 @@ $.getScript(
                                 troopsToDisplay.forEach((unit) => {
                                     const count = troops[unit] || 0; // Mostra 0 se não houver tropas
                                     villageTroopsHTML += `
-                                <div style="display: flex; align-items: center; gap: 1px; width: 100%;">
-                                    <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 10px; height: 10px;">
-                                    <span style="font-size: 10px;">${count}</span>
+                                <div style="display: flex; align-items: center; gap: 0px; width: 100%;">
+                                    <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 7px; height: 7px;">
+                                    <span style="font-size: 7px;">${count}</span>
                                 </div>
                             `;
                                 });
@@ -1113,20 +1113,20 @@ $.getScript(
                                         flexDirection: 'column', // Flex column para estruturar as linhas
                                         alignItems: 'center',
                                         justifyContent: 'flex-start',
-                                        gap: '1px',
+                                        gap: '0px',
                                         padding: '2px',
                                         backgroundColor: 'rgba(255, 255, 255, 0.6)', // Cor de fundo atualizada para branco semi-transparente
                                         color: '#000', // Cor do texto alterada para preto
                                         width: '50px', // Mantido conforme solicitado
                                         height: '35px', // Aumentado para acomodar edifícios e tropas
                                         zIndex: '10',
-                                        fontSize: '10px', // Mantido para legibilidade
+                                        fontSize: '7px', // Mantido para legibilidade
                                         overflow: 'hidden', // Evita que o conteúdo ultrapasse o div
                                     })
                                     .attr('id', 'dsm' + v.id)
                                     .html(`
                                 ${buildingsHTML}
-                                <div style="display: flex; flex-direction: column; gap: 1px; width: 100%;">
+                                <div style="display: flex; flex-direction: column; gap: 0px; width: 100%;">
                                     ${villageTroopsHTML}
                                 </div>
                             `); // Estrutura ajustada para incluir uma linha separadora
