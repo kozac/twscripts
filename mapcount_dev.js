@@ -614,7 +614,15 @@ $.getScript(
                     unitAmounts,
                     stackLimit,
                     scaleDownPerField,
+                    selectedTroopType, // **Adicionado**
                 } = userInput;
+
+                // **Definir TROOP_TYPES.custom se o tipo for 'custom'**
+                if (selectedTroopType === 'custom') {
+                    TROOP_TYPES.custom = Object.keys(unitAmounts);
+                } else {
+                    TROOP_TYPES.custom = [];
+                }
 
                 const villagesThatNeedStack = findVillagesThatNeedStack(
                     playersData,
@@ -1222,6 +1230,7 @@ $.getScript(
             mapOverlay.reload();
         }
 
+
         // **Helper: Calcular Quantidades de Tropas Necessárias para Cada Aldeia**
         function calculateAmountMissingTroops(
             villagesThatNeedStack,
@@ -1459,6 +1468,7 @@ $.getScript(
                     stackLimit,
                     scaleDownPerField,
                     unitAmounts,
+                    selectedTroopType, // **Adicionado**
                 });
             }
 
@@ -1468,6 +1478,7 @@ $.getScript(
                 unitAmounts,
                 stackLimit,
                 scaleDownPerField,
+                selectedTroopType, // **Adicionado**
             };
         }
 
@@ -1585,8 +1596,10 @@ $.getScript(
                     jQuery('#raCustomTroopSelector').hide();
                 }
 
-                // Atualizar o mapa com base no novo tipo de tropa selecionado
-                updateMap(allVillagesData);
+                // **Alteração: Atualizar o mapa apenas para 'def' ou 'atk'**
+                if (selectedTroopType !== 'custom') {
+                    updateMap(allVillagesData);
+                }
             });
         }
     }
