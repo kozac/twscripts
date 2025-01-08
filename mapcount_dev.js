@@ -1471,7 +1471,7 @@ $.getScript(
                 const selectedCustomTroops = jQuery('.ra-custom-troop-checkbox:checked').map(function () {
                     return jQuery(this).val();
                 }).get();
-
+                console.log(selectedCustomTroops)
                 selectedCustomTroops.forEach(unit => {
                     const amount = parseInt(jQuery(`#unit_${unit}`).val()) || 0;
                     if (amount > 0) {
