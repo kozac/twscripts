@@ -1097,8 +1097,8 @@ $.getScript(
                                     const count = troops[unit] || 0; // Mostra 0 se não houver tropas
                                     villageTroopsHTML += `
                                 <div style="display: flex; align-items: center; gap: 0px; width: 100%;">
-                                    <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 7px; height: 7px;">
-                                    <span style="font-size: 7px;">${count}</span>
+                                    <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 8px; height: 8px;">
+                                    <span style="font-size: 8px;">${count}</span>
                                 </div>
                             `;
                                 });
@@ -1120,7 +1120,7 @@ $.getScript(
                                         width: '50px', // Mantido conforme solicitado
                                         height: '35px', // Aumentado para acomodar edifícios e tropas
                                         zIndex: '10',
-                                        fontSize: '7px', // Mantido para legibilidade
+                                        fontSize: '8px', // Mantido para legibilidade
                                         overflow: 'hidden', // Evita que o conteúdo ultrapasse o div
                                     })
                                     .attr('id', 'dsm' + v.id)
