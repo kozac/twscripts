@@ -636,7 +636,8 @@ $.getScript(
                     const villagesToBeStacked = calculateAmountMissingTroops(
                         villagesThatNeedStack,
                         unitAmounts,
-                        scaleDownPerField
+                        scaleDownPerField,
+                        selectedTroopType // **Passar para a função**
                     );
 
                     villagesToBeStacked.sort(
@@ -1235,7 +1236,8 @@ $.getScript(
         function calculateAmountMissingTroops(
             villagesThatNeedStack,
             unitAmounts,
-            scaleDownPerField
+            scaleDownPerField,
+            selectedTroopType // **Novo parâmetro**
         ) {
             let villagesToBeStacked = [];
 
@@ -1246,7 +1248,8 @@ $.getScript(
                     troops,
                     unitAmounts,
                     distance,
-                    scaleDownPerField
+                    scaleDownPerField,
+                    selectedTroopType // **Passar para a função**
                 );
 
                 villagesToBeStacked.push({
@@ -1268,23 +1271,43 @@ $.getScript(
             troops,
             unitAmounts,
             distance,
-            scaleDownPerField
+            scaleDownPerField,
+            selectedTroopType // **Novo parâmetro**
         ) {
             let missingTroops = {};
 
             const nonScalingUnits = ['spy', 'heavy'];
 
-            distance = distance - 1;
+            if (DEBUG) {
+                console.log(`Selected Troop Type: ${selectedTroopType}`);
+                console.log('Unit Amounts:', unitAmounts);
+                console.log('Troops Available:', troops);
+                console.log('Fields Away:', distance);
+                console.log('Scale Down Per Field:', scaleDownPerField);
+            }
 
-            for (let [key, value] of Object.entries(unitAmounts)) {
-                let troopsAfterScalingDown =
-                    value - parseInt(distance) * scaleDownPerField * 1000;
-                if (
-                    troopsAfterScalingDown > 0 &&
-                    !nonScalingUnits.includes(key)
-                ) {
-                    let troopsDifference = troops[key] - troopsAfterScalingDown;
-                    missingTroops[key] = Math.abs(troopsDifference);
+            if (selectedTroopType !== 'custom') {
+                // Aplicar scaleDownPerField apenas para modos defensivo e atacante
+                const adjustedDistance = distance - 1;
+
+                for (let [key, value] of Object.entries(unitAmounts)) {
+                    let troopsAfterScalingDown =
+                        value - parseInt(adjustedDistance) * scaleDownPerField * 1000;
+                    if (
+                        troopsAfterScalingDown > 0 &&
+                        !nonScalingUnits.includes(key)
+                    ) {
+                        let troopsDifference = troops[key] - troopsAfterScalingDown;
+                        missingTroops[key] = Math.abs(troopsDifference);
+                    }
+                }
+            } else {
+                // No modo custom, calcular diretamente sem scaleDownPerField
+                for (let [key, value] of Object.entries(unitAmounts)) {
+                    let troopsDifference = troops[key] - value;
+                    if (troopsDifference < 0) {
+                        missingTroops[key] = Math.abs(troopsDifference);
+                    }
                 }
             }
 
