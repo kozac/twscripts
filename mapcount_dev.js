@@ -1065,22 +1065,22 @@ $.getScript(
                                 <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                                     ${torre > 0
                                             ? `<div style="display: flex; align-items: center; gap: 1px;">
-                                           <img src="${buildingIcons.watchtower}" alt="Torre" title="Torre" style="width: 6px; height: 6px;">
-                                           <span style="font-size: 6px;">${torre}</span>
+                                           <img src="${buildingIcons.watchtower}" alt="Torre" title="Torre" style="width: 8px; height: 8px;">
+                                           <span style="font-size: 8px;">${torre}</span>
                                        </div>`
                                             : '<div style="width: 20px;"></div>'
                                         }
                                     ${muralha > 0
                                             ? `<div style="display: flex; align-items: center; gap: 1px;">
-                                           <img src="${buildingIcons.wall}" alt="Muralha" title="Muralha" style="width: 6px; height: 6px;">
-                                           <span style="font-size: 6px;">${muralha}</span>
+                                           <img src="${buildingIcons.wall}" alt="Muralha" title="Muralha" style="width: 8px; height: 8px;">
+                                           <span style="font-size: 8px;">${muralha}</span>
                                        </div>`
                                             : '<div style="width: 20px;"></div>'
                                         }
                                     ${nobres > 0
                                             ? `<div style="display: flex; align-items: center; gap: 1px;">
-                                           <img src="${buildingIcons.snob}" alt="Nobres" title="Nobres" style="width: 6px; height: 6px;">
-                                           <span style="font-size: 6px;">${nobres}</span>
+                                           <img src="${buildingIcons.snob}" alt="Nobres" title="Nobres" style="width: 8px; height: 8px;">
+                                           <span style="font-size: 8px;">${nobres}</span>
                                        </div>`
                                             : '<div style="width: 20px;"></div>'
                                         }
