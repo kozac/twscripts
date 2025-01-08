@@ -1,7 +1,7 @@
 /*
  * Script Name: Frontline Stacks Planner
- * Version: v1.0.6
- * Last Updated: 2025-01-08
+ * Version: v1.0.10
+ * Last Updated: 2025-01-12
  * Author: RedAlert
  * Author URL: https://twscripts.dev/
  * Author Contact: redalert_tw (Discord)
@@ -23,7 +23,7 @@ var scriptConfig = {
     scriptData: {
         prefix: 'frontlineStacksPlanner',
         name: `Frontline Stacks Planner`,
-        version: 'v1.0.6',
+        version: 'v1.0.10',
         author: 'RedAlert',
         authorUrl: 'https://twscripts.dev/',
         helpLink:
@@ -56,7 +56,6 @@ var scriptConfig = {
             Village: 'Village',
             Map: 'Map',
             'Pop.': 'Pop.',
-            Distance: 'Distance',
             'Missing Troops': 'Missing Troops',
             'All villages have been properly stacked!':
                 'All villages have been properly stacked!',
@@ -67,6 +66,20 @@ var scriptConfig = {
             'Select Troop Type': 'Select Troop Type',
             Defensiva: 'Defensive',
             Atacante: 'Attacking',
+            Custom: 'Custom',
+            'Select up to 3 troops': 'Select up to 3 troops',
+            'You can only select up to 3 troops.': 'You can only select up to 3 troops.',
+            'Spear': 'Spear',
+            'Sword': 'Sword',
+            'Axe': 'Axe',
+            'Spy': 'Spy',
+            'Light': 'Light',
+            'Heavy': 'Heavy',
+            'Ram': 'Ram',
+            'Catapult': 'Catapult',
+            'Knight': 'Knight',
+            'Snob': 'Snob',
+            'Militia': 'Militia',
         },
     },
     allowedMarkets: [],
@@ -125,6 +138,37 @@ $.getScript(
         const TROOP_TYPES = {
             def: ['spear', 'sword', 'heavy'],
             atk: ['axe', 'light', 'ram'],
+            custom: [], // Será preenchido dinamicamente
+        };
+
+        // **Definição dos Tipos de Edifícios**
+        const BUILDING_TYPES = {
+            torre: 'watchtower',
+            muralha: 'wall',
+            nobres: 'snob',
+        };
+
+        // **Icones de Edifícios**
+        const buildingIcons = {
+            watchtower: '/graphic/buildings/watchtower.png',
+            wall: '/graphic/buildings/wall.png',
+            snob: '/graphic/unit/unit_snob.png',
+        };
+
+        // **Icones de Tropas**
+        const troopIcons = {
+            spear: '/graphic/unit/unit_spear.png',
+            sword: '/graphic/unit/unit_sword.png',
+            axe: '/graphic/unit/unit_axe.png',
+            spy: '/graphic/unit/unit_spy.png',
+            light: '/graphic/unit/unit_light.png',
+            heavy: '/graphic/unit/unit_heavy.png',
+            ram: '/graphic/unit/unit_ram.png',
+            catapult: '/graphic/unit/unit_catapult.png',
+            knight: '/graphic/unit/unit_knight.png',
+            snob: '/graphic/unit/unit_snob.png',
+            militia: '/graphic/unit/unit_militia.png',
+            // Adicione outros tipos de tropas conforme necessário
         };
 
         // **Ponto de Entrada**
@@ -197,6 +241,7 @@ $.getScript(
                         troops: troops,
                         villageCoords: extractCoordsFromName(villageName), // Função para extrair coordenadas
                         villageId: extractIdFromLink(villageLink.attr('href')), // Função para extrair ID da aldeia
+                        buildings: {}, // **Inicializa o objeto de edifícios**
                     });
 
                     // **Log de Depuração: Dados Extraídos por Aldeia**
@@ -216,6 +261,54 @@ $.getScript(
             return villagesData;
         }
 
+        // **Função para Extrair os Dados dos Edifícios**
+        function extractBuildingData(html) {
+            const buildingsData = [];
+
+            // Seleciona todas as linhas da tabela de edifícios
+            const rows = html.find('table.vis.w100 tr');
+
+            // Log de depuração: Número de linhas encontradas
+            if (DEBUG) {
+                console.log(`Número de linhas encontradas na tabela de edifícios: ${rows.length}`);
+            }
+
+            rows.each(function () {
+                const row = jQuery(this);
+                const cells = row.find('td');
+
+                // Verifica se a linha corresponde a uma aldeia (possui links para aldeias)
+                const villageLink = row.find('a[href*="screen=info_village&id="]');
+                if (villageLink.length > 0) {
+                    const villageName = villageLink.text().trim();
+
+                    const torre = parseInt(cells.eq(6).text().trim()) || 0; // watchtower.png (posição 6)
+                    const muralha = parseInt(cells.eq(18).text().trim()) || 0; // wall.png (posição 18)
+                    const nobres = parseInt(cells.eq(7).text().trim()) || 0; // snob.png (posição 7)
+
+                    buildingsData.push({
+                        villageName: villageName,
+                        torre: torre,
+                        muralha: muralha,
+                        nobres: nobres,
+                    });
+
+                    // **Log de Depuração: Dados Extraídos dos Edifícios**
+                    if (DEBUG) {
+                        console.log(`Edifícios da Aldeia: ${villageName}`);
+                        console.log(`Torre: ${torre}, Muralha: ${muralha}, Nobres: ${nobres}`);
+                    }
+                }
+            });
+
+            // **Log de Depuração: Dados Completos dos Edifícios**
+            if (DEBUG) {
+                console.log('Dados Extraídos dos Edifícios:', buildingsData);
+            }
+
+            return buildingsData;
+        }
+
         // **Função de Inicialização do Script**
         async function initScript() {
             const playersToFetch = await getTribeMembersList();
@@ -225,12 +318,13 @@ $.getScript(
                 const memberUrls = playersToFetch.map((item) => item.url);
 
                 // Mostrar barra de progresso e notificar o usuário
-                twSDK.startProgressBar(memberUrls.length);
+                twSDK.startProgressBar(memberUrls.length * 2); // **Ajustado para duas requisições por membro**
 
+                // **Primeira Requisição: Dados de Tropas**
                 twSDK.getAll(
                     memberUrls,
                     function (index, data) {
-                        twSDK.updateProgressBar(index, memberUrls.length);
+                        twSDK.updateProgressBar(index, memberUrls.length * 2);
 
                         // Parsear a resposta como HTML
                         const htmlDoc = jQuery.parseHTML(data);
@@ -255,29 +349,81 @@ $.getScript(
                         };
                     },
                     function () {
-                        if (DEBUG) {
-                            console.debug(`${scriptInfo} playersData`, playersData);
-                        }
+                        // **Segunda Requisição: Dados de Edifícios**
+                        const buildingUrls = playersToFetch.map((item) => {
+                            let buildingUrl = `/game.php?screen=ally&mode=members_buildings&player_id=${item.id}&village=${game_data.village.id}`;
+                            if (game_data.player.sitter != '0') {
+                                buildingUrl += `&t=${game_data.player.id}`;
+                            }
+                            return buildingUrl;
+                        });
 
-                        // Extrai os dados das tropas
-                        const allVillagesData = playersData
-                            .map(player => player.villagesData)
-                            .flat();
+                        twSDK.getAll(
+                            buildingUrls,
+                            function (index, data) {
+                                twSDK.updateProgressBar(index + memberUrls.length, memberUrls.length * 2);
 
-                        if (DEBUG) {
-                            console.log('Dados Extraídos das Aldeias após fetchAll:', allVillagesData);
-                        }
+                                // Parsear a resposta como HTML
+                                const htmlDoc = jQuery.parseHTML(data);
+                                const html = jQuery(htmlDoc);
 
-                        // Construir interface do usuário
-                        buildUI();
+                                // **Log de Depuração: Página HTML de Edifícios do Membro Carregada**
+                                if (DEBUG) {
+                                    console.log(`Página HTML de Edifícios para o Jogador ${playersData[index].name} carregada.`);
+                                }
 
-                        // Registrar manipuladores de ações
-                        handleCalculateStackPlans(playersData);
-                        handleBacklineStacks(playersData);
-                        handleExport();
+                                const buildingsData = extractBuildingData(html);
 
-                        // Registrar manipulador para mudança de tipo de tropa
-                        handleTroopTypeChange(allVillagesData);
+                                // **Log de Depuração: Dados de Edifícios por Jogador**
+                                if (DEBUG) {
+                                    console.log(`Dados de Edifícios para Jogador ${index + 1} (${playersData[index].name}):`, buildingsData);
+                                }
+
+                                // Atualiza as informações dos jogadores com os edifícios
+                                buildingsData.forEach((building) => {
+                                    const village = playersData[index].villagesData.find(
+                                        (v) => v.villageName === building.villageName
+                                    );
+                                    if (village) {
+                                        village.buildings = {
+                                            torre: building.torre,
+                                            muralha: building.muralha,
+                                            nobres: building.nobres,
+                                        };
+                                    }
+                                });
+                            },
+                            function () {
+                                if (DEBUG) {
+                                    console.debug(`${scriptInfo} playersData com edifícios`, playersData);
+                                }
+
+                                // Extrai os dados das tropas e edifícios
+                                const allVillagesData = playersData
+                                    .map(player => player.villagesData)
+                                    .flat();
+
+                                if (DEBUG) {
+                                    console.log('Dados Extraídos das Aldeias após fetchAll:', allVillagesData);
+                                }
+
+                                // Construir interface do usuário
+                                buildUI();
+
+                                // Registrar manipuladores de ações
+                                handleCalculateStackPlans(playersData);
+                                handleBacklineStacks(playersData);
+                                handleExport();
+
+                                // Registrar manipulador para mudança de tipo de tropa
+                                handleTroopTypeChange(allVillagesData);
+                            },
+                            function () {
+                                UI.ErrorMessage(
+                                    twSDK.tt('Error fetching player incomings!')
+                                );
+                            }
+                        );
                     },
                     function () {
                         UI.ErrorMessage(
@@ -357,6 +503,25 @@ $.getScript(
                 <div class="ra-mb15">
                     ${troopTypeSelectorHtml} <!-- **Adicionado: Selector de Tipo de Tropa** -->
                 </div>
+                <!-- **Adicionado: Custom Troop Selector** -->
+                <div class="ra-mb15" id="raCustomTroopSelector" style="display: none;">
+                    <label class="ra-label">
+                        ${twSDK.tt('Select up to 3 troops')}
+                    </label>
+                    <div class="ra-custom-troop-options">
+                        ${TROOP_ORDER.map(unit => `
+                            <label>
+                                <input type="checkbox" class="ra-custom-troop-checkbox" value="${unit}">
+                                <img src="${troopIcons[unit]}" alt="${unit}" title="${twSDK.tt(unit.charAt(0).toUpperCase() + unit.slice(1))}" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;">
+                                ${twSDK.tt(unit.charAt(0).toUpperCase() + unit.slice(1))}
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div id="raCustomTroopWarning" style="color: red; display: none;">
+                        ${twSDK.tt('You can only select up to 3 troops.')}
+                    </div>
+                </div>
+                <!-- **Fim: Custom Troop Selector** -->
                 <div>
                     <a href="javascript:void(0);" id="raPlanStacks" class="btn">
                         ${twSDK.tt('Calculate Stacks')}
@@ -380,6 +545,8 @@ $.getScript(
                 .ra-text-center .ra-input { text-align: center; }
                 .ra-troop-type-selector { display: flex; gap: 10px; align-items: center; }
                 .ra-troop-type-selector label { font-weight: 600; }
+                .ra-custom-troop-options { display: flex; flex-wrap: wrap; gap: 10px; }
+                .ra-custom-troop-options label { display: flex; align-items: center; gap: 4px; }
             `;
 
             twSDK.renderBoxWidget(
@@ -388,6 +555,17 @@ $.getScript(
                 'ra-frontline-stacks',
                 customStyle
             );
+
+            // **Adicionado: Evento para Limitar Seleção de 3 Tropas no Custom Selector**
+            jQuery('.ra-custom-troop-checkbox').on('change', function () {
+                const checkedBoxes = jQuery('.ra-custom-troop-checkbox:checked');
+                if (checkedBoxes.length > 3) {
+                    jQuery(this).prop('checked', false);
+                    jQuery('#raCustomTroopWarning').show();
+                } else {
+                    jQuery('#raCustomTroopWarning').hide();
+                }
+            });
         }
 
         // **Helper: Construir Selector de Tipo de Tropa**
@@ -402,6 +580,10 @@ $.getScript(
                     <label>
                         <input type="radio" name="raTroopType" value="atk">
                         ${twSDK.tt('Atacante')}
+                    </label>
+                    <label>
+                        <input type="radio" name="raTroopType" value="custom">
+                        ${twSDK.tt('Custom')}
                     </label>
                 </div>
             `;
@@ -419,13 +601,29 @@ $.getScript(
             jQuery('#raPlanStacks').on('click', function (e) {
                 e.preventDefault();
 
+                const userInput = collectUserInput();
+
+                if (!userInput) {
+                    // collectUserInput já tratou a mensagem de erro
+                    return;
+                }
+
                 const {
                     chosenTribes,
                     distance,
                     unitAmounts,
                     stackLimit,
                     scaleDownPerField,
-                } = collectUserInput();
+                    selectedTroopType, // **Adicionado**
+                } = userInput;
+
+                // **Definir TROOP_TYPES.custom se o tipo for 'custom'**
+                console.log(selectedTroopType)
+                if (selectedTroopType === 'custom') {
+                    TROOP_TYPES.custom = Object.keys(unitAmounts);
+                } else {
+                    TROOP_TYPES.custom = [];
+                }
 
                 const villagesThatNeedStack = findVillagesThatNeedStack(
                     playersData,
@@ -439,7 +637,8 @@ $.getScript(
                     const villagesToBeStacked = calculateAmountMissingTroops(
                         villagesThatNeedStack,
                         unitAmounts,
-                        scaleDownPerField
+                        scaleDownPerField,
+                        selectedTroopType // **Passar para a função**
                     );
 
                     villagesToBeStacked.sort(
@@ -475,6 +674,11 @@ $.getScript(
                 e.preventDefault();
 
                 const { chosenTribes, distance } = collectUserInput();
+
+                if (!chosenTribes) {
+                    // collectUserInput já tratou a mensagem de erro
+                    return;
+                }
 
                 let playerVillages = playersData
                     .map((player) => {
@@ -652,30 +856,6 @@ $.getScript(
             });
         }
 
-        // **Helper: Construir Selector de Tipo de Tropa**
-        function buildTroopTypeSelector() {
-            const content = `
-                <div class="ra-troop-type-selector">
-                    <label for="raTroopType">${twSDK.tt('Select Troop Type')}:</label>
-                    <label>
-                        <input type="radio" name="raTroopType" value="def" checked>
-                        ${twSDK.tt('Defensiva')}
-                    </label>
-                    <label>
-                        <input type="radio" name="raTroopType" value="atk">
-                        ${twSDK.tt('Atacante')}
-                    </label>
-                </div>
-            `;
-
-            // **Log de Depuração: Selector de Tipo de Tropa Construído**
-            if (DEBUG) {
-                console.log('Troop Type Selector HTML:', content);
-            }
-
-            return content;
-        }
-
         // **Helper: Construir Tabela de Aldeias**
         function buildVillagesTable(villages) {
             let villagesTableHtml = `
@@ -714,10 +894,36 @@ $.getScript(
                     troops,
                     pop,
                     missingTroops,
+                    buildings, // **Adicionado: Dados de Edifícios**
                 } = village;
                 let [x, y] = villageCoords.split('|');
                 let missingTroopsString =
                     buildMissingTroopsString(missingTroops);
+
+                // **Construir HTML dos Edifícios**
+                let buildingsHTML = '';
+                if (buildings) {
+                    const { torre, muralha, nobres } = buildings;
+                    buildingsHTML = `
+                        <div style="display: flex; justify-content: center; align-items: center; gap: 0px; flex: 1;">
+                            ${torre > 0
+                            ? `<img src="${buildingIcons.watchtower}" alt="Torre" title="Torre" style="width: 7px; height: 7px;">
+                                   <span style="font-size: 7px;">${torre}</span>`
+                            : ''
+                        }
+                            ${muralha > 0
+                            ? `<img src="${buildingIcons.wall}" alt="Muralha" title="Muralha" style="width: 7px; height: 7px;">
+                                   <span style="font-size: 7px;">${muralha}</span>`
+                            : ''
+                        }
+                            ${nobres > 0
+                            ? `<img src="${buildingIcons.snob}" alt="Nobres" title="Nobres" style="width: 7px; height: 7px;">
+                                   <span style="font-size: 7px;">${nobres}</span>`
+                            : ''
+                        }
+                        </div>
+                    `;
+                }
 
                 index++;
 
@@ -765,9 +971,10 @@ $.getScript(
                 array.sort((a, b) => parseInt(a[7]) - parseInt(b[7]));
             }
 
+            // **Alteração: Tipo do Input de 'email' para 'text'**
             let dropdown = `<label for="ra${entity}" class="ra-label">${twSDK.tt(
                 'Select enemy tribes'
-            )}</label><input type="email" class="ra-input" multiple list="raSelect${entity}" placeholder="${twSDK.tt(
+            )}</label><input type="text" class="ra-input" multiple list="raSelect${entity}" placeholder="${twSDK.tt(
                 'Start typing and suggestions will show ...'
             )}" id="ra${entity}"><datalist id="raSelect${entity}">`;
 
@@ -801,7 +1008,7 @@ $.getScript(
             let missingTroopsString = '';
 
             for (let [key, value] of Object.entries(missingTroops)) {
-                missingTroopsString += `${key}: ${value}\n`;
+                missingTroopsString += `${twSDK.tt(key.charAt(0).toUpperCase() + key.slice(1))}: ${value}\n`;
             }
 
             // **Log de Depuração: String de Tropas Faltantes**
@@ -873,22 +1080,6 @@ $.getScript(
                     mapOverlay.mapHandler.spawnSector;
             }
 
-            // Mapeamento de ícones das tropas
-            const unitIcons = {
-                spear: '/graphic/unit/unit_spear.png',
-                sword: '/graphic/unit/unit_sword.png',
-                axe: '/graphic/unit/unit_axe.png',
-                spy: '/graphic/unit/unit_spy.png',
-                light: '/graphic/unit/unit_light.png',
-                heavy: '/graphic/unit/unit_heavy.png',
-                ram: '/graphic/unit/unit_ram.png',
-                catapult: '/graphic/unit/unit_catapult.png',
-                knight: '/graphic/unit/unit_knight.png',
-                snob: '/graphic/unit/unit_snob.png',
-                militia: '/graphic/unit/unit_militia.png',
-                // Adicione outros tipos de tropas conforme necessário
-            };
-
             TWMap.mapHandler.spawnSector = function (data, sector) {
                 // Override Map Sector Spawn
                 mapOverlay.mapHandler._spawnSector(data, sector);
@@ -933,20 +1124,54 @@ $.getScript(
                                     troopsToDisplay = TROOP_TYPES.def;
                                 } else if (selectedTroopType === 'atk') {
                                     troopsToDisplay = TROOP_TYPES.atk;
+                                } else if (selectedTroopType === 'custom') {
+                                    troopsToDisplay = TROOP_TYPES.custom;
                                 }
 
-                                // **Início das Modificações**
-                                // Formatar a string com as contagens de cada tropa e seus ícones
+                                // **Início das Modificações: Adicionar Edifícios**
+                                const buildings = currentVillage.buildings;
+                                let buildingsHTML = '';
+                                if (buildings) {
+                                    const { torre, muralha, nobres } = buildings;
+                                    buildingsHTML = `
+                                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                            ${torre > 0
+                                            ? `<div style="display: flex; align-items: center; gap: 1px;">
+                                                   <img src="${buildingIcons.watchtower}" alt="Torre" title="Torre" style="width: 8px; height: 8px;">
+                                                   <span style="font-size: 8px;">${torre}</span>
+                                               </div>`
+                                            : '<div style="width: 20px;"></div>'
+                                        }
+                                            ${muralha > 0
+                                            ? `<div style="display: flex; align-items: center; gap: 1px;">
+                                                   <img src="${buildingIcons.wall}" alt="Muralha" title="Muralha" style="width: 8px; height: 8px;">
+                                                   <span style="font-size: 8px;">${muralha}</span>
+                                               </div>`
+                                            : '<div style="width: 20px;"></div>'
+                                        }
+                                            ${nobres > 0
+                                            ? `<div style="display: flex; align-items: center; gap: 1px;">
+                                                   <img src="${buildingIcons.snob}" alt="Nobres" title="Nobres" style="width: 8px; height: 8px;">
+                                                   <span style="font-size: 8px;">${nobres}</span>
+                                               </div>`
+                                            : '<div style="width: 20px;"></div>'
+                                        }
+                                        </div>
+                                    `;
+                                }
+                                // **Fim das Modificações**
+
+                                // **Início das Modificações: Adicionar Tropas**
                                 const troops = currentVillage.troops;
                                 let villageTroopsHTML = '';
 
                                 troopsToDisplay.forEach((unit) => {
-                                    const count = troops[unit];
-                                    if (count > 0 && unitIcons[unit]) {
+                                    const count = troops[unit] || 0; // Mostra 0 se não houver tropas
+                                    if (count > 0 && troopIcons[unit]) {
                                         villageTroopsHTML += `
-                                            <div style="display: flex; align-items: center; justify-content: center; gap: 2px; flex: 1;">
-                                                <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 12px; height: 12px;">
-                                                <span style="font-size: 10px;">${count}</span>
+                                            <div style="display: flex; align-items: center; gap: 1px; width: 100%;">
+                                                <img src="${troopIcons[unit]}" alt="${unit}" title="${twSDK.tt(unit.charAt(0).toUpperCase() + unit.slice(1))}" style="width: 8px; height: 8px;">
+                                                <span style="font-size: 8px;">${count}</span>
                                             </div>
                                         `;
                                     }
@@ -956,29 +1181,35 @@ $.getScript(
                                 if (villageTroopsHTML === '') {
                                     villageTroopsHTML = '0';
                                 }
-
                                 // **Fim das Modificações**
 
-const eleDIV = $('<div></div>')
-    .css({
-        position: 'absolute',
-        display: 'flex',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '1px',
-        padding: '2px',
-        backgroundColor: 'rgba(255, 255, 255, 0.6)', // Cor de fundo atualizada para branco semi-transparente
-        color: '#000', // Opcional: Alterar a cor do texto para preto para melhor contraste
-        width: '50px', // Mantido conforme solicitado
-        height: '35px', // Mantido conforme solicitado
-        zIndex: '10',
-        fontSize: '10px', // Reduzido para melhor legibilidade
-        overflow: 'hidden', // Evita que o conteúdo ultrapasse o div
-    })
-    .attr('id', 'dsm' + v.id)
-    .html(villageTroopsHTML); // Alterado para exibir as tropas com ícones e texto reduzido
+                                // **Início das Modificações: Estrutura do Quadradinho**
+                                const eleDIV = $('<div></div>')
+                                    .css({
+                                        position: 'absolute',
+                                        display: 'flex',
+                                        flexDirection: 'column', // Flex column para estruturar as linhas
+                                        alignItems: 'flex-start',
+                                        justifyContent: 'flex-start',
+                                        gap: '0px',
+                                        padding: '0px',
+                                        backgroundColor: 'rgba(255, 255, 255, 0.6)', // Cor de fundo atualizada para branco semi-transparente
+                                        color: '#000', // Cor do texto alterada para preto
+                                        width: '53px', // Mantido conforme solicitado
+                                        height: '38px', // Aumentado para acomodar edifícios e tropas
+                                        zIndex: '10',
+                                        fontSize: '8px', // Mantido para legibilidade
+                                        overflow: 'hidden', // Evita que o conteúdo ultrapasse o div
+                                    })
+                                    .attr('id', 'dsm' + v.id)
+                                    .html(`
+                                        ${buildingsHTML}
+                                        <div style="display: flex; flex-direction: column; gap: 0px; width: 100%;">
+                                            ${villageTroopsHTML}
+                                        </div>
+                                    `); // Estrutura ajustada para incluir edifícios e tropas
+
+                                // **Fim das Modificações**
 
                                 sector.appendElement(
                                     eleDIV[0],
@@ -990,6 +1221,7 @@ const eleDIV = $('<div></div>')
                                 if (DEBUG) {
                                     console.log(`Atualizando Mapa para Aldeia: ${currentVillage.villageName}`);
                                     console.log('Tropas no Mapa:', troops);
+                                    console.log('Edifícios no Mapa:', buildings);
                                 }
                             }
                         }
@@ -1000,11 +1232,13 @@ const eleDIV = $('<div></div>')
             mapOverlay.reload();
         }
 
+
         // **Helper: Calcular Quantidades de Tropas Necessárias para Cada Aldeia**
         function calculateAmountMissingTroops(
             villagesThatNeedStack,
             unitAmounts,
-            scaleDownPerField
+            scaleDownPerField,
+            selectedTroopType // **Novo parâmetro**
         ) {
             let villagesToBeStacked = [];
 
@@ -1015,7 +1249,8 @@ const eleDIV = $('<div></div>')
                     troops,
                     unitAmounts,
                     distance,
-                    scaleDownPerField
+                    scaleDownPerField,
+                    selectedTroopType // **Passar para a função**
                 );
 
                 villagesToBeStacked.push({
@@ -1037,23 +1272,43 @@ const eleDIV = $('<div></div>')
             troops,
             unitAmounts,
             distance,
-            scaleDownPerField
+            scaleDownPerField,
+            selectedTroopType // **Novo parâmetro**
         ) {
             let missingTroops = {};
 
             const nonScalingUnits = ['spy', 'heavy'];
 
-            distance = distance - 1;
+            if (DEBUG) {
+                console.log(`Selected Troop Type: ${selectedTroopType}`);
+                console.log('Unit Amounts:', unitAmounts);
+                console.log('Troops Available:', troops);
+                console.log('Fields Away:', distance);
+                console.log('Scale Down Per Field:', scaleDownPerField);
+            }
 
-            for (let [key, value] of Object.entries(unitAmounts)) {
-                let troopsAfterScalingDown =
-                    value - parseInt(distance) * scaleDownPerField * 1000;
-                if (
-                    troopsAfterScalingDown > 0 &&
-                    !nonScalingUnits.includes(key)
-                ) {
-                    let troopsDifference = troops[key] - troopsAfterScalingDown;
-                    missingTroops[key] = Math.abs(troopsDifference);
+            if (selectedTroopType !== 'custom') {
+                // Aplicar scaleDownPerField apenas para modos defensivo e atacante
+                const adjustedDistance = distance - 1;
+
+                for (let [key, value] of Object.entries(unitAmounts)) {
+                    let troopsAfterScalingDown =
+                        value - parseInt(adjustedDistance) * scaleDownPerField * 1000;
+                    if (
+                        troopsAfterScalingDown > 0 &&
+                        !nonScalingUnits.includes(key)
+                    ) {
+                        let troopsDifference = troops[key] - troopsAfterScalingDown;
+                        missingTroops[key] = Math.abs(troopsDifference);
+                    }
+                }
+            } else {
+                // No modo custom, calcular diretamente sem scaleDownPerField
+                for (let [key, value] of Object.entries(unitAmounts)) {
+                    let troopsDifference = troops[key] - value;
+                    if (troopsDifference < 0) {
+                        missingTroops[key] = Math.abs(troopsDifference);
+                    }
                 }
             }
 
@@ -1177,29 +1432,59 @@ const eleDIV = $('<div></div>')
 
         // **Helper: Coletar Entrada do Usuário**
         function collectUserInput() {
-            let chosenTribes = jQuery('#raTribes').val().trim();
+            let chosenTribes = jQuery('#raTribes').val();
+
+            if (!chosenTribes || chosenTribes.length === 0) {
+                UI.ErrorMessage(twSDK.tt('You need to select an enemy tribe!'));
+                return null; // Early exit if no tribes selected
+            }
+
+            // If chosenTribes is a string, split by comma; if it's already array, use as is
+            if (typeof chosenTribes === 'string') {
+                chosenTribes = chosenTribes.split(',').map(item => item.trim());
+            } else if (Array.isArray(chosenTribes)) {
+                chosenTribes = chosenTribes.map(item => item.trim());
+            } else {
+                // If it's neither string nor array, convert to array
+                chosenTribes = [chosenTribes];
+            }
+
             let distance = parseInt(jQuery('#raDistance').val());
             let stackLimit = parseInt(jQuery('#raStack').val());
             let scaleDownPerField = parseInt(jQuery('#raScalePerField').val());
             let unitAmounts = {};
 
-            if (chosenTribes === '') {
-                UI.ErrorMessage(twSDK.tt('You need to select an enemy tribe!'));
-            } else {
-                chosenTribes = chosenTribes.split(',').map(item => item.trim());
+            const selectedTroopType = jQuery('input[name="raTroopType"]:checked').val();
+            console.log(selectedTroopType)
+
+            if (selectedTroopType === 'def' || selectedTroopType === 'atk') {
+                jQuery('#raUnitSelector input').each(function () {
+                    const unit = jQuery(this).attr('data-unit');
+                    const amount = parseInt(jQuery(this).val());
+
+                    if (amount > 0) {
+                        unitAmounts = {
+                            ...unitAmounts,
+                            [unit]: amount,
+                        };
+                    }
+                });
+            } else if (selectedTroopType == 'custom') {
+                console.log("dentro do else if custom")
+                const selectedCustomTroops = jQuery('.ra-custom-troop-checkbox:checked').map(function () {
+                    return jQuery(this).val();
+                }).get();
+                console.log(selectedCustomTroops)
+                selectedCustomTroops.forEach(unit => {
+                    const amount = parseInt(jQuery(`#unit_${unit}`).val()) || 0;
+                    if (amount >= 0) {
+                        unitAmounts = {
+                            ...unitAmounts,
+                            [unit]: amount,
+                        };
+                    }
+                });
             }
-
-            jQuery('#raUnitSelector input').each(function () {
-                const unit = jQuery(this).attr('data-unit');
-                const amount = parseInt(jQuery(this).val());
-
-                if (amount > 0) {
-                    unitAmounts = {
-                        ...unitAmounts,
-                        [unit]: amount,
-                    };
-                }
-            });
 
             // **Log de Depuração: Coleta de Entrada do Usuário**
             if (DEBUG) {
@@ -1209,6 +1494,7 @@ const eleDIV = $('<div></div>')
                     stackLimit,
                     scaleDownPerField,
                     unitAmounts,
+                    selectedTroopType, // **Adicionado**
                 });
             }
 
@@ -1218,6 +1504,7 @@ const eleDIV = $('<div></div>')
                 unitAmounts,
                 stackLimit,
                 scaleDownPerField,
+                selectedTroopType, // **Adicionado**
             };
         }
 
@@ -1329,8 +1616,16 @@ const eleDIV = $('<div></div>')
                     console.log(`Troop Type Changed to: ${selectedTroopType}`);
                 }
 
-                // Atualizar o mapa com base no novo tipo de tropa selecionado
-                updateMap(allVillagesData);
+                if (selectedTroopType === 'custom') {
+                    jQuery('#raCustomTroopSelector').show();
+                } else {
+                    jQuery('#raCustomTroopSelector').hide();
+                }
+
+                // **Alteração: Atualizar o mapa apenas para 'def' ou 'atk'**
+                if (selectedTroopType !== 'custom') {
+                    updateMap(allVillagesData);
+                }
             });
         }
     }
