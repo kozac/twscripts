@@ -1,7 +1,7 @@
 /*
  * Script Name: Frontline Stacks Planner
- * Version: v1.0.7
- * Last Updated: 2025-01-09
+ * Version: v1.0.8
+ * Last Updated: 2025-01-10
  * Author: RedAlert
  * Author URL: https://twscripts.dev/
  * Author Contact: redalert_tw (Discord)
@@ -23,7 +23,7 @@ var scriptConfig = {
     scriptData: {
         prefix: 'frontlineStacksPlanner',
         name: `Frontline Stacks Planner`,
-        version: 'v1.0.7',
+        version: 'v1.0.8',
         author: 'RedAlert',
         authorUrl: 'https://twscripts.dev/',
         helpLink:
@@ -56,7 +56,6 @@ var scriptConfig = {
             Village: 'Village',
             Map: 'Map',
             'Pop.': 'Pop.',
-            Distance: 'Distance',
             'Missing Troops': 'Missing Troops',
             'All villages have been properly stacked!':
                 'All villages have been properly stacked!',
@@ -253,9 +252,9 @@ $.getScript(
                 if (villageLink.length > 0) {
                     const villageName = villageLink.text().trim();
 
-                    const torre = parseInt(cells.eq(6).text().trim()) || 0; // watchtower.png
-                    const muralha = parseInt(cells.eq(18).text().trim()) || 0; // wall.png
-                    const nobres = parseInt(cells.eq(7).text().trim()) || 0; // snob.png (hidden)
+                    const torre = parseInt(cells.eq(5).text().trim()) || 0; // watchtower.png (posição 5)
+                    const muralha = parseInt(cells.eq(16).text().trim()) || 0; // wall.png (posição 16)
+                    const nobres = parseInt(cells.eq(6).text().trim()) || 0; // snob.png (posição 6)
 
                     buildingsData.push({
                         villageName: villageName,
@@ -1063,17 +1062,17 @@ $.getScript(
                                         <div style="display: flex; justify-content: center; align-items: center; gap: 2px; flex: 1;">
                                             ${torre > 0
                                             ? `<img src="${buildingIcons.watchtower}" alt="Torre" title="Torre" style="width: 8px; height: 8px;">
-                                                       <span style="font-size: 6px;">${torre}</span>`
+                                               <span style="font-size: 6px;">${torre}</span>`
                                             : ''
                                         }
                                             ${muralha > 0
                                             ? `<img src="${buildingIcons.wall}" alt="Muralha" title="Muralha" style="width: 8px; height: 8px;">
-                                                       <span style="font-size: 6px;">${muralha}</span>`
+                                               <span style="font-size: 6px;">${muralha}</span>`
                                             : ''
                                         }
                                             ${nobres > 0
                                             ? `<img src="${buildingIcons.snob}" alt="Nobres" title="Nobres" style="width: 8px; height: 8px;">
-                                                       <span style="font-size: 6px;">${nobres}</span>`
+                                               <span style="font-size: 6px;">${nobres}</span>`
                                             : ''
                                         }
                                         </div>
@@ -1103,20 +1102,20 @@ $.getScript(
                                 }
                                 // **Fim das Modificações**
 
+                                // **Início das Modificações: Estrutura do Quadradinho**
                                 const eleDIV = $('<div></div>')
                                     .css({
                                         position: 'absolute',
                                         display: 'flex',
-                                        flexDirection: 'column', // Alterado para coluna
-                                        flexWrap: 'wrap',
+                                        flexDirection: 'column', // Flex column para estruturar as linhas
                                         alignItems: 'center',
-                                        justifyContent: 'center',
+                                        justifyContent: 'flex-start',
                                         gap: '1px',
                                         padding: '2px',
                                         backgroundColor: 'rgba(255, 255, 255, 0.6)', // Cor de fundo atualizada para branco semi-transparente
                                         color: '#000', // Cor do texto alterada para preto
                                         width: '50px', // Mantido conforme solicitado
-                                        height: '50px', // Aumentado para acomodar edifícios
+                                        height: '60px', // Aumentado para acomodar edifícios e tropas
                                         zIndex: '10',
                                         fontSize: '6px', // Mantido para legibilidade
                                         overflow: 'hidden', // Evita que o conteúdo ultrapasse o div
@@ -1124,10 +1123,13 @@ $.getScript(
                                     .attr('id', 'dsm' + v.id)
                                     .html(`
                                         ${buildingsHTML}
-                                        <div style="display: flex; flex-direction: column; gap: 1px; width: 100%; height: 100%;">
+                                        <hr style="width: 100%; border: none; border-top: 1px solid #ccc; margin: 1px 0;">
+                                        <div style="display: flex; flex-direction: column; gap: 1px; width: 100%;">
                                             ${villageTroopsHTML}
                                         </div>
-                                    `); // Alterado para incluir edifícios e tropas
+                                    `); // Estrutura ajustada para incluir uma linha separadora
+
+                                // **Fim das Modificações**
 
                                 sector.appendElement(
                                     eleDIV[0],
@@ -1150,8 +1152,6 @@ $.getScript(
 
             mapOverlay.reload();
         }
-
-
 
         // **Helper: Calcular Quantidades de Tropas Necessárias para Cada Aldeia**
         function calculateAmountMissingTroops(
