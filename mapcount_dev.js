@@ -601,13 +601,20 @@ $.getScript(
             jQuery('#raPlanStacks').on('click', function (e) {
                 e.preventDefault();
 
+                const userInput = collectUserInput();
+
+                if (!userInput) {
+                    // collectUserInput já tratou a mensagem de erro
+                    return;
+                }
+
                 const {
                     chosenTribes,
                     distance,
                     unitAmounts,
                     stackLimit,
                     scaleDownPerField,
-                } = collectUserInput();
+                } = userInput;
 
                 const villagesThatNeedStack = findVillagesThatNeedStack(
                     playersData,
@@ -657,6 +664,11 @@ $.getScript(
                 e.preventDefault();
 
                 const { chosenTribes, distance } = collectUserInput();
+
+                if (!chosenTribes) {
+                    // collectUserInput já tratou a mensagem de erro
+                    return;
+                }
 
                 let playerVillages = playersData
                     .map((player) => {
@@ -949,9 +961,10 @@ $.getScript(
                 array.sort((a, b) => parseInt(a[7]) - parseInt(b[7]));
             }
 
+            // **Alteração: Tipo do Input de 'email' para 'text'**
             let dropdown = `<label for="ra${entity}" class="ra-label">${twSDK.tt(
                 'Select enemy tribes'
-            )}</label><input type="email" class="ra-input" multiple list="raSelect${entity}" placeholder="${twSDK.tt(
+            )}</label><input type="text" class="ra-input" multiple list="raSelect${entity}" placeholder="${twSDK.tt(
                 'Start typing and suggestions will show ...'
             )}" id="ra${entity}"><datalist id="raSelect${entity}">`;
 
@@ -1201,13 +1214,13 @@ $.getScript(
                                     console.log('Edifícios no Mapa:', buildings);
                                 }
                             }
-                        }}
+                        }
                     }
-                };
+                }
+            };
 
-                mapOverlay.reload();
-            }
-        
+            mapOverlay.reload();
+        }
 
         // **Helper: Calcular Quantidades de Tropas Necessárias para Cada Aldeia**
         function calculateAmountMissingTroops(
@@ -1386,17 +1399,27 @@ $.getScript(
 
         // **Helper: Coletar Entrada do Usuário**
         function collectUserInput() {
-            let chosenTribes = jQuery('#raTribes').val().trim();
+            let chosenTribes = jQuery('#raTribes').val();
+
+            if (!chosenTribes || chosenTribes.length === 0) {
+                UI.ErrorMessage(twSDK.tt('You need to select an enemy tribe!'));
+                return null; // Early exit if no tribes selected
+            }
+
+            // If chosenTribes is a string, split by comma; if it's already array, use as is
+            if (typeof chosenTribes === 'string') {
+                chosenTribes = chosenTribes.split(',').map(item => item.trim());
+            } else if (Array.isArray(chosenTribes)) {
+                chosenTribes = chosenTribes.map(item => item.trim());
+            } else {
+                // If it's neither string nor array, convert to array
+                chosenTribes = [chosenTribes];
+            }
+
             let distance = parseInt(jQuery('#raDistance').val());
             let stackLimit = parseInt(jQuery('#raStack').val());
             let scaleDownPerField = parseInt(jQuery('#raScalePerField').val());
             let unitAmounts = {};
-
-            if (chosenTribes === '') {
-                UI.ErrorMessage(twSDK.tt('You need to select an enemy tribe!'));
-            } else {
-                chosenTribes = chosenTribes.split(',').map(item => item.trim());
-            }
 
             const selectedTroopType = jQuery('input[name="raTroopType"]:checked').val();
 
