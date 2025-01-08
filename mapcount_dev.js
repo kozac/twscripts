@@ -244,9 +244,6 @@ $.getScript(
                         buildings: {}, // **Inicializa o objeto de edifícios**
                     });
 
-                    // Adiciona os dados de tropas disponíveis
-                    villagesData[villagesData.length - 1].availableTroops = troops;
-
                     // **Log de Depuração: Dados Extraídos por Aldeia**
                     if (DEBUG) {
                         console.log(`Aldeia: ${villageName}`);
@@ -1164,11 +1161,11 @@ $.getScript(
                                 // **Fim das Modificações**
 
                                 // **Início das Modificações: Adicionar Tropas**
-                                const missingTroops = currentVillage.missingTroops; // Use missingTroops
+                                const troops = currentVillage.troops;
                                 let villageTroopsHTML = '';
 
                                 troopsToDisplay.forEach((unit) => {
-                                    const count = missingTroops[unit] || 0; // Use missingTroops
+                                    const count = troops[unit] || 0; // Mostra 0 se não houver tropas
                                     if (count > 0 && troopIcons[unit]) {
                                         villageTroopsHTML += `
                                             <div style="display: flex; align-items: center; gap: 1px; width: 100%;">
@@ -1222,17 +1219,18 @@ $.getScript(
                                 // **Log de Depuração: Atualização do Mapa para Aldeia**
                                 if (DEBUG) {
                                     console.log(`Atualizando Mapa para Aldeia: ${currentVillage.villageName}`);
-                                    console.log('Tropas no Mapa:', missingTroops);
+                                    console.log('Tropas no Mapa:', troops);
                                     console.log('Edifícios no Mapa:', buildings);
                                 }
                             }
                         }
                     }
-                };
+                }
+            };
 
-                mapOverlay.reload();
-            }
+            mapOverlay.reload();
         }
+
 
         // **Helper: Calcular Quantidades de Tropas Necessárias para Cada Aldeia**
         function calculateAmountMissingTroops(
