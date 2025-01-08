@@ -138,7 +138,7 @@ $.getScript(
         const buildingIcons = {
             watchtower: '/graphic/buildings/watchtower.png',
             wall: '/graphic/buildings/wall.png',
-            snob: '/graphic/buildings/snob.png',
+            snob: '/graphic/unit/unit_snob.png',
         };
 
         // **Ponto de Entrada**
@@ -1126,7 +1126,6 @@ $.getScript(
                                     .attr('id', 'dsm' + v.id)
                                     .html(`
                                 ${buildingsHTML}
-                                <hr style="width: 100%; border: none; border-top: 1px solid #ccc; margin: 1px 0;">
                                 <div style="display: flex; flex-direction: column; gap: 1px; width: 100%;">
                                     ${villageTroopsHTML}
                                 </div>
