@@ -817,20 +817,20 @@ $.getScript(
                 if (buildings) {
                     const { torre, muralha, nobres } = buildings;
                     buildingsHTML = `
-                        <div style="display: flex; justify-content: center; align-items: center; gap: 2px; flex: 1;">
+                        <div style="display: flex; justify-content: center; align-items: center; gap: 0px; flex: 1;">
                             ${torre > 0
-                            ? `<img src="${buildingIcons.watchtower}" alt="Torre" title="Torre" style="width: 8px; height: 8px;">
-                                       <span style="font-size: 6px;">${torre}</span>`
+                            ? `<img src="${buildingIcons.watchtower}" alt="Torre" title="Torre" style="width: 7px; height: 7px;">
+                                       <span style="font-size: 7px;">${torre}</span>`
                             : ''
                         }
                             ${muralha > 0
-                            ? `<img src="${buildingIcons.wall}" alt="Muralha" title="Muralha" style="width: 8px; height: 8px;">
-                                       <span style="font-size: 6px;">${muralha}</span>`
+                            ? `<img src="${buildingIcons.wall}" alt="Muralha" title="Muralha" style="width: 7px; height: 7px;">
+                                       <span style="font-size: 7px;">${muralha}</span>`
                             : ''
                         }
                             ${nobres > 0
-                            ? `<img src="${buildingIcons.snob}" alt="Nobres" title="Nobres" style="width: 8px; height: 8px;">
-                                       <span style="font-size: 6px;">${nobres}</span>`
+                            ? `<img src="${buildingIcons.snob}" alt="Nobres" title="Nobres" style="width: 7px; height: 7px;">
+                                       <span style="font-size: 7px;">${nobres}</span>`
                             : ''
                         }
                         </div>
