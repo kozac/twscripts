@@ -1,7 +1,7 @@
 /*
  * Script Name: Frontline Stacks Planner
- * Version: v1.0.8
- * Last Updated: 2025-01-10
+ * Version: v1.0.9
+ * Last Updated: 2025-01-11
  * Author: RedAlert
  * Author URL: https://twscripts.dev/
  * Author Contact: redalert_tw (Discord)
@@ -23,7 +23,7 @@ var scriptConfig = {
     scriptData: {
         prefix: 'frontlineStacksPlanner',
         name: `Frontline Stacks Planner`,
-        version: 'v1.0.8',
+        version: 'v1.0.9',
         author: 'RedAlert',
         authorUrl: 'https://twscripts.dev/',
         helpLink:
@@ -66,7 +66,9 @@ var scriptConfig = {
             'Select Troop Type': 'Select Troop Type',
             Defensiva: 'Defensive',
             Atacante: 'Attacking',
-            'Select Building Type': 'Select Building Type',
+            Custom: 'Custom',
+            'Select up to 3 troops': 'Select up to 3 troops',
+            'You can only select up to 3 troops.': 'You can only select up to 3 troops.',
         },
     },
     allowedMarkets: [],
@@ -125,6 +127,7 @@ $.getScript(
         const TROOP_TYPES = {
             def: ['spear', 'sword', 'heavy'],
             atk: ['axe', 'light', 'ram'],
+            custom: [], // Será preenchido dinamicamente
         };
 
         // **Definição dos Tipos de Edifícios**
@@ -252,9 +255,9 @@ $.getScript(
                 if (villageLink.length > 0) {
                     const villageName = villageLink.text().trim();
 
-                    const torre = parseInt(cells.eq(6).text().trim()) || 0; // watchtower.png (posição 5)
-                    const muralha = parseInt(cells.eq(18).text().trim()) || 0; // wall.png (posição 16)
-                    const nobres = parseInt(cells.eq(6).text().trim()) || 0; // snob.png (posição 6)
+                    const torre = parseInt(cells.eq(6).text().trim()) || 0; // watchtower.png (posição 6)
+                    const muralha = parseInt(cells.eq(18).text().trim()) || 0; // wall.png (posição 18)
+                    const nobres = parseInt(cells.eq(7).text().trim()) || 0; // snob.png (posição 7)
 
                     buildingsData.push({
                         villageName: villageName,
@@ -473,6 +476,24 @@ $.getScript(
                 <div class="ra-mb15">
                     ${troopTypeSelectorHtml} <!-- **Adicionado: Selector de Tipo de Tropa** -->
                 </div>
+                <!-- **Adicionado: Custom Troop Selector** -->
+                <div class="ra-mb15" id="raCustomTroopSelector" style="display: none;">
+                    <label class="ra-label">
+                        ${twSDK.tt('Select up to 3 troops')}
+                    </label>
+                    <div class="ra-custom-troop-options">
+                        ${TROOP_ORDER.map(unit => `
+                            <label>
+                                <input type="checkbox" class="ra-custom-troop-checkbox" value="${unit}">
+                                ${twSDK.tt(unit.charAt(0).toUpperCase() + unit.slice(1))}
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div id="raCustomTroopWarning" style="color: red; display: none;">
+                        ${twSDK.tt('You can only select up to 3 troops.')}
+                    </div>
+                </div>
+                <!-- **Fim: Custom Troop Selector** -->
                 <div>
                     <a href="javascript:void(0);" id="raPlanStacks" class="btn">
                         ${twSDK.tt('Calculate Stacks')}
@@ -496,6 +517,8 @@ $.getScript(
                 .ra-text-center .ra-input { text-align: center; }
                 .ra-troop-type-selector { display: flex; gap: 10px; align-items: center; }
                 .ra-troop-type-selector label { font-weight: 600; }
+                .ra-custom-troop-options { display: flex; flex-wrap: wrap; gap: 10px; }
+                .ra-custom-troop-options label { flex: 1 0 30%; }
             `;
 
             twSDK.renderBoxWidget(
@@ -504,6 +527,17 @@ $.getScript(
                 'ra-frontline-stacks',
                 customStyle
             );
+
+            // **Adicionado: Evento para Limitar Seleção de 3 Tropas no Custom Selector**
+            jQuery('.ra-custom-troop-checkbox').on('change', function () {
+                const checkedBoxes = jQuery('.ra-custom-troop-checkbox:checked');
+                if (checkedBoxes.length > 3) {
+                    jQuery(this).prop('checked', false);
+                    jQuery('#raCustomTroopWarning').show();
+                } else {
+                    jQuery('#raCustomTroopWarning').hide();
+                }
+            });
         }
 
         // **Helper: Construir Selector de Tipo de Tropa**
@@ -518,6 +552,10 @@ $.getScript(
                     <label>
                         <input type="radio" name="raTroopType" value="atk">
                         ${twSDK.tt('Atacante')}
+                    </label>
+                    <label>
+                        <input type="radio" name="raTroopType" value="custom">
+                        ${twSDK.tt('Custom')}
                     </label>
                 </div>
             `;
@@ -820,17 +858,17 @@ $.getScript(
                         <div style="display: flex; justify-content: center; align-items: center; gap: 0px; flex: 1;">
                             ${torre > 0
                             ? `<img src="${buildingIcons.watchtower}" alt="Torre" title="Torre" style="width: 7px; height: 7px;">
-                                       <span style="font-size: 7px;">${torre}</span>`
+                                   <span style="font-size: 7px;">${torre}</span>`
                             : ''
                         }
                             ${muralha > 0
                             ? `<img src="${buildingIcons.wall}" alt="Muralha" title="Muralha" style="width: 7px; height: 7px;">
-                                       <span style="font-size: 7px;">${muralha}</span>`
+                                   <span style="font-size: 7px;">${muralha}</span>`
                             : ''
                         }
                             ${nobres > 0
                             ? `<img src="${buildingIcons.snob}" alt="Nobres" title="Nobres" style="width: 7px; height: 7px;">
-                                       <span style="font-size: 7px;">${nobres}</span>`
+                                   <span style="font-size: 7px;">${nobres}</span>`
                             : ''
                         }
                         </div>
@@ -1051,41 +1089,40 @@ $.getScript(
                                     troopsToDisplay = TROOP_TYPES.def;
                                 } else if (selectedTroopType === 'atk') {
                                     troopsToDisplay = TROOP_TYPES.atk;
+                                } else if (selectedTroopType === 'custom') {
+                                    troopsToDisplay = TROOP_TYPES.custom;
                                 }
 
                                 // **Início das Modificações: Adicionar Edifícios**
                                 const buildings = currentVillage.buildings;
                                 let buildingsHTML = '';
                                 if (buildings) {
-                                    const { torre, muralha } = buildings;
-                                    const troops = currentVillage.troops;
-                                    console.log("troops: ",troops)
-                                    const nobres = troops.snob || 0; // Mostra 0 se não houver tropas
+                                    const { torre, muralha, nobres } = buildings;
                                     buildingsHTML = `
-                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                                    ${torre > 0
+                                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                            ${torre > 0
                                             ? `<div style="display: flex; align-items: center; gap: 1px;">
-                                           <img src="${buildingIcons.watchtower}" alt="Torre" title="Torre" style="width: 8px; height: 8px;">
-                                           <span style="font-size: 8px;">${torre}</span>
-                                       </div>`
+                                                   <img src="${buildingIcons.watchtower}" alt="Torre" title="Torre" style="width: 8px; height: 8px;">
+                                                   <span style="font-size: 8px;">${torre}</span>
+                                               </div>`
                                             : '<div style="width: 20px;"></div>'
                                         }
-                                    ${muralha > 0
+                                            ${muralha > 0
                                             ? `<div style="display: flex; align-items: center; gap: 1px;">
-                                           <img src="${buildingIcons.wall}" alt="Muralha" title="Muralha" style="width: 8px; height: 8px;">
-                                           <span style="font-size: 8px;">${muralha}</span>
-                                       </div>`
+                                                   <img src="${buildingIcons.wall}" alt="Muralha" title="Muralha" style="width: 8px; height: 8px;">
+                                                   <span style="font-size: 8px;">${muralha}</span>
+                                               </div>`
                                             : '<div style="width: 20px;"></div>'
                                         }
-                                    ${nobres > 0
+                                            ${nobres > 0
                                             ? `<div style="display: flex; align-items: center; gap: 1px;">
-                                           <img src="${buildingIcons.snob}" alt="Nobres" title="Nobres" style="width: 8px; height: 8px;">
-                                           <span style="font-size: 8px;">${nobres}</span>
-                                       </div>`
+                                                   <img src="${buildingIcons.snob}" alt="Nobres" title="Nobres" style="width: 8px; height: 8px;">
+                                                   <span style="font-size: 8px;">${nobres}</span>
+                                               </div>`
                                             : '<div style="width: 20px;"></div>'
                                         }
-                                </div>
-                            `;
+                                        </div>
+                                    `;
                                 }
                                 // **Fim das Modificações**
 
@@ -1095,14 +1132,20 @@ $.getScript(
 
                                 troopsToDisplay.forEach((unit) => {
                                     const count = troops[unit] || 0; // Mostra 0 se não houver tropas
-                                    villageTroopsHTML += `
-                                <div style="display: flex; align-items: center; gap: 0px; width: 100%;">
-                                    <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 8px; height: 8px;">
-                                    <span style="font-size: 8px;">${count}</span>
-                                </div>
-                            `;
+                                    if (count > 0 && unitIcons[unit]) {
+                                        villageTroopsHTML += `
+                                            <div style="display: flex; align-items: center; gap: 1px; width: 100%;">
+                                                <img src="${unitIcons[unit]}" alt="${unit}" title="${unit}" style="width: 8px; height: 8px;">
+                                                <span style="font-size: 8px;">${count}</span>
+                                            </div>
+                                        `;
+                                    }
                                 });
 
+                                // Se não houver tropas para exibir, exibe "0"
+                                if (villageTroopsHTML === '') {
+                                    villageTroopsHTML = '0';
+                                }
                                 // **Fim das Modificações**
 
                                 // **Início das Modificações: Estrutura do Quadradinho**
@@ -1125,11 +1168,11 @@ $.getScript(
                                     })
                                     .attr('id', 'dsm' + v.id)
                                     .html(`
-                                ${buildingsHTML}
-                                <div style="display: flex; flex-direction: column; gap: 0px; width: 100%;">
-                                    ${villageTroopsHTML}
-                                </div>
-                            `); // Estrutura ajustada para incluir uma linha separadora
+                                        ${buildingsHTML}
+                                        <div style="display: flex; flex-direction: column; gap: 0px; width: 100%;">
+                                            ${villageTroopsHTML}
+                                        </div>
+                                    `); // Estrutura ajustada para incluir edifícios e tropas
 
                                 // **Fim das Modificações**
 
@@ -1344,17 +1387,35 @@ $.getScript(
                 chosenTribes = chosenTribes.split(',').map(item => item.trim());
             }
 
-            jQuery('#raUnitSelector input').each(function () {
-                const unit = jQuery(this).attr('data-unit');
-                const amount = parseInt(jQuery(this).val());
+            const selectedTroopType = jQuery('input[name="raTroopType"]:checked').val();
 
-                if (amount > 0) {
-                    unitAmounts = {
-                        ...unitAmounts,
-                        [unit]: amount,
-                    };
-                }
-            });
+            if (selectedTroopType === 'def' || selectedTroopType === 'atk') {
+                jQuery('#raUnitSelector input').each(function () {
+                    const unit = jQuery(this).attr('data-unit');
+                    const amount = parseInt(jQuery(this).val());
+
+                    if (amount > 0) {
+                        unitAmounts = {
+                            ...unitAmounts,
+                            [unit]: amount,
+                        };
+                    }
+                });
+            } else if (selectedTroopType === 'custom') {
+                const selectedCustomTroops = jQuery('.ra-custom-troop-checkbox:checked').map(function () {
+                    return jQuery(this).val();
+                }).get();
+
+                selectedCustomTroops.forEach(unit => {
+                    const amount = parseInt(jQuery(`#unit_${unit}`).val()) || 0;
+                    if (amount > 0) {
+                        unitAmounts = {
+                            ...unitAmounts,
+                            [unit]: amount,
+                        };
+                    }
+                });
+            }
 
             // **Log de Depuração: Coleta de Entrada do Usuário**
             if (DEBUG) {
@@ -1482,6 +1543,12 @@ $.getScript(
 
                 if (DEBUG) {
                     console.log(`Troop Type Changed to: ${selectedTroopType}`);
+                }
+
+                if (selectedTroopType === 'custom') {
+                    jQuery('#raCustomTroopSelector').show();
+                } else {
+                    jQuery('#raCustomTroopSelector').hide();
                 }
 
                 // Atualizar o mapa com base no novo tipo de tropa selecionado
