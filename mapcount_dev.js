@@ -1470,6 +1470,7 @@ $.getScript(
                     }
                 });
             } else if (selectedTroopType === 'custom') {
+                console.log("dentro do else if custom")
                 const selectedCustomTroops = jQuery('.ra-custom-troop-checkbox:checked').map(function () {
                     return jQuery(this).val();
                 }).get();
