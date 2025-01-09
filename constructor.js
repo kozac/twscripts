@@ -2,7 +2,7 @@
 // @name                Upador Automático Tribal Wars
 // @namespace           Murilo KZC
 // @include             **screen=main*
-// @version             0.0.5
+// @version             0.0.6
 // @copyright           2018, Tribalwarsbr100 (https://openuserjs.org//users/Tribalwarsbr100)
 // @license             AGPL-3.0-or-later
 // @supportURL          https://github.com/tribalwarsbr100/Upador-Tribal-Wars/issues
@@ -11,6 +11,8 @@
 // @grant               GM_getValue
 // @grant               unsafeWindow
 // @grant               none
+// @updateURL    https://raw.githubusercontent.com/kozac/twscripts/main/constructor.js
+// @downloadURL  https://raw.githubusercontent.com/kozac/twscripts/main/constructor.js
 // ==/UserScript==
 
 
