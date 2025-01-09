@@ -4,9 +4,12 @@
 // @description  Auto scavenge and unlock new options
 // @author       Murilo KZC
 // @include      **mode=scavenge*
-// @run-at       document-end
+// @grant        none
+// @updateURL    https://raw.githubusercontent.com/kozac/twscripts/main/scavenge.js
+// @downloadURL  https://raw.githubusercontent.com/kozac/twscripts/main/scavenge.js
 // ==/UserScript==
 
+// (Conteúdo do script permanece o mesmo)
 (function () {
     "use strict";
 
