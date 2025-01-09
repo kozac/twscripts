@@ -20,7 +20,7 @@
     // =======================
 
     // Intervalo de refresh em minutos. Defina como 0 para desativar o refresh automático.
-    const refreshIntervalMinutes = 15; // Alterar conforme necessário
+    const refreshIntervalMinutes = 1; // Alterar conforme necessário
 
     // Número máximo de packs na fila de recrutamento.
     const maxPacksInQueue = 2; // Alterar para o número desejado de packs
