@@ -1,12 +1,11 @@
 // ==UserScript==
 // @name         Continuous Recruiting Enhanced
-// @version      0.1.3
+// @version      0.1.13
 // @description  Recruta automaticamente as unidades configuradas mantendo a fila de recrutamento sempre ativa. Inclui opções de refresh configurável, atualização automática e configuração de packs e quantidade de tropas por recrutamento.
 // @author       Murilo KZC
-// @match        https://*.tribalwars.com.br/*&screen=train*
-// @match        https://*.tribalwars.com.br/*&screen=stable*
-// @match        https://*.tribalwars.com.br/*&screen=barracks*
-// @require      https://code.jquery.com/jquery-3.6.0.min.js
+// @include        **screen=train*
+// @include        **screen=stable*
+// @include        **screen=barracks*
 // @grant        none
 // @run-at       document-end
 // @updateURL    https://raw.githubusercontent.com/kozac/twscripts/main/recrut.js
@@ -31,108 +30,132 @@
 
     // Configuração das unidades a recrutar
     const unidadesConfig = [
-        { nome: "spear", recrutar: true, selector: ".unit_sprite_smaller.spear" },
-        { nome: "sword", recrutar: false, selector: ".unit_sprite_smaller.sword" },
-        { nome: "axe", recrutar: false, selector: ".unit_sprite_smaller.axe" },
-        { nome: "spy", recrutar: false, selector: ".unit_sprite_smaller.spy" },
-        { nome: "light", recrutar: false, selector: ".unit_sprite_smaller.light" },
-        { nome: "heavy", recrutar: false, selector: ".unit_sprite_smaller.heavy" },
-        { nome: "ram", recrutar: false, selector: ".unit_sprite_smaller.ram" },
-        { nome: "catapult", recrutar: false, selector: ".unit_sprite_smaller.catapult" }
+        { nome: "spear", recrutar: true, selector: 'input[name="spear"]' },
+        { nome: "sword", recrutar: false, selector: 'input[name="sword"]' },
+        { nome: "axe", recrutar: false, selector: 'input[name="axe"]' },
+        { nome: "spy", recrutar: false, selector: 'input[name="spy"]' },
+        { nome: "light", recrutar: false, selector: 'input[name="light"]' },
+        { nome: "heavy", recrutar: false, selector: 'input[name="heavy"]' },
+        { nome: "ram", recrutar: false, selector: 'input[name="ram"]' },
+        { nome: "catapult", recrutar: false, selector: 'input[name="catapult"]' }
     ];
+
+    // Flag para evitar recrutamentos simultâneos
+    let isAddingPack = false;
 
     // ===========================
     // Funções Auxiliares
     // ===========================
 
-    // Função para gerar um tempo aleatório entre inferior e superior (em ms)
+    /**
+     * Gera um tempo aleatório entre inferior e superior (em milissegundos)
+     * @param {number} inferior - Limite inferior em ms
+     * @param {number} superior - Limite superior em ms
+     * @returns {number} - Tempo aleatório gerado
+     */
     function gerarTempoAleatorio(inferior, superior) {
         return Math.round(Math.random() * (superior - inferior) + inferior);
     }
 
-    // Função para verificar e recrutar unidades
+    /**
+     * Conta o número de packs na fila de recrutamento
+     * @returns {number} - Número de packs na fila
+     */
+    function contarPacksNaFila() {
+        const fila = $('#trainqueue_barracks');
+        let count = 0;
+        if (fila.length > 0) {
+            // Conta as linhas com a classe .sortable_row
+            count += fila.find('.sortable_row').length;
+        }
+        // Conta a linha com a classe .lit (se existir)
+        const litRow = $('#trainqueue_wrap_barracks tr.lit').length;
+        count += litRow;
+        return count;
+    }
+
+    /**
+     * Verifica e recruta unidades conforme a configuração
+     */
     function verificarERecrutar() {
-        // Contar o número atual de packs na fila
-        const currentPacks = $('.train_queue .queue_item').length;
-        const packsToAdd = maxPacksInQueue - currentPacks;
-
-        if (packsToAdd <= 0) {
-            console.log(`Número máximo de packs na fila já alcançado (${maxPacksInQueue}).`);
+        if (isAddingPack) {
+            console.log("Já está adicionando um pack. Aguardando.");
             return;
         }
+        try {
+            const currentPacks = contarPacksNaFila();
+            let packsToAdd = maxPacksInQueue - currentPacks;
 
-        console.log(`Packs na fila: ${currentPacks}. Adicionando ${packsToAdd} pack(s).`);
+            if (packsToAdd <= 0) {
+                console.log(`Número máximo de packs na fila já alcançado (${maxPacksInQueue}).`);
+                return;
+            }
 
-        // Selecionar as unidades que devem ser recrutadas
-        const unidadesParaRecrutar = unidadesConfig.filter(unidade => unidade.recrutar);
+            console.log(`Packs na fila: ${currentPacks}. Adicionando ${packsToAdd} pack(s).`);
 
-        if (unidadesParaRecrutar.length === 0) {
-            console.warn("Nenhuma unidade configurada para recrutamento.");
-            return;
-        }
+            // Selecionar as unidades que devem ser recrutadas
+            const unidadesParaRecrutar = unidadesConfig.filter(unidade => unidade.recrutar);
 
-        // Distribuir os packs entre as unidades configuradas
-        for (let i = 0; i < packsToAdd; i++) {
-            // Selecionar a unidade em ordem sequencial (round-robin)
-            const unidade = unidadesParaRecrutar[i % unidadesParaRecrutar.length];
+            if (unidadesParaRecrutar.length === 0) {
+                console.warn("Nenhuma unidade configurada para recrutamento.");
+                return;
+            }
 
-            // Verificar se a unidade está disponível para recrutamento
-            if ($(unidade.selector).length > 0) {
-                const input = $(`input[name=${unidade.nome}]`);
-                if (input.length > 0 && !input.parent().is(":hidden")) {
+            // Recrutar packs conforme necessário
+            unidadesParaRecrutar.forEach(unidade => {
+                if (packsToAdd <= 0) return; // Já adicionou o número necessário de packs
+
+                const input = $(unidade.selector);
+                if (input.length > 0 && input.is(':visible')) {
                     input.val(unitsPerRecruit);
                     console.log(`Recrutando unidade: ${unidade.nome} com quantidade: ${unitsPerRecruit}`);
-                } else {
-                    console.warn(`Input para a unidade ${unidade.nome} não encontrado ou está oculto.`);
-                    continue;
-                }
 
-                // Clicar no botão de recrutar
-                $(".btn-recruit").click();
-            } else {
-                console.warn(`Elemento para a unidade ${unidade.nome} não encontrado.`);
-            }
-        }
-    }
+                    // Clicar no botão de recrutar
+                    const recrutarBtn = $('.btn-recruit');
+                    if (recrutarBtn.length > 0 && recrutarBtn.is(':visible') && !recrutarBtn.prop('disabled')) {
+                        isAddingPack = true;
+                        recrutarBtn.click();
+                        console.log(`Clique no botão de recrutar para ${unidade.nome}`);
 
-    // Função para inicializar o observador de mudanças na fila de recrutamento
-    function iniciarObservador() {
-        // Ajuste o seletor para a área correta da fila de recrutamento
-        const targetNode = document.querySelector('.train_units'); // Verifique se este seletor está correto
-        if (!targetNode) {
-            console.warn("Elemento para observação não encontrado.");
-            return;
-        }
+                        // Adicionar um pequeno delay para evitar problemas
+                        setTimeout(() => {
+                            isAddingPack = false;
+                            verificarERecrutar(); // Chamada recursiva após delay
+                        }, 2000); // 2 segundos
 
-        const config = { childList: true, subtree: true };
-
-        const callback = function(mutationsList, observer) {
-            for (let mutation of mutationsList) {
-                if (mutation.type === 'childList') {
-                    // Verificar se a fila está abaixo do máximo após a mudança
-                    const currentPacks = $('.train_queue .queue_item').length;
-                    if (currentPacks < maxPacksInQueue) {
-                        verificarERecrutar();
+                        packsToAdd--; // Reduzir o número de packs a adicionar
+                    } else {
+                        console.warn("Botão de recrutar não está disponível.");
                     }
+                } else {
+                    console.warn(`Input para a unidade ${unidade.nome} não encontrado ou não está visível.`);
                 }
-            }
-        };
+            });
 
-        const observer = new MutationObserver(callback);
-        observer.observe(targetNode, config);
+        } catch (error) {
+            console.error("Erro na função verificarERecrutar:", error);
+        }
     }
 
-    // Função para gerenciar o ciclo de verificação com intervalos aleatórios
+    /**
+     * Inicia o ciclo de verificação com intervalos aleatórios
+     */
     function iniciarCiclo() {
-        const tempo = gerarTempoAleatorio(10000, 60000); // Entre 10s e 60s
-        console.log(`Próxima verificação em ${tempo / 1000} segundos.`);
-        setTimeout(() => {
-            verificarERecrutar();
-            iniciarCiclo();
-        }, tempo);
+        try {
+            const tempo = gerarTempoAleatorio(10000, 60000); // Entre 10s e 60s
+            console.log(`Próxima verificação em ${tempo / 1000} segundos.`);
+            setTimeout(() => {
+                verificarERecrutar();
+                iniciarCiclo();
+            }, tempo);
+        } catch (error) {
+            console.error("Erro na função iniciarCiclo:", error);
+        }
     }
 
-    // Função para agendar o refresh da página
+    /**
+     * Agenda o refresh da página conforme a configuração
+     */
     function agendarRefresh() {
         if (refreshIntervalMinutes <= 0) {
             console.log("Refresh automático desativado.");
@@ -152,16 +175,36 @@
     // Inicialização do Script
     // ===========================
 
-    $(document).ready(function() {
-        console.log("Script de recrutamento contínuo aprimorado iniciado.");
+    /**
+     * Espera até que o formulário de recrutamento e os inputs estejam disponíveis
+     * @param {Function} callback - Função a ser chamada após a disponibilidade
+     */
+    function esperarInputsRecrutamento(callback) {
+        const interval = setInterval(() => {
+            const form = $('#train_form');
+            if (form.length > 0) {
+                // Verificar se pelo menos um input está presente e visível
+                const inputsExistem = unidadesConfig.some(unidade => $(unidade.selector).length > 0 && $(unidade.selector).is(':visible'));
+                if (inputsExistem) {
+                    clearInterval(interval);
+                    callback();
+                }
+            }
+        }, 500); // Verifica a cada 500ms
+    }
 
-        verificarERecrutar(); // Verificação inicial
+    esperarInputsRecrutamento(() => {
+        try {
+            console.log("Script de recrutamento contínuo aprimorado iniciado.");
 
-        iniciarCiclo(); // Iniciar ciclo de verificações
+            verificarERecrutar(); // Verificação inicial
 
-        iniciarObservador(); // Iniciar observador de mudanças na fila
+            iniciarCiclo(); // Iniciar ciclo de verificações
 
-        agendarRefresh(); // Agendar refresh da página, se configurado
+            agendarRefresh(); // Agendar refresh da página, se configurado
+        } catch (error) {
+            console.error("Erro na inicialização do script:", error);
+        }
     });
 
 })();
