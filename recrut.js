@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Continuous Recruiting Enhanced
-// @version      0.1.1
-// @description  Recruta automaticamente as unidades configuradas mantendo a fila de recrutamento sempre ativa. Inclui opção de refresh configurável.
+// @version      0.1.2
+// @description  Recruta automaticamente as unidades configuradas mantendo a fila de recrutamento sempre ativa. Inclui opção de refresh configurável e atualização automática.
 // @author       Murilo KZC
 // @match        https://*.tribalwars.com.br/*&screen=train*
 // @match        https://*.tribalwars.com.br/*&screen=stable*
@@ -9,6 +9,8 @@
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
 // @grant        none
 // @run-at       document-end
+// @updateURL    https://raw.githubusercontent.com/kozac/twscripts/main/recrut.js
+// @downloadURL  https://raw.githubusercontent.com/kozac/twscripts/main/recrut.js
 // ==/UserScript==
 
 (function() {
