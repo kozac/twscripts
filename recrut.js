@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Continuous Recruiting Enhanced
-// @version      0.1.2
-// @description  Recruta automaticamente as unidades configuradas mantendo a fila de recrutamento sempre ativa. Inclui opção de refresh configurável e atualização automática.
+// @version      0.1.3
+// @description  Recruta automaticamente as unidades configuradas mantendo a fila de recrutamento sempre ativa. Inclui opções de refresh configurável, atualização automática e configuração de packs e quantidade de tropas por recrutamento.
 // @author       Murilo KZC
 // @match        https://*.tribalwars.com.br/*&screen=train*
 // @match        https://*.tribalwars.com.br/*&screen=stable*
@@ -22,6 +22,12 @@
 
     // Intervalo de refresh em minutos. Defina como 0 para desativar o refresh automático.
     const refreshIntervalMinutes = 15; // Alterar conforme necessário
+
+    // Número máximo de packs na fila de recrutamento.
+    const maxPacksInQueue = 2; // Alterar para o número desejado de packs
+
+    // Quantidade de tropas a recrutar por pack.
+    const unitsPerRecruit = 1; // Alterar conforme necessário
 
     // Configuração das unidades a recrutar
     const unidadesConfig = [
@@ -46,26 +52,46 @@
 
     // Função para verificar e recrutar unidades
     function verificarERecrutar() {
-        let recrutado = false;
+        // Contar o número atual de packs na fila
+        const currentPacks = $('.train_queue .queue_item').length;
+        const packsToAdd = maxPacksInQueue - currentPacks;
 
-        for (let unidade of unidadesConfig) {
-            if (unidade.recrutar) {
-                const existeNaFila = $(unidade.selector).length > 0;
-
-                if (!existeNaFila) {
-                    const input = $(`input[name=${unidade.nome}]`);
-                    if (input.length > 0 && !input.parent().is(":hidden")) {
-                        input.val("1");
-                        recrutado = true;
-                        console.log(`Recrutando unidade: ${unidade.nome}`);
-                        break; // Recrutar uma unidade por vez
-                    }
-                }
-            }
+        if (packsToAdd <= 0) {
+            console.log(`Número máximo de packs na fila já alcançado (${maxPacksInQueue}).`);
+            return;
         }
 
-        if (recrutado) {
-            $(".btn-recruit").click();
+        console.log(`Packs na fila: ${currentPacks}. Adicionando ${packsToAdd} pack(s).`);
+
+        // Selecionar as unidades que devem ser recrutadas
+        const unidadesParaRecrutar = unidadesConfig.filter(unidade => unidade.recrutar);
+
+        if (unidadesParaRecrutar.length === 0) {
+            console.warn("Nenhuma unidade configurada para recrutamento.");
+            return;
+        }
+
+        // Distribuir os packs entre as unidades configuradas
+        for (let i = 0; i < packsToAdd; i++) {
+            // Selecionar a unidade em ordem sequencial (round-robin)
+            const unidade = unidadesParaRecrutar[i % unidadesParaRecrutar.length];
+
+            // Verificar se a unidade está disponível para recrutamento
+            if ($(unidade.selector).length > 0) {
+                const input = $(`input[name=${unidade.nome}]`);
+                if (input.length > 0 && !input.parent().is(":hidden")) {
+                    input.val(unitsPerRecruit);
+                    console.log(`Recrutando unidade: ${unidade.nome} com quantidade: ${unitsPerRecruit}`);
+                } else {
+                    console.warn(`Input para a unidade ${unidade.nome} não encontrado ou está oculto.`);
+                    continue;
+                }
+
+                // Clicar no botão de recrutar
+                $(".btn-recruit").click();
+            } else {
+                console.warn(`Elemento para a unidade ${unidade.nome} não encontrado.`);
+            }
         }
     }
 
@@ -83,9 +109,9 @@
         const callback = function(mutationsList, observer) {
             for (let mutation of mutationsList) {
                 if (mutation.type === 'childList') {
-                    // Verifica se a fila está vazia após a mudança
-                    const filaVazia = $('.train_queue .queue_item').length === 0;
-                    if (filaVazia) {
+                    // Verificar se a fila está abaixo do máximo após a mudança
+                    const currentPacks = $('.train_queue .queue_item').length;
+                    if (currentPacks < maxPacksInQueue) {
                         verificarERecrutar();
                     }
                 }
