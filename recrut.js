@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Continuous Recruiting Enhanced
-// @version      0.1.13
+// @version      0.1.15
 // @description  Recruta automaticamente as unidades configuradas mantendo a fila de recrutamento sempre ativa. Inclui opções de refresh configurável, atualização automática e configuração de packs e quantidade de tropas por recrutamento.
 // @author       Murilo KZC
 // @include        **screen=train*
