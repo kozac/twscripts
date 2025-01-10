@@ -2,7 +2,7 @@
 // @name                Upador Automático Tribal Wars
 // @namespace           Murilo KZC
 // @include             **screen=main*
-// @version             0.0.7
+// @version             0.0.8
 // @copyright           2018, Tribalwarsbr100 (https://openuserjs.org//users/Tribalwarsbr100)
 // @license             AGPL-3.0-or-later
 // @supportURL          https://github.com/tribalwarsbr100/Upador-Tribal-Wars/issues
@@ -41,7 +41,7 @@ const Etapa = "Etapa_1";
 const Construção_Edificios_Ordem = true;
 
 // Configuração para coletar recompensas de quests
-const Quest_Interval_Minutes = 10; // em minutos, padrão 10
+const Quest_Interval_Minutes = 1; // em minutos, padrão 10
 const Quest_Interval = Quest_Interval_Minutes * 60 * 1000;
 
 //*************************** /CONFIGURAÇÃO ***************************//
@@ -190,12 +190,203 @@ function getConstrução_proximo_edificio() {
     }
     return instituir;
 }
+
+function getConstrução_Edifcios_Serie() {
+    var Sequência_Construção = [];
+    
+    // Estatua 1
+    Sequência_Construção.push("main_buildlink_statue_1");
+    
+    // Bosque 1
+    Sequência_Construção.push("main_buildlink_wood_1");
+    // Argila 1
+    Sequência_Construção.push("main_buildlink_stone_1");
+    // Ferro 1
+    Sequência_Construção.push("main_buildlink_iron_1");
+    
+    // Bosque 2
+    Sequência_Construção.push("main_buildlink_wood_2");
+    // Argila 2
+    Sequência_Construção.push("main_buildlink_stone_2");
+    // Ferro 2
+    Sequência_Construção.push("main_buildlink_iron_2");
+    
+    // Bosque 3
+    Sequência_Construção.push("main_buildlink_wood_3");
+    // Argila 2
+    Sequência_Construção.push("main_buildlink_stone_2");
+    // Ferro 2
+    Sequência_Construção.push("main_buildlink_iron_2");
+    
+    // Armazém 2
+    Sequência_Construção.push("main_buildlink_storage_2");
+    // Armazém 3
+    Sequência_Construção.push("main_buildlink_storage_3");
+    
+    // Edifício Principal 2
+    Sequência_Construção.push("main_buildlink_main_2");
+    // Edifício Principal 3
+    Sequência_Construção.push("main_buildlink_main_3");
+    
+    // Quartel 1
+    Sequência_Construção.push("main_buildlink_barracks_1");
+    // Mercado 1
+    Sequência_Construção.push("main_buildlink_market_1");
+    
+    // Fazenda 2
+    Sequência_Construção.push("main_buildlink_farm_2");
+    // Fazenda 3
+    Sequência_Construção.push("main_buildlink_farm_3");
+    
+    // Argila 3
+    Sequência_Construção.push("main_buildlink_stone_3");
+    // Ferro 3
+    Sequência_Construção.push("main_buildlink_iron_3");
+    
+    // Armazém 4
+    Sequência_Construção.push("main_buildlink_storage_4");
+    
+    // Muralha 1
+    Sequência_Construção.push("main_buildlink_wall_1");
+    // Muralha 2
+    Sequência_Construção.push("main_buildlink_wall_2");
+    
+    // Mercado 2
+    Sequência_Construção.push("main_buildlink_market_2");
+    
+    // Bosque 4
+    Sequência_Construção.push("main_buildlink_wood_4");
+    // Argila 4
+    Sequência_Construção.push("main_buildlink_stone_4");
+    // Ferro 4
+    Sequência_Construção.push("main_buildlink_iron_4");
+    
+    // Esconderijo 2
+    Sequência_Construção.push("main_buildlink_hide_2");
+    // Esconderijo 3
+    Sequência_Construção.push("main_buildlink_hide_3");
+    
+    // Quartel 2
+    Sequência_Construção.push("main_buildlink_barracks_2");
+    
+    // Bosque 5
+    Sequência_Construção.push("main_buildlink_wood_5");
+    // Bosque 6
+    Sequência_Construção.push("main_buildlink_wood_6");
+    // Bosque 7
+    Sequência_Construção.push("main_buildlink_wood_7");
+    
+    // Armazém 5
+    Sequência_Construção.push("main_buildlink_storage_5");
+    
+    // Fazenda 4
+    Sequência_Construção.push("main_buildlink_farm_4");
+    // Fazenda 5
+    Sequência_Construção.push("main_buildlink_farm_5");
+    
+    // Bosque 8
+    Sequência_Construção.push("main_buildlink_wood_8");
+    // Argila 5
+    Sequência_Construção.push("main_buildlink_stone_5");
+    // Argila 6
+    Sequência_Construção.push("main_buildlink_stone_6");
+    
+    // Bosque 9
+    Sequência_Construção.push("main_buildlink_wood_9");
+    // Argila 7
+    Sequência_Construção.push("main_buildlink_stone_7");
+    // Ferro 5
+    Sequência_Construção.push("main_buildlink_iron_5");
+    
+    // Armazém 6
+    Sequência_Construção.push("main_buildlink_storage_6");
+    // Fazenda 6
+    Sequência_Construção.push("main_buildlink_farm_6");
+    
+    // Bosque 10
+    Sequência_Construção.push("main_buildlink_wood_10");
+    // Bosque 11
+    Sequência_Construção.push("main_buildlink_wood_11");
+    // Bosque 12
+    Sequência_Construção.push("main_buildlink_wood_12");
+    
+    // Argila 8
+    Sequência_Construção.push("main_buildlink_stone_8");
+    // Ferro 6
+    Sequência_Construção.push("main_buildlink_iron_6");
+    
+    // Armazém 7
+    Sequência_Construção.push("main_buildlink_storage_7");
+    
+    // Bosque 13
+    Sequência_Construção.push("main_buildlink_wood_13");
+    // Argila 9
+    Sequência_Construção.push("main_buildlink_stone_9");
+    // Argila 10
+    Sequência_Construção.push("main_buildlink_stone_10");
+    // Ferro 7
+    Sequência_Construção.push("main_buildlink_iron_7");
+    
+    // Bosque 14
+    Sequência_Construção.push("main_buildlink_wood_14");
+    // Argila 11
+    Sequência_Construção.push("main_buildlink_stone_11");
+    // Ferro 8
+    Sequência_Construção.push("main_buildlink_iron_8");
+    
+    // Armazém 8
+    Sequência_Construção.push("main_buildlink_storage_8");
+    
+    // Bosque 15
+    Sequência_Construção.push("main_buildlink_wood_15");
+    // Argila 12
+    Sequência_Construção.push("main_buildlink_stone_12");
+    // Ferro 9
+    Sequência_Construção.push("main_buildlink_iron_9");
+    
+    // Armazém 9
+    Sequência_Construção.push("main_buildlink_storage_9");
+    
+    // Fazenda 7
+    Sequência_Construção.push("main_buildlink_farm_7");
+    
+    // Bosque 16
+    Sequência_Construção.push("main_buildlink_wood_16");
+    // Argila 13
+    Sequência_Construção.push("main_buildlink_stone_13");
+    // Ferro 10
+    Sequência_Construção.push("main_buildlink_iron_10");
+    
+    // Armazém 9 (Repetido conforme sequência fornecida)
+    Sequência_Construção.push("main_buildlink_storage_9");
+    
+    // Fazenda 8
+    Sequência_Construção.push("main_buildlink_farm_8");
+    
+    // Bosque 17
+    Sequência_Construção.push("main_buildlink_wood_17");
+    // Argila 14
+    Sequência_Construção.push("main_buildlink_stone_14");
+    // Ferro 11
+    Sequência_Construção.push("main_buildlink_iron_11");
+    
+    // Bosque 18
+    Sequência_Construção.push("main_buildlink_wood_18");
+    // Argila 14
+    Sequência_Construção.push("main_buildlink_stone_14");
+    // Ferro 12
+    Sequência_Construção.push("main_buildlink_iron_12");
+    
+    return Sequência_Construção;
+}
+
+/*
 function getConstrução_Edifcios_Serie() {
     var Sequência_Construção = [];
 
     // Edificios Inicial conforme figura: https://i.imgur.com/jPuHuHN.png
 
-    //*************************** QUEST ***************************//
+
     // Construção Madeira 1
     Sequência_Construção.push("main_buildlink_wood_1");
     // Construção Argila 1
@@ -626,7 +817,7 @@ function getConstrução_Edifcios_Serie() {
 
     return Sequência_Construção;
 
-}
+} */
 
 //*************************** NOVA FUNCIONALIDADE ***************************//
 
