@@ -4,7 +4,7 @@
 // @name                Upador Automático Tribal Wars com Recrutamento de Paladino e Verificação de População
 // @namespace           Murilo KZC
 // @include             **screen=main*
-// @version             1.0.8
+// @version             1.0.9
 // @grant               GM_getResourceText
 // @grant               GM_addStyle
 // @grant               GM_getValue
@@ -238,12 +238,15 @@ function Proxima_Construção() {
             // Antes de tentar construir outra fazenda, verifica se já tem uma na fila
             if (isFarmInQueue()) {
                 console.log("Já existe FAZENDA na fila. Aguardando finalizar para não duplicar.");
+                construindoFazenda = false;
+
                 let proximoEdificio = getConstrução_proximo_edificio(construindoFazenda);
                 if (proximoEdificio) {
                     proximoEdificio.click();
                     updateBuildingUI(proximoEdificio.id);
                     console.log("Próximo Edifício:", proximoEdificio.id);
                 }
+                construindoFazenda = true;
             }
         }
     }
