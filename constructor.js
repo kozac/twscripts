@@ -4,7 +4,7 @@
 // @name                Upador Automático Tribal Wars com Recrutamento de Paladino e Verificação de População
 // @namespace           Murilo KZC
 // @include             **screen=main*
-// @version             1.0.9
+// @version             1.1.0
 // @grant               GM_getResourceText
 // @grant               GM_addStyle
 // @grant               GM_getValue
@@ -246,7 +246,6 @@ function Proxima_Construção() {
                     updateBuildingUI(proximoEdificio.id);
                     console.log("Próximo Edifício:", proximoEdificio.id);
                 }
-                construindoFazenda = true;
             }
         }
     }
