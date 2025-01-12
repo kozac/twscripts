@@ -27,7 +27,7 @@ const COOKIE_RECRUTAMENTO = "recrutadoPaladino";
 const DIAS_VALIDADE_COOKIE = 99;
 
 // ***** CONFIGS PARA FAZENDA ***** //
-const FARM_THRESHOLD = 0.90;     // Se >= 80%, prioriza a fazenda
+const FARM_THRESHOLD = 0.95;     // Se >= 80%, prioriza a fazenda
 const MAX_FARM_LEVEL = 30;       // Nível máximo permitido
 // *************************** /CONFIGURAÇÃO ***************************//
 
