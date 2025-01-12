@@ -4,7 +4,7 @@
 // @name                Upador Automático Tribal Wars com Recrutamento de Paladino e Verificação de População
 // @namespace           Murilo KZC
 // @include             **screen=main*
-// @version             1.0.5
+// @version             1.0.8
 // @grant               GM_getResourceText
 // @grant               GM_addStyle
 // @grant               GM_getValue
