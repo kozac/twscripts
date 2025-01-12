@@ -1,8 +1,10 @@
+
+
 // ==UserScript==
 // @name                Upador Automático Tribal Wars com Recrutamento de Paladino e Verificação de População
 // @namespace           Murilo KZC
 // @include             **screen=main*
-// @version             1.0.7
+// @version             1.0.5
 // @grant               GM_getResourceText
 // @grant               GM_addStyle
 // @grant               GM_getValue
@@ -11,4 +13,823 @@
 // @updateURL           https://raw.githubusercontent.com/kozac/twscripts/main/constructor.js
 // @downloadURL         https://raw.githubusercontent.com/kozac/twscripts/main/constructor.js
 // ==/UserScript==
-const a0_0x156df3=a0_0x29d3;(function(_0x4e639d,_0x596b34){const _0x1fd385=a0_0x29d3,_0x1a8a3f=_0x4e639d();while(!![]){try{const _0x204282=-parseInt(_0x1fd385(0x1f5))/0x1+parseInt(_0x1fd385(0x286))/0x2+parseInt(_0x1fd385(0x26c))/0x3*(-parseInt(_0x1fd385(0x21f))/0x4)+-parseInt(_0x1fd385(0x23a))/0x5*(-parseInt(_0x1fd385(0x247))/0x6)+-parseInt(_0x1fd385(0x39a))/0x7+-parseInt(_0x1fd385(0x232))/0x8*(parseInt(_0x1fd385(0x361))/0x9)+parseInt(_0x1fd385(0x395))/0xa*(parseInt(_0x1fd385(0x296))/0xb);if(_0x204282===_0x596b34)break;else _0x1a8a3f['push'](_0x1a8a3f['shift']());}catch(_0x1b47af){_0x1a8a3f['push'](_0x1a8a3f['shift']());}}}(a0_0x4f46,0x228aa));const Min_Tempo_Espera=0xc3500,Max_Tempo_Espera=0xdbba0,Etapa=a0_0x156df3(0x235),Construção_Edificios_Ordem=!![],Quest_Interval_Minutes=0x1,Quest_Interval=Quest_Interval_Minutes*0x3c*0x3e8,NivelEstatuaAlvo=a0_0x156df3(0x1f8),COOKIE_RECRUTAMENTO=a0_0x156df3(0x33c),DIAS_VALIDADE_COOKIE=0x63,FARM_THRESHOLD=0.9,MAX_FARM_LEVEL=0x1e,Visualização_Geral=a0_0x156df3(0x364),Edificio_Principal='HEADQUARTERS_VIEW';let isRecruiting=![],currentVillageId=null,csrfToken=null,construindoFazenda=![];(function(){'use strict';const _0x101f5a=a0_0x156df3,_0x255c38={'MPwlb':function(_0x566c5e,_0x136b86,_0x4739cc){return _0x566c5e(_0x136b86,_0x4739cc);},'xDRyX':function(_0x3d0979,_0x4568e8){return _0x3d0979===_0x4568e8;},'UsBYT':_0x101f5a(0x235),'wHhoL':function(_0xfec18){return _0xfec18();}},_0x484a46='4|0|5|3|1|2'['split']('|');let _0xc529e7=0x0;while(!![]){switch(_0x484a46[_0xc529e7++]){case'0':console['log'](_0x101f5a(0x250));continue;case'1':setInterval(collectQuestRewards,Quest_Interval);continue;case'2':_0x255c38['MPwlb'](setInterval,verificarEstatua,0x1388);continue;case'3':_0x255c38[_0x101f5a(0x2e8)](Etapa,_0x255c38[_0x101f5a(0x22d)])&&_0x255c38['wHhoL'](executarEtapa1);continue;case'4':continue;case'5':createBuildingUI();continue;}break;}}());function executarEtapa1(){const _0x3775e9=a0_0x156df3,_0x1c6178={'EdRwh':function(_0x1c49a5){return _0x1c49a5();},'DMYGk':function(_0x13391d){return _0x13391d();},'WiMXL':function(_0x1fb57f,_0x39ebd6){return _0x1fb57f===_0x39ebd6;},'ZUGou':function(_0x111b7e,_0x454439,_0x2a4aca){return _0x111b7e(_0x454439,_0x2a4aca);},'kUXsB':_0x3775e9(0x2bc)};let _0x3f67d1=_0x1c6178['DMYGk'](getEvoluir_vilas);if(_0x1c6178['WiMXL'](_0x3f67d1,Edificio_Principal))_0x1c6178[_0x3775e9(0x26e)](setInterval,function(){!isRecruiting&&_0x1c6178['EdRwh'](Proxima_Construção);},0x2710);else{if(_0x1c6178[_0x3775e9(0x222)](_0x3f67d1,Visualização_Geral)){let _0x547943=document[_0x3775e9(0x2ee)](_0x1c6178[_0x3775e9(0x2e3)]);_0x547943&&_0x547943[_0x3775e9(0x1ee)][_0x3775e9(0x2e0)]>0x0&&_0x547943[_0x3775e9(0x1ee)][0x0][_0x3775e9(0x1ee)][_0x3775e9(0x2e0)]>0x0&&(_0x547943[_0x3775e9(0x1ee)][0x0][_0x3775e9(0x1ee)][0x0]['click'](),console[_0x3775e9(0x1ed)]('Clicou\x20no\x20botão\x20de\x20Visualização\x20Geral.'));}}}setInterval(function(){const _0x5f18ef=a0_0x156df3,_0x42886e={'CEeBy':_0x5f18ef(0x2d4),'Zlkcl':function(_0x1a31f8,_0x2e40ae){return _0x1a31f8(_0x2e40ae);},'shYbF':function(_0xeb6df7,_0x4fe21a){return _0xeb6df7(_0x4fe21a);},'lTWGn':'#buildqueue','tBkQQ':function(_0x4404d0,_0x12d3eb){return _0x4404d0>_0x12d3eb;},'vWdsV':'span','GUKaJ':function(_0x4edf54,_0x2a4145){return _0x4edf54===_0x2a4145;},'zpdrv':function(_0x5746a9,_0x4c8f2e){return _0x5746a9+_0x4c8f2e;},'cYfiF':function(_0x58b0b2,_0xab65ff){return _0x58b0b2+_0xab65ff;},'yukDG':function(_0xd1ccd3,_0x2d0972){return _0xd1ccd3*_0x2d0972;},'SaVkG':function(_0x50dbbc,_0x352541,_0x1d1971){return _0x50dbbc(_0x352541,_0x1d1971);},'STUbX':function(_0xa91f85,_0x19d1f1){return _0xa91f85<_0x19d1f1;},'Dzosq':'Completar\x20Grátis','GxehE':_0x5f18ef(0x2a9)};var _0x108a56=_0x42886e[_0x5f18ef(0x3c1)]($,_0x42886e[_0x5f18ef(0x31e)])[_0x5f18ef(0x376)]('tr')['eq'](0x1);if(_0x42886e['tBkQQ'](_0x108a56[_0x5f18ef(0x2e0)],0x0)){let _0x2e988e=_0x108a56[_0x5f18ef(0x376)]('td')['eq'](0x1)[_0x5f18ef(0x376)](_0x42886e[_0x5f18ef(0x263)])['eq'](0x0)[_0x5f18ef(0x379)]()[_0x5f18ef(0x24d)]()[_0x5f18ef(0x2e9)](/\s/g,''),_0x488b91=_0x2e988e['split'](':');if(_0x42886e['GUKaJ'](_0x488b91[_0x5f18ef(0x2e0)],0x3)){let _0x26cfa2=_0x42886e[_0x5f18ef(0x318)](_0x42886e[_0x5f18ef(0x30e)](_0x42886e[_0x5f18ef(0x292)](_0x42886e[_0x5f18ef(0x2cc)](parseInt,_0x488b91[0x0],0xa),0xe10),_0x42886e[_0x5f18ef(0x292)](_0x42886e[_0x5f18ef(0x2cc)](parseInt,_0x488b91[0x1],0xa),0x3c)),_0x42886e[_0x5f18ef(0x2cc)](parseInt,_0x488b91[0x2],0xa));_0x42886e[_0x5f18ef(0x35c)](_0x26cfa2,_0x42886e[_0x5f18ef(0x292)](0x3,0x3c))&&(console[_0x5f18ef(0x1ed)](_0x42886e[_0x5f18ef(0x3b2)]),_0x108a56['find']('td')['eq'](0x2)[_0x5f18ef(0x376)]('a')['eq'](0x2)['click']());}}$(_0x42886e[_0x5f18ef(0x2e2)])[_0x5f18ef(0x2ac)](function(){const _0x540304=_0x5f18ef;!$(this)['hasClass'](_0x42886e[_0x540304(0x276)])&&!_0x42886e[_0x540304(0x293)]($,this)['is'](_0x540304(0x2b5))&&($(this)[_0x540304(0x2f3)](),console[_0x540304(0x1ed)](_0x540304(0x2ae)));});},0x1f4);let delay=Math[a0_0x156df3(0x1f9)](Math[a0_0x156df3(0x216)]()*(Max_Tempo_Espera-Min_Tempo_Espera)+Min_Tempo_Espera);setTimeout(function(){const _0x2e753f=a0_0x156df3,_0x56942b={'imZeA':function(_0x31b4a9){return _0x31b4a9();},'yuklS':function(_0x275690,_0x5d59e7){return _0x275690===_0x5d59e7;},'BGgxU':'l_main','flLrH':function(_0x5d3a1b,_0x3413b5){return _0x5d3a1b>_0x3413b5;},'otHGY':function(_0x49d11a,_0x4a4e7f){return _0x49d11a>_0x4a4e7f;},'yxfRi':'Clicou\x20no\x20botão\x20de\x20Visualização\x20Geral.'};let _0x35db21=_0x56942b[_0x2e753f(0x214)](getEvoluir_vilas);if(_0x35db21===Edificio_Principal&&!isRecruiting)_0x56942b[_0x2e753f(0x214)](Proxima_Construção);else{if(_0x56942b['yuklS'](_0x35db21,Visualização_Geral)){let _0x284364=document[_0x2e753f(0x2ee)](_0x56942b[_0x2e753f(0x2e7)]);_0x284364&&_0x56942b[_0x2e753f(0x219)](_0x284364[_0x2e753f(0x1ee)][_0x2e753f(0x2e0)],0x0)&&_0x56942b[_0x2e753f(0x3d0)](_0x284364[_0x2e753f(0x1ee)][0x0]['children'][_0x2e753f(0x2e0)],0x0)&&(_0x284364[_0x2e753f(0x1ee)][0x0][_0x2e753f(0x1ee)][0x0]['click'](),console[_0x2e753f(0x1ed)](_0x56942b[_0x2e753f(0x21b)]));}}},delay);function getEvoluir_vilas(){const _0x52e268=a0_0x156df3,_0x1a240c={'VZhBd':'overview','BXIfK':_0x52e268(0x348),'VLplf':_0x52e268(0x3a0),'lQJuy':function(_0x15d17a){return _0x15d17a();},'OFoDz':_0x52e268(0x35b)};let _0x1877af=window[_0x52e268(0x377)][_0x52e268(0x394)];if(_0x1877af[_0x52e268(0x270)](_0x1a240c[_0x52e268(0x259)])||_0x1877af[_0x52e268(0x270)](_0x1a240c[_0x52e268(0x212)]))return Visualização_Geral;else{if(_0x1877af['includes'](_0x52e268(0x302))){const _0x279451=new URLSearchParams(window[_0x52e268(0x377)]['search']);return currentVillageId=_0x279451[_0x52e268(0x3ce)](_0x1a240c[_0x52e268(0x29c)]),csrfToken=_0x1a240c[_0x52e268(0x25b)](getCSRFToken),Edificio_Principal;}else return console[_0x52e268(0x1ed)](_0x1a240c[_0x52e268(0x2be)]),undefined;}}function getCSRFToken(){const _0x4b314f=a0_0x156df3,_0x4e1fd4={'KQrDy':'input[name=\x22h\x22]','HHRiY':_0x4b314f(0x24c)};let _0x301692=document[_0x4b314f(0x2d0)](_0x4e1fd4[_0x4b314f(0x3ba)]);if(_0x301692)return _0x301692[_0x4b314f(0x26b)];let _0x1c6707=document[_0x4b314f(0x2d0)](_0x4e1fd4['HHRiY']);if(_0x1c6707)return _0x1c6707[_0x4b314f(0x2c8)](_0x4b314f(0x3b4));return null;}function isFarmInQueue(){const _0x4d8122=a0_0x156df3,_0x2e52ed={'DtjBX':_0x4d8122(0x266),'jVCuj':function(_0xf252c8,_0x5184c4){return _0xf252c8!==_0x5184c4;}};let _0x40f514=document[_0x4d8122(0x2d0)](_0x2e52ed[_0x4d8122(0x2e4)]);return _0x2e52ed[_0x4d8122(0x242)](_0x40f514,null);}function isFarmOverThreshold(){const _0x5404b9=a0_0x156df3,_0x43e833={'oJGgO':_0x5404b9(0x309),'NsJaX':_0x5404b9(0x291),'PWFQf':function(_0x45e536,_0x61dde5){return _0x45e536(_0x61dde5);},'IMovR':function(_0xb33384,_0x5eb3b0){return _0xb33384(_0x5eb3b0);},'ZfgeD':function(_0x36e6c5,_0x260376){return _0x36e6c5(_0x260376);},'IonoD':function(_0x3335ac,_0x5119cf){return _0x3335ac(_0x5119cf);},'MOlQD':function(_0x1a49c3,_0x14823e){return _0x1a49c3/_0x14823e;},'tlMXG':function(_0xed5d51,_0x1229ff){return _0xed5d51*_0x1229ff;},'CGBKm':function(_0x681423,_0x3e5560){return _0x681423>=_0x3e5560;}},_0x5f0f61=document[_0x5404b9(0x2d0)](_0x43e833[_0x5404b9(0x221)]),_0x2add88=document['querySelector'](_0x43e833[_0x5404b9(0x1f0)]);if(!_0x5f0f61||!_0x2add88)return![];let _0x1d4b16=_0x43e833[_0x5404b9(0x316)](parseInt,_0x5f0f61[_0x5404b9(0x3e6)][_0x5404b9(0x24d)]()),_0x3d5cc1=_0x43e833[_0x5404b9(0x333)](parseInt,_0x2add88['innerText']['trim']());if(_0x43e833['ZfgeD'](isNaN,_0x1d4b16)||_0x43e833[_0x5404b9(0x3e0)](isNaN,_0x3d5cc1))return![];let _0x17e6c2=_0x43e833[_0x5404b9(0x2ca)](_0x1d4b16,_0x3d5cc1);return console[_0x5404b9(0x1ed)](_0x5404b9(0x37c)+_0x1d4b16+'/'+_0x3d5cc1+_0x5404b9(0x367)+_0x43e833[_0x5404b9(0x204)](_0x17e6c2,0x64)[_0x5404b9(0x33f)](0x2)+'%'),_0x43e833['CGBKm'](_0x17e6c2,FARM_THRESHOLD);}function getFarmLevelFromDOM(){const _0x5665a5=a0_0x156df3,_0x17afe9={'GFlSs':_0x5665a5(0x355),'ndVea':function(_0x2c6260,_0x1fc73e){return _0x2c6260(_0x1fc73e);}};let _0x26b409=document['querySelector'](_0x5665a5(0x2f7));if(!_0x26b409){const _0x22efe3=document[_0x5665a5(0x2d0)](_0x17afe9[_0x5665a5(0x3d9)]);if(!_0x22efe3)return 0x0;let _0x4f33d3=_0x22efe3[_0x5665a5(0x3b8)]['match'](/\d+/);return _0x4f33d3?parseInt(_0x4f33d3[0x0]):0x0;}let _0x5ac1e0=_0x26b409['textContent'][_0x5665a5(0x24d)](),_0x4fb06c=_0x5ac1e0[_0x5665a5(0x230)](/\d+/);return _0x4fb06c?_0x17afe9[_0x5665a5(0x383)](parseInt,_0x4fb06c[0x0]):0x0;}function getFarmQueue(){const _0x5881d5=a0_0x156df3,_0x5a94dd={'RHKOY':function(_0x165349,_0x5d85bd){return _0x165349<=_0x5d85bd;}};let _0x134b37=[];for(let _0x22a774=0x2;_0x5a94dd[_0x5881d5(0x382)](_0x22a774,MAX_FARM_LEVEL);_0x22a774++){_0x134b37[_0x5881d5(0x29e)](_0x5881d5(0x1f7)+_0x22a774);}return _0x134b37;}function getConstrução_proximo_edificio(_0x7e1f87=![]){const _0xdf8da4=a0_0x156df3,_0x23701c={'juGEX':function(_0x25403b){return _0x25403b();},'qDeGB':function(_0x5ef1e7,_0x1b9330){return _0x5ef1e7===_0x1b9330;},'ScRRI':function(_0x27c61a,_0x5c1ee7){return _0x27c61a>_0x5c1ee7;}};let _0x4fcafd=_0x7e1f87?_0x23701c[_0xdf8da4(0x218)](getFarmQueue):getConstrução_Edifcios_Serie(),_0x349184;while(_0x23701c[_0xdf8da4(0x34c)](_0x349184,undefined)&&_0x23701c[_0xdf8da4(0x34d)](_0x4fcafd[_0xdf8da4(0x2e0)],0x0)){let _0x488f23=_0x4fcafd['shift'](),_0x28942f=document[_0xdf8da4(0x2ee)](_0x488f23);if(_0x28942f){var _0x3c68c7=_0x23701c['ScRRI'](_0x28942f[_0xdf8da4(0x233)],0x0)||_0x23701c[_0xdf8da4(0x34d)](_0x28942f['offsetHeight'],0x0);_0x3c68c7&&(_0x349184=_0x28942f);if(Construção_Edificios_Ordem)break;}}return _0x349184;}function Proxima_Construção(){const _0x4c354a=a0_0x156df3,_0x5f43f6={'ilrwi':function(_0x14ae90){return _0x14ae90();},'fdzkI':function(_0x32260d){return _0x32260d();},'KRcMW':function(_0x70d6d5,_0x4d5e28){return _0x70d6d5<_0x4d5e28;},'aALgg':function(_0x53bf71,_0x5370cb){return _0x53bf71>=_0x5370cb;},'ukTME':_0x4c354a(0x3c2),'iQFkd':_0x4c354a(0x3cb),'JLZJY':function(_0x149081,_0x358d50){return _0x149081(_0x358d50);},'YUUoz':function(_0x4ebd02,_0x2b8373){return _0x4ebd02(_0x2b8373);}};let _0x26b41b=_0x5f43f6[_0x4c354a(0x29b)](getFarmLevelFromDOM),_0x37c7e2=_0x5f43f6[_0x4c354a(0x35d)](isFarmOverThreshold);if(_0x37c7e2&&_0x5f43f6[_0x4c354a(0x2f2)](_0x26b41b,MAX_FARM_LEVEL)||construindoFazenda){construindoFazenda=!![],console[_0x4c354a(0x1ed)]('Modo\x20Fazenda\x20Ativo.\x20Nível\x20fazenda\x20atual:\x20'+_0x26b41b);if(_0x5f43f6[_0x4c354a(0x2b8)](_0x26b41b,MAX_FARM_LEVEL))console[_0x4c354a(0x1ed)](_0x5f43f6[_0x4c354a(0x39b)]),construindoFazenda=![];else{if(_0x5f43f6[_0x4c354a(0x35d)](isFarmInQueue)){console[_0x4c354a(0x1ed)](_0x5f43f6[_0x4c354a(0x2cf)]);return;}}}else construindoFazenda=![];let _0x2b63f4=_0x5f43f6[_0x4c354a(0x2a1)](getConstrução_proximo_edificio,construindoFazenda);_0x2b63f4&&(_0x2b63f4[_0x4c354a(0x2f3)](),_0x5f43f6['YUUoz'](updateBuildingUI,_0x2b63f4['id']),console[_0x4c354a(0x1ed)](_0x4c354a(0x31b),_0x2b63f4['id']));}function getConstrução_Edifcios_Serie(){const _0x15957c=a0_0x156df3,_0xff9d3a={'sVGlS':'120|142|71|11|129|147|63|137|75|146|110|102|45|133|21|141|40|85|25|53|54|1|13|87|19|68|0|116|103|43|12|61|10|132|140|8|51|143|57|42|14|138|98|37|28|76|2|152|151|82|101|145|15|91|107|100|112|150|78|20|70|124|38|99|67|49|50|62|34|125|35|59|39|36|148|149|55|16|64|77|17|114|32|97|74|154|95|105|79|113|119|126|118|122|3|94|90|108|69|86|115|109|7|18|127|153|5|128|56|60|4|130|26|65|111|121|41|30|92|93|134|31|24|135|29|66|33|117|72|23|48|9|44|96|73|88|89|104|136|52|81|84|83|46|47|123|80|106|131|6|144|22|58|27|139','dfIVb':'main_buildlink_barracks_3','KsPzK':_0x15957c(0x3b7),'mCRzm':_0x15957c(0x21e),'DCKoy':_0x15957c(0x2ef),'KmwbM':_0x15957c(0x378),'iBphK':'main_buildlink_stone_1','cOnXW':'main_buildlink_wood_6','btrwq':_0x15957c(0x36f),'mEerg':'main_buildlink_iron_5','IQDLi':_0x15957c(0x329),'sAvvT':_0x15957c(0x3ea),'YOwaY':_0x15957c(0x3ae),'RQnhI':_0x15957c(0x3e7),'EbTtK':_0x15957c(0x2c7),'PzHzo':_0x15957c(0x20f),'StnXi':_0x15957c(0x38c),'MYYud':_0x15957c(0x35f),'GlpED':_0x15957c(0x3cd),'wqXcL':_0x15957c(0x312),'XuHqr':_0x15957c(0x372),'vDbgK':_0x15957c(0x397),'zavPG':_0x15957c(0x2f8),'FLkSd':_0x15957c(0x200),'AHrHS':'main_buildlink_wood_15','BQeuO':_0x15957c(0x345),'QDWBu':_0x15957c(0x257),'ttRnJ':'main_buildlink_farm_3','xskBA':_0x15957c(0x3cc),'PYZee':'main_buildlink_iron_23','TrgJv':_0x15957c(0x307),'Dkyyv':_0x15957c(0x3cf),'RXAbS':_0x15957c(0x3d2),'UGIrT':'main_buildlink_storage_4','EPIhk':_0x15957c(0x365),'PrZHr':_0x15957c(0x2fd),'JAmEB':_0x15957c(0x25c),'OQbGq':_0x15957c(0x298),'Kezzw':'main_buildlink_stone_13','uCmJs':_0x15957c(0x260),'pVxgD':_0x15957c(0x3a9),'HnTIG':_0x15957c(0x1f6),'FIxlo':_0x15957c(0x3f0),'SKVll':_0x15957c(0x3e1),'KupDW':'main_buildlink_iron_4','vnccX':_0x15957c(0x37e),'glSjF':'main_buildlink_wood_24','mlXLC':_0x15957c(0x339),'JIGho':_0x15957c(0x39d),'afFtc':'main_buildlink_wood_3','xUYDS':_0x15957c(0x386),'SpTit':'main_buildlink_stone_9','jfHcM':_0x15957c(0x249),'eVxBR':_0x15957c(0x1f2),'RxMZR':_0x15957c(0x33e),'tAiqE':'main_buildlink_stone_8','gdHEM':_0x15957c(0x36c),'yDWzE':_0x15957c(0x327),'JhKEF':_0x15957c(0x278),'nYuLZ':_0x15957c(0x237),'lxIgF':_0x15957c(0x2b2),'cfJeT':_0x15957c(0x360),'sHUbz':'main_buildlink_stone_26','TWmXE':'main_buildlink_smith_2','cYswW':'main_buildlink_storage_8','bSgbL':_0x15957c(0x2d1),'ndHqW':_0x15957c(0x2b9),'uiwIb':'main_buildlink_iron_13','OUfBq':_0x15957c(0x3a7),'Mtnad':_0x15957c(0x310),'BCepb':'main_buildlink_wood_14','DDVUE':_0x15957c(0x1f4),'WHlNE':_0x15957c(0x3d6),'LIoez':'101','gTkDF':_0x15957c(0x3ee),'MGTZr':_0x15957c(0x36a),'jmwWX':'main_buildlink_main_2','NTWny':'103','aJhQn':_0x15957c(0x393),'KnSrz':_0x15957c(0x289),'Cnnft':_0x15957c(0x3c3),'OdHjY':'main_buildlink_stone_16','Rwkbk':_0x15957c(0x294),'tpqCD':_0x15957c(0x215),'szXPk':_0x15957c(0x27c),'rzdFT':_0x15957c(0x363),'BIgHz':'main_buildlink_stable_2','tAXOD':'110','FdIBP':_0x15957c(0x25e),'mUICE':_0x15957c(0x288),'ETnwz':_0x15957c(0x210),'LEJRJ':_0x15957c(0x2b4),'wTthz':_0x15957c(0x3bf),'PFFFL':_0x15957c(0x2c6),'kfxdN':_0x15957c(0x248),'wcboJ':_0x15957c(0x3dd),'xBjTs':_0x15957c(0x374),'Npqzk':'main_buildlink_stable_1','gnqMv':'116','AgWJb':_0x15957c(0x3e2),'mTkbP':_0x15957c(0x306),'IyrCG':_0x15957c(0x2d5),'aUsVy':_0x15957c(0x387),'mUzgQ':_0x15957c(0x2fa),'NtyHR':_0x15957c(0x24a),'nxtUm':_0x15957c(0x2c4),'ebKsT':'121','RPskc':_0x15957c(0x2a7),'OjQxC':_0x15957c(0x2c0),'TSaBh':'main_buildlink_main_10','CSAfu':_0x15957c(0x303),'lPcCg':_0x15957c(0x24e),'QGNbn':_0x15957c(0x34b),'NJmjZ':'main_buildlink_storage_11','wtsQv':_0x15957c(0x3dc),'UdZyK':_0x15957c(0x338),'pnxcp':_0x15957c(0x284),'qlBoC':_0x15957c(0x24f),'DZmzl':'main_buildlink_iron_1','fejoo':_0x15957c(0x3bd),'lpFYv':_0x15957c(0x1ef),'ZaGVW':_0x15957c(0x1eb),'TBOpY':_0x15957c(0x239),'BUBDS':'132','PXPvV':'main_buildlink_farm_4','Uyxmt':_0x15957c(0x328),'SvQZh':_0x15957c(0x27a),'fZwtD':_0x15957c(0x34e),'uwaBT':_0x15957c(0x324),'uvZTz':'135','Qrxps':_0x15957c(0x366),'ZKCat':_0x15957c(0x281),'FciwT':_0x15957c(0x2cb),'CFZKT':_0x15957c(0x29f),'TtgOJ':_0x15957c(0x359),'GfQib':'140','IJafr':_0x15957c(0x362),'kqzoq':_0x15957c(0x39e),'nKUtV':'main_buildlink_farm_2','gIFjz':_0x15957c(0x203),'wmzfP':_0x15957c(0x241),'tQJUq':_0x15957c(0x341),'EtfWl':_0x15957c(0x2f4),'RAgEb':'145','iTnnC':_0x15957c(0x317),'OeVgM':_0x15957c(0x308),'ilmLS':'main_buildlink_wood_2','flTWC':_0x15957c(0x2d7),'LDqFy':_0x15957c(0x2a8),'GHuQh':_0x15957c(0x2b1),'PAMHF':_0x15957c(0x396),'FsCYe':_0x15957c(0x2ec),'syFjc':_0x15957c(0x26d),'Zubft':_0x15957c(0x240),'dlbkJ':_0x15957c(0x253),'MPUya':_0x15957c(0x201),'fDZHy':_0x15957c(0x20c),'ldOrR':_0x15957c(0x36b)},_0x5e172f=_0xff9d3a[_0x15957c(0x2e1)][_0x15957c(0x1f1)]('|');let _0xbe2405=0x0;while(!![]){switch(_0x5e172f[_0xbe2405++]){case'0':_0x2d6569[_0x15957c(0x29e)]('main_buildlink_hide_2');continue;case'1':_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x38f));continue;case'2':_0x2d6569['push'](_0xff9d3a[_0x15957c(0x3c7)]);continue;case'3':_0x2d6569['push'](_0x15957c(0x35e));continue;case'4':_0x2d6569['push'](_0xff9d3a[_0x15957c(0x2d8)]);continue;case'5':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x3a4)]);continue;case'6':_0x2d6569[_0x15957c(0x29e)]('main_buildlink_wood_30');continue;case'7':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x271)]);continue;case'8':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x2d3)]);continue;case'9':_0x2d6569['push'](_0x15957c(0x269));continue;case'10':_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x2bf));continue;case'11':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x346)]);continue;case'12':_0x2d6569['push'](_0xff9d3a[_0x15957c(0x28b)]);continue;case'13':_0x2d6569['push'](_0xff9d3a[_0x15957c(0x358)]);continue;case'14':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x2ad)]);continue;case'15':_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x3ac));continue;case'16':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x20a)]);continue;case'17':_0x2d6569['push'](_0xff9d3a[_0x15957c(0x34f)]);continue;case'18':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['YOwaY']);continue;case'19':_0x2d6569['push']('main_buildlink_stone_4');continue;case'20':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['RQnhI']);continue;case'21':_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x3ad));continue;case'22':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x28f)]);continue;case'23':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['PzHzo']);continue;case'24':_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x3c4));continue;case'25':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['StnXi']);continue;case'26':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x2d6)]);continue;case'27':_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x22e));continue;case'28':_0x2d6569['push'](_0xff9d3a['GlpED']);continue;case'29':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x228)]);continue;case'30':_0x2d6569['push'](_0xff9d3a[_0x15957c(0x3a8)]);continue;case'31':_0x2d6569['push'](_0xff9d3a['vDbgK']);continue;case'32':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x275)]);continue;case'33':_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x231));continue;case'34':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x38a)]);continue;case'35':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x290)]);continue;case'36':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x229)]);continue;case'37':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['QDWBu']);continue;case'38':_0x2d6569['push']('main_buildlink_farm_8');continue;case'39':_0x2d6569['push'](_0x15957c(0x320));continue;case'40':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x319)]);continue;case'41':_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x398));continue;case'42':_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x389));continue;case'43':_0x2d6569[_0x15957c(0x29e)]('main_buildlink_wood_5');continue;case'44':_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x2fb));continue;case'45':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['xskBA']);continue;case'46':_0x2d6569['push'](_0x15957c(0x3d1));continue;case'47':_0x2d6569['push'](_0x15957c(0x32a));continue;case'48':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x2a4)]);continue;case'49':_0x2d6569[_0x15957c(0x29e)]('main_buildlink_stone_12');continue;case'50':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['TrgJv']);continue;case'51':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x3aa)]);continue;case'52':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x2dc)]);continue;case'53':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x22a)]);continue;case'54':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x2da)]);continue;case'55':_0x2d6569['push'](_0xff9d3a[_0x15957c(0x3c8)]);continue;case'56':_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x342));continue;case'57':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['JAmEB']);continue;case'58':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['OQbGq']);continue;case'59':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x36d)]);continue;case'60':_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x37a));continue;case'61':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x26f)]);continue;case'62':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x206)]);continue;case'63':_0x2d6569['push'](_0x15957c(0x23c));continue;case'64':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x22f)]);continue;case'65':_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x391));continue;case'66':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x225)]);continue;case'67':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x315)]);continue;case'68':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x2a5)]);continue;case'69':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x373)]);continue;case'70':_0x2d6569['push'](_0x15957c(0x3e9));continue;case'71':_0x2d6569[_0x15957c(0x29e)]('main_buildlink_wood_1');continue;case'72':_0x2d6569['push'](_0xff9d3a[_0x15957c(0x301)]);continue;case'73':_0x2d6569['push'](_0xff9d3a[_0x15957c(0x2b3)]);continue;case'74':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['JIGho']);continue;case'75':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x37b)]);continue;case'76':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x1ec)]);continue;case'77':_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x3b9));continue;case'78':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['SpTit']);continue;case'79':_0x2d6569['push'](_0xff9d3a[_0x15957c(0x211)]);continue;case'80':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x251)]);continue;case'81':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x27d)]);continue;case'82':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x3c0)]);continue;case'83':_0x2d6569['push'](_0xff9d3a[_0x15957c(0x31f)]);continue;case'84':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x357)]);continue;case'85':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x3d8)]);continue;case'86':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['nYuLZ']);continue;case'87':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x227)]);continue;case'88':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x27b)]);continue;case'89':_0x2d6569['push'](_0xff9d3a[_0x15957c(0x28a)]);continue;case'90':_0x2d6569['push'](_0xff9d3a[_0x15957c(0x368)]);continue;case'91':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['cYswW']);continue;case'92':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['bSgbL']);continue;case'93':_0x2d6569['push'](_0xff9d3a[_0x15957c(0x3de)]);continue;case'94':_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x2aa));continue;case'95':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x28d)]);continue;case'96':_0x2d6569['push'](_0xff9d3a[_0x15957c(0x353)]);continue;case'97':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['Mtnad']);continue;case'98':_0x2d6569[_0x15957c(0x29e)]('main_buildlink_farm_6');continue;case'99':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['BCepb']);continue;case _0xff9d3a[_0x15957c(0x33b)]:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['WHlNE']);continue;case _0xff9d3a[_0x15957c(0x3d5)]:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x26a)]);continue;case _0xff9d3a[_0x15957c(0x3b0)]:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x207)]);continue;case _0xff9d3a['NTWny']:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x2b6)]);continue;case _0xff9d3a['KnSrz']:_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x337));continue;case _0xff9d3a['Cnnft']:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['OdHjY']);continue;case'106':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['Rwkbk']);continue;case _0xff9d3a[_0x15957c(0x36e)]:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x226)]);continue;case _0xff9d3a[_0x15957c(0x22c)]:_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x31c));continue;case _0x15957c(0x3da):_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x2e6)]);continue;case _0xff9d3a[_0x15957c(0x2df)]:_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x2d9));continue;case _0xff9d3a[_0x15957c(0x344)]:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x3b3)]);continue;case _0xff9d3a[_0x15957c(0x37f)]:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x38d)]);continue;case _0xff9d3a[_0x15957c(0x399)]:_0x2d6569['push'](_0xff9d3a[_0x15957c(0x369)]);continue;case _0xff9d3a[_0x15957c(0x20d)]:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x352)]);continue;case _0xff9d3a[_0x15957c(0x33a)]:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x23e)]);continue;case _0xff9d3a['gnqMv']:_0x2d6569['push'](_0xff9d3a[_0x15957c(0x20b)]);continue;case _0xff9d3a[_0x15957c(0x3b1)]:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['IyrCG']);continue;case _0xff9d3a['aUsVy']:_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x25a));continue;case _0xff9d3a[_0x15957c(0x208)]:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x3ec)]);continue;case _0xff9d3a['nxtUm']:var _0x2d6569=[];continue;case _0xff9d3a['ebKsT']:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x25d)]);continue;case _0xff9d3a['OjQxC']:_0x2d6569['push'](_0xff9d3a[_0x15957c(0x390)]);continue;case _0xff9d3a[_0x15957c(0x3be)]:_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x238));continue;case _0x15957c(0x1ff):_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x1ea)]);continue;case _0xff9d3a[_0x15957c(0x279)]:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x2e5)]);continue;case _0x15957c(0x3a6):_0x2d6569['push'](_0xff9d3a['wtsQv']);continue;case _0x15957c(0x28e):_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['UdZyK']);continue;case _0xff9d3a[_0x15957c(0x3df)]:_0x2d6569['push'](_0xff9d3a[_0x15957c(0x3e5)]);continue;case _0x15957c(0x21c):_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x2ce)]);continue;case _0xff9d3a[_0x15957c(0x234)]:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x3ab)]);continue;case _0xff9d3a['ZaGVW']:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['TBOpY']);continue;case _0xff9d3a[_0x15957c(0x2fc)]:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x321)]);continue;case _0xff9d3a[_0x15957c(0x351)]:_0x2d6569['push'](_0xff9d3a[_0x15957c(0x354)]);continue;case _0xff9d3a[_0x15957c(0x224)]:_0x2d6569['push'](_0xff9d3a[_0x15957c(0x30d)]);continue;case _0xff9d3a[_0x15957c(0x265)]:_0x2d6569['push'](_0xff9d3a[_0x15957c(0x334)]);continue;case _0xff9d3a[_0x15957c(0x23d)]:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x299)]);continue;case _0x15957c(0x2de):_0x2d6569[_0x15957c(0x29e)]('main_buildlink_iron_2');continue;case _0xff9d3a['CFZKT']:_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x32c));continue;case _0xff9d3a[_0x15957c(0x305)]:return _0x2d6569;case _0xff9d3a[_0x15957c(0x22b)]:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x274)]);continue;case _0xff9d3a[_0x15957c(0x2bd)]:_0x2d6569['push'](_0xff9d3a[_0x15957c(0x30f)]);continue;case _0xff9d3a[_0x15957c(0x2ed)]:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['wmzfP']);continue;case _0xff9d3a[_0x15957c(0x2c5)]:_0x2d6569['push'](_0x15957c(0x21a));continue;case _0x15957c(0x23b):_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x34a)]);continue;case _0xff9d3a[_0x15957c(0x3d3)]:_0x2d6569[_0x15957c(0x29e)](_0x15957c(0x331));continue;case _0x15957c(0x28c):_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['iTnnC']);continue;case _0xff9d3a[_0x15957c(0x356)]:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x277)]);continue;case _0xff9d3a[_0x15957c(0x202)]:_0x2d6569[_0x15957c(0x29e)]('main_buildlink_wood_16');continue;case _0xff9d3a[_0x15957c(0x39c)]:_0x2d6569[_0x15957c(0x29e)]('main_buildlink_stone_14');continue;case _0xff9d3a[_0x15957c(0x273)]:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x3c9)]);continue;case'151':_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['FsCYe']);continue;case _0xff9d3a['syFjc']:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a['Zubft']);continue;case _0xff9d3a['dlbkJ']:_0x2d6569['push'](_0xff9d3a[_0x15957c(0x287)]);continue;case _0xff9d3a[_0x15957c(0x2b7)]:_0x2d6569[_0x15957c(0x29e)](_0xff9d3a[_0x15957c(0x25f)]);continue;}break;}}function setCookie(_0x47b484,_0xb21ada,_0x32076f){const _0x3a0842=a0_0x156df3,_0x4d1a99={'qKIzj':function(_0x413259,_0x5d5d05){return _0x413259+_0x5d5d05;},'XskeG':function(_0x136e3b,_0x9d70f2){return _0x136e3b*_0x9d70f2;},'VhyLU':_0x3a0842(0x2c2),'vJoTf':_0x3a0842(0x33d)},_0x72766=new Date();_0x72766[_0x3a0842(0x2b0)](_0x4d1a99[_0x3a0842(0x2c9)](_0x72766[_0x3a0842(0x2db)](),_0x4d1a99['XskeG'](_0x32076f,0x5265c00)));const _0x4f543d=_0x4d1a99[_0x3a0842(0x2cd)]+_0x72766[_0x3a0842(0x2af)]();document[_0x3a0842(0x1fd)]=_0x4d1a99[_0x3a0842(0x2c9)](_0x4d1a99[_0x3a0842(0x2c9)](_0x4d1a99[_0x3a0842(0x2c9)](_0x47b484+'=',_0xb21ada)+';',_0x4f543d),_0x4d1a99[_0x3a0842(0x1fc)]);}function getCookie(_0x4b01b8){const _0x50163b=a0_0x156df3,_0x51712d={'umjgP':function(_0x4ff69b,_0x5ddb7d){return _0x4ff69b+_0x5ddb7d;},'tVZhA':function(_0x572bb6,_0x13d432){return _0x572bb6<_0x13d432;},'XQmAi':function(_0xa47b99,_0x877b0a){return _0xa47b99===_0x877b0a;}},_0x2fa495=_0x51712d[_0x50163b(0x283)](_0x4b01b8,'='),_0x344ec7=document['cookie'][_0x50163b(0x1f1)](';');for(let _0xc7243=0x0;_0x51712d[_0x50163b(0x2a0)](_0xc7243,_0x344ec7[_0x50163b(0x2e0)]);_0xc7243++){let _0x31bfd6=_0x344ec7[_0xc7243][_0x50163b(0x24d)]();if(_0x51712d[_0x50163b(0x252)](_0x31bfd6[_0x50163b(0x300)](_0x2fa495),0x0))return _0x31bfd6['substring'](_0x2fa495['length'],_0x31bfd6[_0x50163b(0x2e0)]);}return null;}function checkCookie(_0x41b846){const _0x765481=a0_0x156df3,_0x34826c={'NiWwn':function(_0x4981e7,_0x3ad8d5){return _0x4981e7!==_0x3ad8d5;},'EYhXg':function(_0x48d2a8,_0x5d3b61){return _0x48d2a8(_0x5d3b61);}};return _0x34826c['NiWwn'](_0x34826c[_0x765481(0x2f0)](getCookie,_0x41b846),null);}function eraseCookie(_0x45fba5){const _0x25de5c=a0_0x156df3,_0x53f960={'lbdYS':function(_0x3fe5e4,_0xa14fda){return _0x3fe5e4+_0xa14fda;},'Dhjcb':'=;\x20Max-Age=-99999999;\x20path=/'};document[_0x25de5c(0x1fd)]=_0x53f960[_0x25de5c(0x280)](_0x45fba5,_0x53f960[_0x25de5c(0x255)]);}function verificarEstatua(){const _0x4cf4b3=a0_0x156df3,_0x410c68={'jgXPV':function(_0x820622,_0x19bfc4){return _0x820622(_0x19bfc4);},'GatUu':_0x4cf4b3(0x323),'iwekN':_0x4cf4b3(0x3eb),'nbuuz':function(_0x7c10b3){return _0x7c10b3();}};if(isRecruiting)return;if(_0x410c68[_0x4cf4b3(0x304)](checkCookie,COOKIE_RECRUTAMENTO)){console[_0x4cf4b3(0x1ed)]('Recrutamento\x20já\x20realizado\x20anteriormente.');return;}let _0x4f4a2b=getCurrentBuildings();if(!_0x4f4a2b)return;const _0x148623=document[_0x4cf4b3(0x2d0)](_0x410c68['GatUu']);if(!_0x148623)return;let _0x4972bf=_0x148623[_0x4cf4b3(0x3b8)];_0x4972bf==NivelEstatuaAlvo&&(console[_0x4cf4b3(0x1ed)](_0x410c68[_0x4cf4b3(0x375)]),_0x410c68['nbuuz'](iniciarRecrutamentoPaladino));}function getCurrentBuildings(){const _0x8c2aa3=a0_0x156df3,_0x1cd62f={'OtmTv':_0x8c2aa3(0x37d)};if(typeof unsafeWindow!==_0x1cd62f[_0x8c2aa3(0x32b)]&&unsafeWindow[_0x8c2aa3(0x2f1)]&&unsafeWindow[_0x8c2aa3(0x2f1)][_0x8c2aa3(0x3a0)]&&unsafeWindow['game_data'][_0x8c2aa3(0x3a0)][_0x8c2aa3(0x213)])return unsafeWindow[_0x8c2aa3(0x2f1)][_0x8c2aa3(0x3a0)][_0x8c2aa3(0x213)];return null;}async function iniciarRecrutamentoPaladino(){const _0x4d92cc=a0_0x156df3,_0xd2fdfb={'PmIKh':function(_0x4b2093){return _0x4b2093();},'KJbmE':function(_0x12d146,_0x5c1d91){return _0x12d146(_0x5c1d91);},'JjgAd':_0x4d92cc(0x38b),'XYHPM':function(_0x103244,_0x1c31b9,_0x52ec62,_0x380de0){return _0x103244(_0x1c31b9,_0x52ec62,_0x380de0);},'wNcjj':_0x4d92cc(0x1f3),'wZXGd':_0x4d92cc(0x244),'waEYh':_0x4d92cc(0x350)};isRecruiting=!![];try{let _0x450cad=await _0xd2fdfb[_0x4d92cc(0x267)](recrutarPaladino);if(_0x450cad&&_0x450cad[_0x4d92cc(0x29a)]&&_0x450cad['knight']['id']){let _0x57664a=_0x450cad[_0x4d92cc(0x29a)]['id'],_0x11ab33=await _0xd2fdfb[_0x4d92cc(0x1fb)](acelerarRecrutamento,_0x57664a);_0x11ab33&&_0x11ab33[_0x4d92cc(0x2ff)]?console[_0x4d92cc(0x2ff)](_0xd2fdfb[_0x4d92cc(0x261)],_0x11ab33['error']):(_0xd2fdfb['XYHPM'](setCookie,COOKIE_RECRUTAMENTO,_0xd2fdfb[_0x4d92cc(0x297)],DIAS_VALIDADE_COOKIE),console[_0x4d92cc(0x1ed)](_0xd2fdfb[_0x4d92cc(0x2ea)]));}}catch(_0x44df92){console[_0x4d92cc(0x2ff)](_0xd2fdfb[_0x4d92cc(0x2c3)],_0x44df92);}finally{isRecruiting=![];}}async function recrutarPaladino(){const _0x409c6a=a0_0x156df3,_0x2d2c13={'iWYNw':function(_0x2a88a0,_0x270563){return _0x2a88a0||_0x270563;},'pGimQ':'home','NeObP':_0x409c6a(0x2ba),'UeoWf':function(_0x350e4c,_0x2fbb2,_0x534225){return _0x350e4c(_0x2fbb2,_0x534225);},'OCKoW':_0x409c6a(0x23f),'SSyzi':'application/json,\x20text/javascript,\x20*/*;\x20q=0.01','CyYyE':_0x409c6a(0x3ef),'IxKUA':_0x409c6a(0x3e3)};if(_0x2d2c13[_0x409c6a(0x2f9)](!currentVillageId,!csrfToken))return null;let _0x354567=_0x409c6a(0x336)+window['location']['host']+_0x409c6a(0x24b)+currentVillageId+_0x409c6a(0x347),_0x43fdc0=new URLSearchParams();_0x43fdc0[_0x409c6a(0x220)](_0x2d2c13[_0x409c6a(0x2a3)],currentVillageId),_0x43fdc0[_0x409c6a(0x220)](_0x409c6a(0x2ab),_0x2d2c13['NeObP']),_0x43fdc0[_0x409c6a(0x220)]('h',csrfToken);let _0x29332c=await _0x2d2c13[_0x409c6a(0x3bc)](fetch,_0x354567,{'method':_0x2d2c13['OCKoW'],'headers':{'Accept':_0x2d2c13[_0x409c6a(0x268)],'Content-Type':_0x2d2c13[_0x409c6a(0x29d)],'X-Requested-With':_0x2d2c13[_0x409c6a(0x2bb)]},'body':_0x43fdc0[_0x409c6a(0x243)](),'credentials':_0x409c6a(0x3e8)});if(!_0x29332c['ok'])throw new Error(_0x409c6a(0x311)+_0x29332c[_0x409c6a(0x343)]);return await _0x29332c[_0x409c6a(0x3bb)]();}async function acelerarRecrutamento(_0x1fa15d){const _0x4beebe=a0_0x156df3,_0x1093fe={'iuElH':function(_0x3a48e6,_0x3c9b04){return _0x3a48e6||_0x3c9b04;},'kfbfu':_0x4beebe(0x3c5),'CSrqK':function(_0x49601,_0x299d7d,_0x235477){return _0x49601(_0x299d7d,_0x235477);},'tqwYI':_0x4beebe(0x3ef),'mVMvi':'XMLHttpRequest','nylHD':_0x4beebe(0x3c6)};if(_0x1093fe[_0x4beebe(0x272)](!currentVillageId,!csrfToken)||!_0x1fa15d)return null;let _0x3bc8a0='https://'+window[_0x4beebe(0x377)][_0x4beebe(0x326)]+_0x4beebe(0x24b)+currentVillageId+_0x4beebe(0x30c),_0x2182e9=new URLSearchParams();_0x2182e9[_0x4beebe(0x220)](_0x4beebe(0x29a),_0x1fa15d),_0x2182e9[_0x4beebe(0x220)](_0x1093fe['kfbfu'],currentVillageId),_0x2182e9['append']('h',csrfToken);let _0x2921c4=await _0x1093fe['CSrqK'](fetch,_0x3bc8a0,{'method':_0x4beebe(0x23f),'headers':{'Accept':_0x4beebe(0x31a),'Content-Type':_0x1093fe[_0x4beebe(0x31d)],'X-Requested-With':_0x1093fe['mVMvi']},'body':_0x2182e9['toString'](),'credentials':_0x4beebe(0x3e8)});if(!_0x2921c4['ok'])throw new Error(_0x4beebe(0x311)+_0x2921c4[_0x4beebe(0x343)]);let _0x53e955=await _0x2921c4[_0x4beebe(0x3bb)]();return console[_0x4beebe(0x1ed)](_0x1093fe[_0x4beebe(0x380)],_0x53e955),_0x53e955;}function a0_0x4f46(){const _0x4bbd38=['main_buildlink_iron_15','--\x20Script\x20do\x20Tribal\x20Wars\x20ativado\x20--','eVxBR','XQmAi','153','14px','Dhjcb','start','main_buildlink_wood_10','ezWvU','VZhBd','main_buildlink_main_9','lQJuy','main_buildlink_wood_9','RPskc','111','ldOrR','main_buildlink_wood_7','JjgAd','padding','vWdsV','catch','uvZTz','#buildqueue\x20.buildorder_farm','PmIKh','SSyzi','main_buildlink_storage_19','gTkDF','value','135BByBNj','152','ZUGou','uCmJs','includes','DCKoy','iuElH','GHuQh','IJafr','zavPG','CEeBy','ilmLS','main_buildlink_stone_3','QGNbn','main_buildlink_barracks_1','cfJeT','main_buildlink_main_4','RxMZR','XofCN','type','lbdYS','136','EiAZN','umjgP','128','EhDUn','352022jXUHSs','MPUya','main_buildlink_stone_20','104','sHUbz','cOnXW','146','uiwIb','127','EbTtK','AHrHS','#pop_max_label','yukDG','Zlkcl','main_buildlink_stone_29','1000','1621631MQUqYD','wNcjj','main_buildlink_storage_22','FciwT','knight','ilrwi','VLplf','CyYyE','push','138','tVZhA','JLZJY','0\x200\x2010px\x20rgba(0,0,0,0.5)','pGimQ','PYZee','KupDW','backgroundColor','main_buildlink_iron_19','149','.btn.btn-confirm-yes','main_buildlink_storage_13','name','each','mEerg','Clicou\x20no\x20botão\x20de\x20confirmação.','toUTCString','setTime','150','main_buildlink_wood_4','mlXLC','main_buildlink_smith_1',':disabled','aJhQn','fDZHy','aALgg','main_buildlink_stone_21','Paul','IxKUA','l_main','kqzoq','OFoDz','main_buildlink_storage_5','122','div','expires=','waEYh','120','tQJUq','main_buildlink_main_6','main_buildlink_iron_29','getAttribute','qKIzj','MOlQD','main_buildlink_storage_20','SaVkG','VhyLU','DZmzl','iQFkd','querySelector','main_buildlink_wood_21','top','KmwbM','hidden','main_buildlink_iron_22','MYYud','148','KsPzK','main_buildlink_storage_3','EPIhk','getTime','RXAbS','qLHJD','137','tAXOD','length','sVGlS','GxehE','kUXsB','DtjBX','NJmjZ','BIgHz','BGgxU','xDRyX','replace','wZXGd','createElement','main_buildlink_barracks_5','gIFjz','getElementById','main_buildlink_stable_3','EYhXg','game_data','KRcMW','click','main_buildlink_stone_30','Escape','createOscillator','#main_buildrow_farm\x20>\x20td:nth-child(1)\x20>\x20span','main_buildlink_barracks_8','iWYNw','119','main_buildlink_wood_25','BUBDS','main_buildlink_iron_10','.popup_box_content\x20a.popup_close','error','indexOf','glSjF','main','123','jgXPV','TtgOJ','117','main_buildlink_iron_8','147','#pop_current_label','position','JTuNF','&screen=statue&ajaxaction=recruit_rush','uwaBT','cYfiF','nKUtV','main_buildlink_barracks_9','HTTP\x20error!\x20status:\x20','main_buildlink_storage_18','borderRadius','warn','SKVll','PWFQf','main_buildlink_storage_2','zpdrv','ttRnJ','application/json,\x20text/javascript,\x20*/*;\x20q=0.01','Próximo\x20Edifício:','main_buildlink_smith_3','tqwYI','lTWGn','gdHEM','main_buildlink_iron_9','PXPvV','destination','#main_buildrow_statue\x20>\x20td:nth-child(1)\x20>\x20span','main_buildlink_iron_20','<strong>Próximo\x20Edifício:</strong>\x20Nenhum','host','main_buildlink_iron_26','133','main_buildlink_storage_12','main_buildlink_iron_27','OtmTv','main_buildlink_storage_6','fontSize','uKMNS','#new_quest','keydown','main_buildlink_storage_7','color','IMovR','Qrxps','mgQrb','https://','main_buildlink_iron_25','main_buildlink_storage_14','main_buildlink_iron_24','xBjTs','DDVUE','recrutadoPaladino',';path=/','main_buildlink_stone_27','toFixed','50px','143','main_buildlink_iron_16','status','FdIBP','main_buildlink_farm_9','iBphK','&screen=statue&ajaxaction=recruit','Visualização\x20Geral','Arial,\x20sans-serif','EtfWl','125','qDeGB','ScRRI','134','sAvvT','Erro\x20durante\x20o\x20recrutamento\x20do\x20paladino:','Uyxmt','wcboJ','OUfBq','SvQZh','#main_buildlink_farm\x20a','OeVgM','yDWzE','btrwq','139','YwLQj','Não\x20foi\x20possível\x20determinar\x20a\x20visualização\x20atual.','STUbX','fdzkI','main_buildlink_farm_10','main_buildlink_iron_18','main_buildlink_wood_26','2169lMirfk','main_buildlink_farm_5','108','OVERVIEW_VIEW','main_buildlink_wall_1','main_buildlink_iron_21','\x20=>\x20ratio\x20=\x20','TWmXE','PFFFL','102','main_buildlink_iron_12','main_buildlink_wood_28','Kezzw','tpqCD','main_buildlink_market_2','CNaDQ','JYCqe','main_buildlink_storage_17','vnccX','115','iwekN','find','location','main_buildlink_wood_8','text','main_buildlink_iron_17','afFtc','População:\x20','undefined','main_buildlink_smith_4','ETnwz','nylHD','style','RHKOY','ndVea','OOsiU','forEach','main_buildlink_wood_12','118','state','main_buildlink_stone_7','FLkSd','Erro\x20ao\x20acelerar\x20o\x20recrutamento:','main_buildlink_iron_3','LEJRJ','uERyy','main_buildlink_wall_2','TSaBh','main_buildlink_wood_20','#fff','main_buildlink_barracks_2','href','30MoifNx','main_buildlink_wood_13','main_buildlink_wood_22','main_buildlink_storage_16','wTthz','757463WjXiyN','ukTME','LDqFy','main_buildlink_wood_18','141','QzGCC','village','appendChild','building-ui','FUvAE','mCRzm','zIndex','126','main_buildlink_stone_25','XuHqr','main_buildlink_barracks_6','Dkyyv','lpFYv','main_buildlink_farm_7','main_buildlink_market_1','main_buildlink_stone_17','COksk','MGTZr','mTkbP','Dzosq','mUICE','content','fkLON','running','main_buildlink_wood_19','textContent','main_buildlink_stone_15','KQrDy','json','UeoWf','130','CSAfu','113','tAiqE','shYbF','Fazenda\x20no\x20nível\x20máximo.\x20Voltando\x20à\x20construção\x20normal.','105','main_buildlink_stone_22','home','Resposta\x20da\x20aceleração:','dfIVb','PrZHr','PAMHF','.popup_box_content','Já\x20existe\x20FAZENDA\x20na\x20fila.\x20Aguardando\x20finalizar\x20para\x20não\x20duplicar.','main_buildlink_main_3','main_buildlink_wood_11','get','main_buildlink_stone_5','otHGY','main_buildlink_stone_28','main_buildlink_wood_27','RAgEb','sine','LIoez','main_buildlink_main_5','boxShadow','JhKEF','GFlSs','109','jKdgi','main_buildlink_main_8','main_buildlink_barracks_7','ndHqW','pnxcp','IonoD','main_buildlink_stone_11','main_buildlink_hide_3','XMLHttpRequest','Não\x20foi\x20possível\x20retomar\x20o\x20AudioContext:','qlBoC','innerText','main_buildlink_stone_10','include','main_buildlink_iron_7','main_buildlink_iron_11','Estátua\x20atingiu\x20o\x20nível\x20alvo.\x20Iniciando\x20recrutamento\x20do\x20paladino.','NtyHR','left','main_buildlink_iron_6','application/x-www-form-urlencoded;\x20charset=UTF-8','main_buildlink_wood_23','Clicou\x20no\x20botão\x20que\x20abre\x20o\x20popup\x20de\x20quests.','lPcCg','131','xUYDS','log','children','main_buildlink_stone_19','NsJaX','split','main_buildlink_wood_29','true','100','153804ozhOUI','main_buildlink_wood_17','main_buildlink_farm_','Nível\x201','floor','RhlYy','KJbmE','vJoTf','cookie','resume','124','main_buildlink_storage_10','main_buildlink_storage_15','flTWC','142','tlMXG','5px','pVxgD','jmwWX','mUzgQ','Oscilador\x20iniciado:\x20deve\x20aparecer\x20o\x20ícone\x20de\x20áudio\x20na\x20aba.','IQDLi','AgWJb','154','kfxdN','.popup_box_content\x20a.close','main_buildlink_stone_24','112','jfHcM','BXIfK','buildings','imZeA','107','random','frDVi','juGEX','flLrH','main_buildlink_stone_6','yxfRi','129','offsetHeight','main_buildlink_stone_18','17396hWabMx','append','oJGgO','WiMXL','ysjdZ','fZwtD','FIxlo','szXPk','lxIgF','wqXcL','BQeuO','UGIrT','GfQib','rzdFT','UsBYT','main_buildlink_iron_30','HnTIG','match','main_buildlink_stone_23','4600BcrBUX','offsetWidth','fejoo','Etapa_1','10px','main_buildlink_smith_5','main_buildlink_storage_21','main_buildlink_iron_28','8185vTwtsQ','144','main_buildlink_stone_2','ZKCat','Npqzk','POST','main_buildlink_barracks_4','main_buildlink_statue_1','jVCuj','toString','Recrutamento\x20bem-sucedido.\x20Cookie\x20definido.','DQkBy','tLlQj','438mJNdKf','114','main_buildlink_iron_14','main_buildlink_main_7','/game.php?village=','meta[name=\x22csrf-token\x22]','trim','main_buildlink_storage_9'];a0_0x4f46=function(){return _0x4bbd38;};return a0_0x4f46();}function collectQuestRewards(){const _0x653be2=a0_0x156df3,_0x53bf19={'EiAZN':_0x653be2(0x3ca),'uERyy':function(_0x2db7ff,_0x5456bb){return _0x2db7ff(_0x5456bb);},'tPuqi':function(_0x30cd22){return _0x30cd22();},'fkLON':'Iniciando\x20coleta\x20de\x20recompensas\x20de\x20quests.','vCmmO':function(_0xca5cea){return _0xca5cea();},'QWPmC':_0x653be2(0x32f),'ysjdZ':function(_0x77ea20,_0x6485cd,_0x1abf34){return _0x77ea20(_0x6485cd,_0x1abf34);}};console[_0x653be2(0x1ed)](_0x53bf19[_0x653be2(0x3b5)]);const _0x44b647=document[_0x653be2(0x2d0)](_0x653be2(0x3ca));if(_0x44b647&&isElementVisible(_0x44b647)){_0x53bf19['vCmmO'](processRewards);return;}let _0x2ee71e=document['querySelector'](_0x53bf19['QWPmC']);if(_0x2ee71e)_0x2ee71e[_0x653be2(0x2f3)](),console[_0x653be2(0x1ed)](_0x653be2(0x3f1));else return;let _0x1a51ab=_0x53bf19[_0x653be2(0x223)](setInterval,function(){const _0x189997=_0x653be2,_0x28bc6a=document[_0x189997(0x2d0)](_0x53bf19[_0x189997(0x282)]);_0x28bc6a&&_0x53bf19[_0x189997(0x38e)](isElementVisible,_0x28bc6a)&&(clearInterval(_0x1a51ab),_0x53bf19['tPuqi'](processRewards));},0x1f4);}function processRewards(){const _0x2132e4=a0_0x156df3,_0x50fa6b={'DQkBy':function(_0x163af5,_0x585786){return _0x163af5(_0x585786);},'zwnDc':function(_0x1525b9){return _0x1525b9();},'tgKxz':'.reward-system-claim-button','FUvAE':function(_0x5dd2d3,_0x5f0ae1){return _0x5dd2d3>_0x5f0ae1;},'mgQrb':function(_0x449942,_0x21e974,_0x1deef0){return _0x449942(_0x21e974,_0x1deef0);},'QzGCC':'a.tab-link[data-tab=\x22reward-tab\x22]'};let _0x54cbeb=document[_0x2132e4(0x2d0)](_0x50fa6b[_0x2132e4(0x39f)]);if(_0x54cbeb)_0x54cbeb[_0x2132e4(0x2f3)]();else{_0x50fa6b['zwnDc'](fecharPopup);return;}setTimeout(function(){const _0x263700=_0x2132e4,_0x31bb2c={'qLHJD':function(_0x10c2c5){return _0x50fa6b['zwnDc'](_0x10c2c5);},'Pjrvy':function(_0x443ad7,_0x452e3b,_0x3d19eb){return _0x443ad7(_0x452e3b,_0x3d19eb);}};let _0x4cfa68=document['querySelectorAll'](_0x50fa6b['tgKxz']);_0x50fa6b[_0x263700(0x3a3)](_0x4cfa68[_0x263700(0x2e0)],0x0)&&_0x4cfa68['forEach'](function(_0x39f3c7,_0x2d727b){const _0x588013=_0x263700;!_0x39f3c7['disabled']&&_0x50fa6b[_0x588013(0x245)](isElementVisible,_0x39f3c7)&&setTimeout(function(){_0x39f3c7['click']();},_0x2d727b*0x1f4);}),_0x50fa6b[_0x263700(0x335)](setTimeout,function(){const _0x2f134d=_0x263700,_0x171694={'RhlYy':function(_0xe51163,_0x3c83ec,_0x357ecc){return _0xe51163(_0x3c83ec,_0x357ecc);},'joKPk':function(_0x2872a5){const _0x47d5e7=a0_0x29d3;return _0x31bb2c[_0x47d5e7(0x2dd)](_0x2872a5);}};let _0x1fc177=document['querySelectorAll'](_0x2f134d(0x2a9));_0x1fc177[_0x2f134d(0x385)](function(_0x50b1db){const _0x216e46=_0x2f134d;isElementVisible(_0x50b1db)&&_0x171694[_0x216e46(0x1fa)](setTimeout,function(){const _0x2244b6=_0x216e46;_0x50b1db[_0x2244b6(0x2f3)]();},0x1f4);}),_0x31bb2c['Pjrvy'](setTimeout,function(){_0x171694['joKPk'](fecharPopup);},0x3e8);},0x7d0);},0x5dc);}function fecharPopup(){const _0x260bdd=a0_0x156df3,_0x2c3d3b={'ezWvU':_0x260bdd(0x20e),'OOsiU':'.popup_box_content\x20a.btn-close','vOLit':function(_0x4cf673,_0x11c119){return _0x4cf673(_0x11c119);},'uKMNS':_0x260bdd(0x330),'tLlQj':_0x260bdd(0x2f5)};let _0x5d17d6=document[_0x260bdd(0x2d0)](_0x2c3d3b[_0x260bdd(0x258)])||document[_0x260bdd(0x2d0)](_0x260bdd(0x2fe))||document[_0x260bdd(0x2d0)](_0x2c3d3b[_0x260bdd(0x384)]);if(_0x5d17d6&&_0x2c3d3b['vOLit'](isElementVisible,_0x5d17d6))_0x5d17d6[_0x260bdd(0x2f3)]();else{let _0xfc9836=new KeyboardEvent(_0x2c3d3b[_0x260bdd(0x32e)],{'key':_0x2c3d3b[_0x260bdd(0x246)],'keyCode':0x1b,'which':0x1b});document['dispatchEvent'](_0xfc9836);}}function a0_0x29d3(_0x521867,_0x6eba7b){const _0x4f4654=a0_0x4f46();return a0_0x29d3=function(_0x29d305,_0x1e088b){_0x29d305=_0x29d305-0x1ea;let _0x424bb9=_0x4f4654[_0x29d305];return _0x424bb9;},a0_0x29d3(_0x521867,_0x6eba7b);}function isElementVisible(_0x7ae580){const _0x3c81dd=a0_0x156df3;return!!(_0x7ae580[_0x3c81dd(0x233)]||_0x7ae580[_0x3c81dd(0x21d)]||_0x7ae580['getClientRects']()[_0x3c81dd(0x2e0)]);}function createBuildingUI(){const _0x52dc3c=a0_0x156df3,_0x406409={'eUgjS':_0x52dc3c(0x2c1),'JTuNF':'fixed','ulPor':_0x52dc3c(0x340),'COksk':_0x52dc3c(0x236),'jKdgi':'rgba(0,\x200,\x200,\x200.7)','EhDUn':_0x52dc3c(0x254),'JYCqe':_0x52dc3c(0x205),'frDVi':_0x52dc3c(0x349),'YwLQj':_0x52dc3c(0x325)};if(document[_0x52dc3c(0x2ee)](_0x52dc3c(0x3a2)))return;let _0x3e00d0=document[_0x52dc3c(0x2eb)](_0x406409['eUgjS']);_0x3e00d0['id']=_0x52dc3c(0x3a2),_0x3e00d0['style'][_0x52dc3c(0x30a)]=_0x406409[_0x52dc3c(0x30b)],_0x3e00d0['style'][_0x52dc3c(0x2d2)]=_0x406409['ulPor'],_0x3e00d0[_0x52dc3c(0x381)][_0x52dc3c(0x3ed)]=_0x406409[_0x52dc3c(0x3af)],_0x3e00d0['style'][_0x52dc3c(0x262)]=_0x406409[_0x52dc3c(0x3af)],_0x3e00d0[_0x52dc3c(0x381)][_0x52dc3c(0x2a6)]=_0x406409[_0x52dc3c(0x3db)],_0x3e00d0[_0x52dc3c(0x381)][_0x52dc3c(0x332)]=_0x52dc3c(0x392),_0x3e00d0[_0x52dc3c(0x381)][_0x52dc3c(0x32d)]=_0x406409[_0x52dc3c(0x285)],_0x3e00d0[_0x52dc3c(0x381)][_0x52dc3c(0x313)]=_0x406409[_0x52dc3c(0x371)],_0x3e00d0[_0x52dc3c(0x381)][_0x52dc3c(0x3a5)]=_0x52dc3c(0x295),_0x3e00d0[_0x52dc3c(0x381)]['fontFamily']=_0x406409[_0x52dc3c(0x217)],_0x3e00d0[_0x52dc3c(0x381)][_0x52dc3c(0x3d7)]=_0x52dc3c(0x2a2),_0x3e00d0['innerHTML']=_0x406409[_0x52dc3c(0x35a)],document['body'][_0x52dc3c(0x3a1)](_0x3e00d0);}function updateBuildingUI(_0xac8b97){const _0x108de7=a0_0x156df3,_0x1ed649={'CNaDQ':'building-ui'};let _0x2206da=document[_0x108de7(0x2ee)](_0x1ed649[_0x108de7(0x370)]);_0x2206da&&(_0x2206da['innerHTML']='<strong>Próximo\x20Edifício:</strong>\x20'+_0xac8b97);}let audioCtx=null,oscillator=null,gainNode=null,audioIniciado=![];function iniciarAudioImperceptivel(){const _0x23410c=a0_0x156df3,_0x464258={'NcddF':_0x23410c(0x3d4),'SBbdd':function(_0x537b45,_0x688b56){return _0x537b45===_0x688b56;},'LJtBl':_0x23410c(0x209)};if(!audioCtx){const _0x19cd46=window['AudioContext']||window['webkitAudioContext'];audioCtx=new _0x19cd46();}!oscillator&&(oscillator=audioCtx[_0x23410c(0x2f6)](),oscillator['frequency']['value']=0x4a38,oscillator[_0x23410c(0x27f)]=_0x464258['NcddF'],gainNode=audioCtx['createGain'](),gainNode['gain'][_0x23410c(0x26b)]=0.02,oscillator['connect'](gainNode),gainNode['connect'](audioCtx[_0x23410c(0x322)])),_0x464258['SBbdd'](audioCtx[_0x23410c(0x388)],'suspended')&&audioCtx[_0x23410c(0x1fe)]()[_0x23410c(0x264)](_0x18eba2=>{const _0x2ded28=_0x23410c;console[_0x2ded28(0x314)](_0x2ded28(0x3e4),_0x18eba2);}),!audioIniciado&&_0x464258['SBbdd'](audioCtx['state'],_0x23410c(0x3b6))&&(oscillator[_0x23410c(0x256)](),audioIniciado=!![],console['log'](_0x464258['LJtBl']));}window['addEventListener']('click',function onUserClick(){const _0x3d27ac=a0_0x156df3,_0x398f10={'XofCN':function(_0x1c4614){return _0x1c4614();}};_0x398f10[_0x3d27ac(0x27e)](iniciarAudioImperceptivel);});
+
+
+//*************************** CONFIGURAÇÃO ***************************//
+const Min_Tempo_Espera = 800000; // 13 minutos 20 segundos
+const Max_Tempo_Espera = 900000; // 15 minutos
+const Etapa = "Etapa_1";
+const Construção_Edificios_Ordem = true;
+const Quest_Interval_Minutes = 1;
+const Quest_Interval = Quest_Interval_Minutes * 60 * 1000;
+const NivelEstatuaAlvo = "Nível 1";
+const COOKIE_RECRUTAMENTO = "recrutadoPaladino";
+const DIAS_VALIDADE_COOKIE = 99;
+
+// ***** CONFIGS PARA FAZENDA ***** //
+const FARM_THRESHOLD = 0.90;     // Se >= 80%, prioriza a fazenda
+const MAX_FARM_LEVEL = 30;       // Nível máximo permitido
+// *************************** /CONFIGURAÇÃO ***************************//
+
+const Visualização_Geral = "OVERVIEW_VIEW";
+const Edificio_Principal = "HEADQUARTERS_VIEW";
+
+let isRecruiting = false;
+let currentVillageId = null;
+let csrfToken = null;
+let construindoFazenda = false; // Flag para saber se estamos forçando fazenda
+
+
+(function () {
+    'use strict';
+
+    console.log("-- Script do Tribal Wars ativado --");
+
+    // Criar a UI para exibir o próximo edifício
+    createBuildingUI();
+
+    if (Etapa === "Etapa_1") {
+        executarEtapa1();
+    }
+
+    // Intervalos
+    setInterval(collectQuestRewards, Quest_Interval);  // Coletar quests
+    setInterval(verificarEstatua, 5000);               // Recrutar Paladino
+
+})();
+
+//*************************** FUNÇÕES DE CONSTRUÇÃO ***************************//
+function executarEtapa1() {
+    let Evoluir_vilas = getEvoluir_vilas();
+    if (Evoluir_vilas === Edificio_Principal) {
+        setInterval(function () {
+            if (!isRecruiting) {
+                Proxima_Construção();
+            }
+        }, 10000);
+    }
+    else if (Evoluir_vilas === Visualização_Geral) {
+        let l_main = document.getElementById("l_main");
+        if (l_main && l_main.children.length > 0 && l_main.children[0].children.length > 0) {
+            l_main.children[0].children[0].click();
+            console.log("Clicou no botão de Visualização Geral.");
+        }
+    }
+}
+
+// Verifica se a construção pode ser finalizada gratuitamente
+setInterval(function () {
+    var tr = $('#buildqueue').find('tr').eq(1);
+
+    if (tr.length > 0) {
+        let text = tr.find('td').eq(1).find('span').eq(0).text().trim().replace(/\s/g, "");
+        let timeSplit = text.split(':');
+
+        if (timeSplit.length === 3) {
+            let seconds = parseInt(timeSplit[0], 10) * 3600
+                + parseInt(timeSplit[1], 10) * 60
+                + parseInt(timeSplit[2], 10);
+            if (seconds < 3 * 60) {
+                console.log("Completar Grátis");
+                tr.find('td').eq(2).find('a').eq(2).click();
+            }
+        }
+    }
+
+    // Confirmações de missões, etc.
+    $('.btn.btn-confirm-yes').each(function () {
+        if (!$(this).hasClass('hidden') && !$(this).is(':disabled')) {
+            $(this).click();
+            console.log("Clicou no botão de confirmação.");
+        }
+    });
+}, 500);
+
+// Intervalo aleatório para chamar Proxima_Construção()
+let delay = Math.floor(Math.random() * (Max_Tempo_Espera - Min_Tempo_Espera) + Min_Tempo_Espera);
+setTimeout(function () {
+    let Evoluir_vilas = getEvoluir_vilas();
+    if (Evoluir_vilas === Edificio_Principal && !isRecruiting) {
+        Proxima_Construção();
+    }
+    else if (Evoluir_vilas === Visualização_Geral) {
+        let l_main = document.getElementById("l_main");
+        if (l_main && l_main.children.length > 0 && l_main.children[0].children.length > 0) {
+            l_main.children[0].children[0].click();
+            console.log("Clicou no botão de Visualização Geral.");
+        }
+    }
+}, delay);
+
+
+// Verifica em qual tela estamos
+function getEvoluir_vilas() {
+    let currentUrl = window.location.href;
+
+    if (currentUrl.includes('overview') || currentUrl.includes('Visualização Geral')) {
+        return Visualização_Geral;
+    }
+    else if (currentUrl.includes('main')) {
+        const urlParams = new URLSearchParams(window.location.search);
+        currentVillageId = urlParams.get('village');
+        csrfToken = getCSRFToken();
+        return Edificio_Principal;
+    }
+    else {
+        console.log("Não foi possível determinar a visualização atual.");
+        return undefined;
+    }
+}
+
+function getCSRFToken() {
+    let csrfInput = document.querySelector('input[name="h"]');
+    if (csrfInput) {
+        return csrfInput.value;
+    }
+    let csrfMeta = document.querySelector('meta[name="csrf-token"]');
+    if (csrfMeta) {
+        return csrfMeta.getAttribute('content');
+    }
+    return null;
+}
+
+// ---------------------- LÓGICA PARA EVITAR VÁRIAS FAZENDAS NA FILA ----------------------
+// Retorna true se houver uma construção de fazenda já na fila
+function isFarmInQueue() {
+    // Seletor: #buildqueue .buildorder_farm
+    let farmQueueRow = document.querySelector('#buildqueue .buildorder_farm');
+    return (farmQueueRow !== null);
+}
+
+// Retorna se a fazenda está acima do threshold (ex: 80%)
+function isFarmOverThreshold() {
+    const popCurrentEl = document.querySelector('#pop_current_label');
+    const popMaxEl = document.querySelector('#pop_max_label');
+    if (!popCurrentEl || !popMaxEl) return false;
+
+    let currentPop = parseInt(popCurrentEl.innerText.trim());
+    let maxPop = parseInt(popMaxEl.innerText.trim());
+    if (isNaN(currentPop) || isNaN(maxPop)) return false;
+
+    let ratio = currentPop / maxPop;
+    console.log(`População: ${currentPop}/${maxPop} => ratio = ${(ratio * 100).toFixed(2)}%`);
+    return ratio >= FARM_THRESHOLD;
+}
+
+function getFarmLevelFromDOM() {
+    let farmSpan = document.querySelector('#main_buildrow_farm > td:nth-child(1) > span');
+    if (!farmSpan) {
+        // Tenta outra forma
+        const link = document.querySelector('#main_buildlink_farm a');
+        if (!link) return 0;
+        let levelText = link.textContent.match(/\d+/);
+        return levelText ? parseInt(levelText[0]) : 0;
+    }
+    let farmText = farmSpan.textContent.trim();
+    let levelMatch = farmText.match(/\d+/);
+    return levelMatch ? parseInt(levelMatch[0]) : 0;
+}
+
+function getFarmQueue() {
+    let Sequência_Fazenda_Construção = [];
+    for (let nivel = 2; nivel <= MAX_FARM_LEVEL; nivel++) {
+        Sequência_Fazenda_Construção.push(`main_buildlink_farm_${nivel}`);
+    }
+    return Sequência_Fazenda_Construção;
+}
+
+// Retorna o próximo elemento de construção
+function getConstrução_proximo_edificio(forcarFazenda = false) {
+    let fila = forcarFazenda ? getFarmQueue() : getConstrução_Edifcios_Serie();
+    let instituir;
+    while (instituir === undefined && fila.length > 0) {
+        let proximoId = fila.shift();
+        let proximoEl = document.getElementById(proximoId);
+        if (proximoEl) {
+            var visivel = (proximoEl.offsetWidth > 0 || proximoEl.offsetHeight > 0);
+            if (visivel) {
+                instituir = proximoEl;
+            }
+            if (Construção_Edificios_Ordem) {
+                break;
+            }
+        }
+    }
+    return instituir;
+}
+
+function Proxima_Construção() {
+    // 1) Verifica condição para forçar fazenda
+    let fazendaNivelAtual = getFarmLevelFromDOM();
+    let fazendaLotada = isFarmOverThreshold();
+
+    // Se a fazenda está acima do threshold E não está no nível máximo
+    // OU se já estamos no modo fazenda
+    if ((fazendaLotada && fazendaNivelAtual < MAX_FARM_LEVEL) || construindoFazenda) {
+        construindoFazenda = true;
+        console.log(`Modo Fazenda Ativo. Nível fazenda atual: ${fazendaNivelAtual}`);
+
+        // Se a fazenda já estiver no máximo, sai do modo fazenda
+        if (fazendaNivelAtual >= MAX_FARM_LEVEL) {
+            console.log("Fazenda no nível máximo. Voltando à construção normal.");
+            construindoFazenda = false;
+        }
+        else {
+            // Antes de tentar construir outra fazenda, verifica se já tem uma na fila
+            if (isFarmInQueue()) {
+                console.log("Já existe FAZENDA na fila. Aguardando finalizar para não duplicar.");
+                let proximoEdificio = getConstrução_proximo_edificio(construindoFazenda);
+                if (proximoEdificio) {
+                    proximoEdificio.click();
+                    updateBuildingUI(proximoEdificio.id);
+                    console.log("Próximo Edifício:", proximoEdificio.id);
+                }
+            }
+        }
+    }
+    else {
+        // Caso não esteja lotada ou já resolvido, sai do modo fazenda
+        construindoFazenda = false;
+    }
+
+    // 2) Seleciona a fila apropriada
+    let proximoEdificio = getConstrução_proximo_edificio(construindoFazenda);
+    if (proximoEdificio) {
+        proximoEdificio.click();
+        updateBuildingUI(proximoEdificio.id);
+        console.log("Próximo Edifício:", proximoEdificio.id);
+    }
+}
+
+function getConstrução_Edifcios_Serie() {
+    var Sequência_Construção = [];
+
+    // Estatua 1
+    Sequência_Construção.push("main_buildlink_statue_1");
+    // Bosque 1
+    Sequência_Construção.push("main_buildlink_wood_1");
+    // Argila 1
+    Sequência_Construção.push("main_buildlink_stone_1");
+    // Ferro 1
+    Sequência_Construção.push("main_buildlink_iron_1");
+    // Bosque 2
+    Sequência_Construção.push("main_buildlink_wood_2");
+    // Argila 2
+    Sequência_Construção.push("main_buildlink_stone_2");
+    // Ferro 2
+    Sequência_Construção.push("main_buildlink_iron_2");
+    // Bosque 3
+    Sequência_Construção.push("main_buildlink_wood_3");
+    // Armazém 2
+    Sequência_Construção.push("main_buildlink_storage_2");
+    // Armazém 3
+    Sequência_Construção.push("main_buildlink_storage_3");
+    // Edifício Principal 2
+    Sequência_Construção.push("main_buildlink_main_2");
+    // Edifício Principal 3
+    Sequência_Construção.push("main_buildlink_main_3");
+    // Quartel 1
+    Sequência_Construção.push("main_buildlink_barracks_1");
+    // Mercado 1
+    Sequência_Construção.push("main_buildlink_market_1");
+    // Fazenda 2
+    Sequência_Construção.push("main_buildlink_farm_2");
+    // Fazenda 3
+    Sequência_Construção.push("main_buildlink_farm_3");
+    // Argila 3
+    Sequência_Construção.push("main_buildlink_stone_3");
+    // Ferro 3
+    Sequência_Construção.push("main_buildlink_iron_3");
+    // Armazém 4
+    Sequência_Construção.push("main_buildlink_storage_4");
+    // Muralha 1
+    Sequência_Construção.push("main_buildlink_wall_1");
+    // Muralha 2
+    Sequência_Construção.push("main_buildlink_wall_2");
+    // Mercado 2
+    Sequência_Construção.push("main_buildlink_market_2");
+    // Bosque 4
+    Sequência_Construção.push("main_buildlink_wood_4");
+    // Argila 4
+    Sequência_Construção.push("main_buildlink_stone_4");
+    // Ferro 4
+    Sequência_Construção.push("main_buildlink_iron_4");
+    // Esconderijo 2
+    Sequência_Construção.push("main_buildlink_hide_2");
+    // Esconderijo 3
+    Sequência_Construção.push("main_buildlink_hide_3");
+    // Quartel 2
+    Sequência_Construção.push("main_buildlink_barracks_2");
+    // Bosque 5
+    Sequência_Construção.push("main_buildlink_wood_5");
+    // Bosque 6
+    Sequência_Construção.push("main_buildlink_wood_6");
+    // Bosque 7
+    Sequência_Construção.push("main_buildlink_wood_7");
+    // Armazém 5
+    Sequência_Construção.push("main_buildlink_storage_5");
+    // Fazenda 4
+    Sequência_Construção.push("main_buildlink_farm_4");
+    // Fazenda 5
+    Sequência_Construção.push("main_buildlink_farm_5");
+    // Bosque 8
+    Sequência_Construção.push("main_buildlink_wood_8");
+    // Argila 5
+    Sequência_Construção.push("main_buildlink_stone_5");
+    // Argila 6
+    Sequência_Construção.push("main_buildlink_stone_6");
+    // Bosque 9
+    Sequência_Construção.push("main_buildlink_wood_9");
+    // Argila 7
+    Sequência_Construção.push("main_buildlink_stone_7");
+    // Ferro 5
+    Sequência_Construção.push("main_buildlink_iron_5");
+    // Armazém 6
+    Sequência_Construção.push("main_buildlink_storage_6");
+    // Fazenda 6
+    Sequência_Construção.push("main_buildlink_farm_6");
+    // Bosque 10
+    Sequência_Construção.push("main_buildlink_wood_10");
+    // Bosque 11
+    Sequência_Construção.push("main_buildlink_wood_11");
+    // Bosque 12
+    Sequência_Construção.push("main_buildlink_wood_12");
+    // Quartel 3
+    Sequência_Construção.push("main_buildlink_barracks_3");
+    // Quartel 4
+    Sequência_Construção.push("main_buildlink_barracks_4");
+    // Quartel 5
+    Sequência_Construção.push("main_buildlink_barracks_5");
+    // Argila 8
+    Sequência_Construção.push("main_buildlink_stone_8");
+    // Ferro 6
+    Sequência_Construção.push("main_buildlink_iron_6");
+    // Armazém 7
+    Sequência_Construção.push("main_buildlink_storage_7");
+    // Fazenda 7
+    Sequência_Construção.push("main_buildlink_farm_7");
+    // Armazém 8
+    Sequência_Construção.push("main_buildlink_storage_8");
+    // Edifício Principal 4
+    Sequência_Construção.push("main_buildlink_main_4");
+    // Edifício Principal 5
+    Sequência_Construção.push("main_buildlink_main_5");
+    // Ferreiro 1
+    Sequência_Construção.push("main_buildlink_smith_1");
+    // Bosque 13
+    Sequência_Construção.push("main_buildlink_wood_13");
+    // Argila 9
+    Sequência_Construção.push("main_buildlink_stone_9");
+    // Argila 10
+    Sequência_Construção.push("main_buildlink_stone_10");
+    // Ferro 7
+    Sequência_Construção.push("main_buildlink_iron_7");
+    // Armazém 9
+    Sequência_Construção.push("main_buildlink_storage_9");
+    // Fazenda 8
+    Sequência_Construção.push("main_buildlink_farm_8");
+    // Bosque 14
+    Sequência_Construção.push("main_buildlink_wood_14");
+    // Argila 11
+    Sequência_Construção.push("main_buildlink_stone_11");
+    // Argila 12
+    Sequência_Construção.push("main_buildlink_stone_12");
+    // Ferro 8
+    Sequência_Construção.push("main_buildlink_iron_8");
+    // Quartel 6
+    Sequência_Construção.push("main_buildlink_barracks_6");
+    // Armazém 10
+    Sequência_Construção.push("main_buildlink_storage_10");
+    // Armazém 11
+    Sequência_Construção.push("main_buildlink_storage_11");
+    // Bosque 15
+    Sequência_Construção.push("main_buildlink_wood_15");
+    // Argila 13
+    Sequência_Construção.push("main_buildlink_stone_13");
+    // Ferro 9
+    Sequência_Construção.push("main_buildlink_iron_9");
+    // Fazenda 9
+    Sequência_Construção.push("main_buildlink_farm_9");
+    // Bosque 16
+    Sequência_Construção.push("main_buildlink_wood_16");
+    // Argila 14
+    Sequência_Construção.push("main_buildlink_stone_14");
+    // Ferro 10
+    Sequência_Construção.push("main_buildlink_iron_10");
+    // Armazém 12
+    Sequência_Construção.push("main_buildlink_storage_12");
+    // Bosque 17
+    Sequência_Construção.push("main_buildlink_wood_17");
+    // Argila 15
+    Sequência_Construção.push("main_buildlink_stone_15");
+    // Ferro 11
+    Sequência_Construção.push("main_buildlink_iron_11");
+    // Quartel 7
+    Sequência_Construção.push("main_buildlink_barracks_7");
+    // Quartel 8
+    Sequência_Construção.push("main_buildlink_barracks_8");
+    // Quartel 9
+    Sequência_Construção.push("main_buildlink_barracks_9");
+    // Bosque 18
+    Sequência_Construção.push("main_buildlink_wood_18");
+    // Ferro 12
+    Sequência_Construção.push("main_buildlink_iron_12");
+    // Ferro 13
+    Sequência_Construção.push("main_buildlink_iron_13");
+    // Argila 16
+    Sequência_Construção.push("main_buildlink_stone_16");
+    // Ferro 14
+    Sequência_Construção.push("main_buildlink_iron_14");
+    // Edifício Principal 6
+    Sequência_Construção.push("main_buildlink_main_6");
+    // Edifício Principal 7
+    Sequência_Construção.push("main_buildlink_main_7");
+    // Edifício Principal 8
+    Sequência_Construção.push("main_buildlink_main_8");
+    // Edifício Principal 9
+    Sequência_Construção.push("main_buildlink_main_9");
+    // Edifício Principal 10
+    Sequência_Construção.push("main_buildlink_main_10");
+    // Fazenda 10
+    Sequência_Construção.push("main_buildlink_farm_10");
+    // Armazém 13
+    Sequência_Construção.push("main_buildlink_storage_13");
+    // Ferreiro 2
+    Sequência_Construção.push("main_buildlink_smith_2");
+    // Ferreiro 3
+    Sequência_Construção.push("main_buildlink_smith_3");
+    // Ferreiro 4
+    Sequência_Construção.push("main_buildlink_smith_4");
+    // Ferreiro 5
+    Sequência_Construção.push("main_buildlink_smith_5");
+    // Estábulo 1
+    Sequência_Construção.push("main_buildlink_stable_1");
+    // Estábulo 2
+    Sequência_Construção.push("main_buildlink_stable_2");
+    // Estábulo 3
+    Sequência_Construção.push("main_buildlink_stable_3");
+    // Argila 17
+    Sequência_Construção.push("main_buildlink_stone_17");
+    // Armazém 14
+    Sequência_Construção.push("main_buildlink_storage_14");
+    // Armazém 15
+    Sequência_Construção.push("main_buildlink_storage_15");
+    // Argila 18
+    Sequência_Construção.push("main_buildlink_stone_18");
+    // Ferro 15
+    Sequência_Construção.push("main_buildlink_iron_15");
+    // Ferro 16
+    Sequência_Construção.push("main_buildlink_iron_16");
+    // Ferro 17
+    Sequência_Construção.push("main_buildlink_iron_17");
+    // Bosque 19
+    Sequência_Construção.push("main_buildlink_wood_19");
+    // Argila 19
+    Sequência_Construção.push("main_buildlink_stone_19");
+    // Ferro 18
+    Sequência_Construção.push("main_buildlink_iron_18");
+    // Bosque 20
+    Sequência_Construção.push("main_buildlink_wood_20");
+    // Argila 20
+    Sequência_Construção.push("main_buildlink_stone_20");
+    // Ferro 19
+    Sequência_Construção.push("main_buildlink_iron_19");
+    // Armazém 16
+    Sequência_Construção.push("main_buildlink_storage_16");
+    // Armazém 17
+    Sequência_Construção.push("main_buildlink_storage_17");
+
+    // Ciclo 1: Bosque 21, Argila 21, Ferro 20
+    Sequência_Construção.push("main_buildlink_wood_21");
+    Sequência_Construção.push("main_buildlink_stone_21");
+    Sequência_Construção.push("main_buildlink_iron_20");
+
+    // Ciclo 2: Bosque 22, Argila 22, Ferro 21 => depois Armazém 18
+    Sequência_Construção.push("main_buildlink_wood_22");
+    Sequência_Construção.push("main_buildlink_stone_22");
+    Sequência_Construção.push("main_buildlink_iron_21");
+    Sequência_Construção.push("main_buildlink_storage_18");
+
+    // Ciclo 3: Bosque 23, Argila 23, Ferro 22
+    Sequência_Construção.push("main_buildlink_wood_23");
+    Sequência_Construção.push("main_buildlink_stone_23");
+    Sequência_Construção.push("main_buildlink_iron_22");
+
+    // Ciclo 4: Bosque 24, Argila 24, Ferro 23 => depois Armazém 19
+    Sequência_Construção.push("main_buildlink_wood_24");
+    Sequência_Construção.push("main_buildlink_stone_24");
+    Sequência_Construção.push("main_buildlink_iron_23");
+    Sequência_Construção.push("main_buildlink_storage_19");
+
+    // Ciclo 5: Bosque 25, Argila 25, Ferro 24
+    Sequência_Construção.push("main_buildlink_wood_25");
+    Sequência_Construção.push("main_buildlink_stone_25");
+    Sequência_Construção.push("main_buildlink_iron_24");
+
+    // Ciclo 6: Bosque 26, Argila 26, Ferro 25 => depois Armazém 20
+    Sequência_Construção.push("main_buildlink_wood_26");
+    Sequência_Construção.push("main_buildlink_stone_26");
+    Sequência_Construção.push("main_buildlink_iron_25");
+    Sequência_Construção.push("main_buildlink_storage_20");
+
+    // Ciclo 7: Bosque 27, Argila 27, Ferro 26
+    Sequência_Construção.push("main_buildlink_wood_27");
+    Sequência_Construção.push("main_buildlink_stone_27");
+    Sequência_Construção.push("main_buildlink_iron_26");
+
+    // Ciclo 8: Bosque 28, Argila 28, Ferro 27 => depois Armazém 21
+    Sequência_Construção.push("main_buildlink_wood_28");
+    Sequência_Construção.push("main_buildlink_stone_28");
+    Sequência_Construção.push("main_buildlink_iron_27");
+    Sequência_Construção.push("main_buildlink_storage_21");
+
+    // Ciclo 9: Bosque 29, Argila 29, Ferro 28
+    Sequência_Construção.push("main_buildlink_wood_29");
+    Sequência_Construção.push("main_buildlink_stone_29");
+    Sequência_Construção.push("main_buildlink_iron_28");
+
+    // Ciclo 10: Bosque 30, Argila 30, Ferro 29 => depois Armazém 22
+    Sequência_Construção.push("main_buildlink_wood_30");
+    Sequência_Construção.push("main_buildlink_stone_30");
+    Sequência_Construção.push("main_buildlink_iron_29");
+    Sequência_Construção.push("main_buildlink_storage_22");
+
+    // Ciclo 11: aqui, Bosque e Argila já estão no 30; faltava apenas Ferro = 29 -> 30
+    Sequência_Construção.push("main_buildlink_iron_30");
+
+    return Sequência_Construção;
+}
+
+//*************************** /FUNÇÕES DE CONSTRUÇÃO ***************************//
+
+
+//*************************** NOVA FUNCIONALIDADE (PALADINO) ***************************//
+function setCookie(nome, valor, dias) {
+    const data = new Date();
+    data.setTime(data.getTime() + (dias * 86400000));
+    const expires = "expires=" + data.toUTCString();
+    document.cookie = nome + "=" + valor + ";" + expires + ";path=/";
+}
+function getCookie(nome) {
+    const nomeEQ = nome + "=";
+    const ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i].trim();
+        if (c.indexOf(nomeEQ) === 0) return c.substring(nomeEQ.length, c.length);
+    }
+    return null;
+}
+function checkCookie(nome) {
+    return getCookie(nome) !== null;
+}
+function eraseCookie(nome) {
+    document.cookie = nome + '=; Max-Age=-99999999; path=/';
+}
+
+function verificarEstatua() {
+    if (isRecruiting) return;
+    if (checkCookie(COOKIE_RECRUTAMENTO)) {
+        console.log("Recrutamento já realizado anteriormente.");
+        return;
+    }
+    let buildings = getCurrentBuildings();
+    if (!buildings) return;
+
+    const statueElement = document.querySelector('#main_buildrow_statue > td:nth-child(1) > span');
+    if (!statueElement) return;
+
+    let nivelEstatua = statueElement.textContent;
+    if (nivelEstatua == NivelEstatuaAlvo) {
+        console.log("Estátua atingiu o nível alvo. Iniciando recrutamento do paladino.");
+        iniciarRecrutamentoPaladino();
+    }
+}
+
+function getCurrentBuildings() {
+    if (typeof unsafeWindow !== 'undefined' &&
+        unsafeWindow.game_data &&
+        unsafeWindow.game_data.village &&
+        unsafeWindow.game_data.village.buildings) {
+        return unsafeWindow.game_data.village.buildings;
+    }
+    // Alternativamente, parse do DOM se necessário
+    return null;
+}
+
+async function iniciarRecrutamentoPaladino() {
+    isRecruiting = true;
+    try {
+        let recrutamentoResponse = await recrutarPaladino();
+        if (recrutamentoResponse && recrutamentoResponse.knight && recrutamentoResponse.knight.id) {
+            let knightId = recrutamentoResponse.knight.id;
+            let aceleracaoResponse = await acelerarRecrutamento(knightId);
+
+            if (aceleracaoResponse && aceleracaoResponse.error) {
+                console.error("Erro ao acelerar o recrutamento:", aceleracaoResponse.error);
+            }
+            else {
+                setCookie(COOKIE_RECRUTAMENTO, "true", DIAS_VALIDADE_COOKIE);
+                console.log("Recrutamento bem-sucedido. Cookie definido.");
+            }
+        }
+    } catch (error) {
+        console.error("Erro durante o recrutamento do paladino:", error);
+    } finally {
+        isRecruiting = false;
+    }
+}
+
+async function recrutarPaladino() {
+    if (!currentVillageId || !csrfToken) return null;
+    let url = `https://${window.location.host}/game.php?village=${currentVillageId}&screen=statue&ajaxaction=recruit`;
+    let formData = new URLSearchParams();
+    formData.append('home', currentVillageId);
+    formData.append('name', 'Paul');
+    formData.append('h', csrfToken);
+
+    let response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: formData.toString(),
+        credentials: 'include'
+    });
+
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return await response.json();
+}
+
+async function acelerarRecrutamento(knightId) {
+    if (!currentVillageId || !csrfToken || !knightId) return null;
+    let url = `https://${window.location.host}/game.php?village=${currentVillageId}&screen=statue&ajaxaction=recruit_rush`;
+    let formData = new URLSearchParams();
+    formData.append('knight', knightId);
+    formData.append('home', currentVillageId);
+    formData.append('h', csrfToken);
+
+    let response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: formData.toString(),
+        credentials: 'include'
+    });
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    let data = await response.json();
+    console.log("Resposta da aceleração:", data);
+    return data;
+}
+//*************************** /NOVA FUNCIONALIDADE ***************************//
+
+
+//*************************** COLETAR RECOMPENSAS DAS QUESTS ***************************//
+function collectQuestRewards() {
+    console.log("Iniciando coleta de recompensas de quests.");
+    const popupContent = document.querySelector('.popup_box_content');
+    if (popupContent && isElementVisible(popupContent)) {
+        processRewards();
+        return;
+    }
+    let questButton = document.querySelector('#new_quest');
+    if (questButton) {
+        questButton.click();
+        console.log("Clicou no botão que abre o popup de quests.");
+    }
+    else {
+        return;
+    }
+    let popupOpenInterval = setInterval(function () {
+        const popupContent = document.querySelector('.popup_box_content');
+        if (popupContent && isElementVisible(popupContent)) {
+            clearInterval(popupOpenInterval);
+            processRewards();
+        }
+    }, 500);
+}
+
+function processRewards() {
+    let recompensasTab = document.querySelector('a.tab-link[data-tab="reward-tab"]');
+    if (recompensasTab) {
+        recompensasTab.click();
+    } else {
+        fecharPopup();
+        return;
+    }
+    setTimeout(function () {
+        let reivindicarButtons = document.querySelectorAll('.reward-system-claim-button');
+        if (reivindicarButtons.length > 0) {
+            reivindicarButtons.forEach(function (button, index) {
+                if (!button.disabled && isElementVisible(button)) {
+                    setTimeout(function () {
+                        button.click();
+                    }, index * 500);
+                }
+            });
+        }
+        setTimeout(function () {
+            let confirmButtons = document.querySelectorAll('.btn.btn-confirm-yes');
+            confirmButtons.forEach(function (button) {
+                if (isElementVisible(button)) {
+                    setTimeout(function () {
+                        button.click();
+                    }, 500);
+                }
+            });
+            setTimeout(function () {
+                fecharPopup();
+            }, 1000);
+        }, 2000);
+    }, 1500);
+}
+
+function fecharPopup() {
+    let closeButton = document.querySelector('.popup_box_content a.close') ||
+        document.querySelector('.popup_box_content a.popup_close') ||
+        document.querySelector('.popup_box_content a.btn-close');
+    if (closeButton && isElementVisible(closeButton)) {
+        closeButton.click();
+    } else {
+        let escEvent = new KeyboardEvent('keydown', { 'key': 'Escape', 'keyCode': 27, 'which': 27 });
+        document.dispatchEvent(escEvent);
+    }
+}
+
+function isElementVisible(element) {
+    return !!(element.offsetWidth || element.offsetHeight || element.getClientRects().length);
+}
+//*************************** /COLETAR RECOMPENSAS DAS QUESTS ***************************//
+
+
+//*************************** CRIAÇÃO DE UI ***************************//
+function createBuildingUI() {
+    if (document.getElementById('building-ui')) return;
+    let uiContainer = document.createElement('div');
+    uiContainer.id = 'building-ui';
+    uiContainer.style.position = 'fixed';
+    uiContainer.style.top = '50px';
+    uiContainer.style.left = '10px';
+    uiContainer.style.padding = '10px';
+    uiContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    uiContainer.style.color = '#fff';
+    uiContainer.style.fontSize = '14px';
+    uiContainer.style.borderRadius = '5px';
+    uiContainer.style.zIndex = '1000';
+    uiContainer.style.fontFamily = 'Arial, sans-serif';
+    uiContainer.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
+    uiContainer.innerHTML = '<strong>Próximo Edifício:</strong> Nenhum';
+    document.body.appendChild(uiContainer);
+}
+
+function updateBuildingUI(buildingID) {
+    let ui = document.getElementById('building-ui');
+    if (ui) {
+        ui.innerHTML = `<strong>Próximo Edifício:</strong> ${buildingID}`;
+    }
+}
+//*************************** /CRIAÇÃO DE UI ***************************//
+
+
+//*************************** ÁUDIO IMPERCEPTÍVEL ***************************//
+let audioCtx = null;
+let oscillator = null;
+let gainNode = null;
+let audioIniciado = false;
+
+function iniciarAudioImperceptivel() {
+    if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+    }
+    if (!oscillator) {
+        oscillator = audioCtx.createOscillator();
+        oscillator.frequency.value = 19000;
+        oscillator.type = 'sine';
+
+        gainNode = audioCtx.createGain();
+        gainNode.gain.value = 0.02;
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+    }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume().catch((err) => {
+            console.warn('Não foi possível retomar o AudioContext:', err);
+        });
+    }
+    if (!audioIniciado && audioCtx.state === 'running') {
+        oscillator.start();
+        audioIniciado = true;
+        console.log('Oscilador iniciado: deve aparecer o ícone de áudio na aba.');
+    }
+}
+
+window.addEventListener('click', function onUserClick() {
+    iniciarAudioImperceptivel();
+});
+//*************************** /ÁUDIO IMPERCEPTÍVEL ***************************//
