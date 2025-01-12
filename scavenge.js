@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Scavenge Auto
-// @version      1.0.5
+// @version      1.0.6
 // @description  Auto scavenge and unlock new options
 // @author       Murilo KZC
 // @include      **mode=scavenge*
@@ -8,4 +8,190 @@
 // @updateURL    https://raw.githubusercontent.com/kozac/twscripts/main/scavenge.js
 // @downloadURL  https://raw.githubusercontent.com/kozac/twscripts/main/scavenge.js
 // ==/UserScript==
-function a0_0xc4f1(_0x153925,_0xac148e){const _0x3fee3c=a0_0x3fee();return a0_0xc4f1=function(_0xc4f1ee,_0x3b6da7){_0xc4f1ee=_0xc4f1ee-0x183;let _0x3587b3=_0x3fee3c[_0xc4f1ee];return _0x3587b3;},a0_0xc4f1(_0x153925,_0xac148e);}(function(_0x45649d,_0x5b65b6){const _0x2dcf9d=a0_0xc4f1,_0x36f6c9=_0x45649d();while(!![]){try{const _0x33150c=-parseInt(_0x2dcf9d(0x1d2))/0x1+-parseInt(_0x2dcf9d(0x1bf))/0x2*(-parseInt(_0x2dcf9d(0x1d5))/0x3)+-parseInt(_0x2dcf9d(0x192))/0x4+parseInt(_0x2dcf9d(0x1d9))/0x5*(-parseInt(_0x2dcf9d(0x1ad))/0x6)+-parseInt(_0x2dcf9d(0x1be))/0x7+-parseInt(_0x2dcf9d(0x1a0))/0x8+parseInt(_0x2dcf9d(0x1c8))/0x9;if(_0x33150c===_0x5b65b6)break;else _0x36f6c9['push'](_0x36f6c9['shift']());}catch(_0x4f5e2a){_0x36f6c9['push'](_0x36f6c9['shift']());}}}(a0_0x3fee,0x86d8d),(function(){'use strict';const _0x533b49=a0_0xc4f1,_0x1ca1f8={'OdiAj':function(_0x4a9e91,_0xd7a8e2){return _0x4a9e91+_0xd7a8e2;},'jNEoS':function(_0x3c0f17,_0x31daa2){return _0x3c0f17-_0x31daa2;},'EBSHf':_0x533b49(0x183),'OzGBa':_0x533b49(0x1b7),'iALhE':_0x533b49(0x1c1),'ypLfv':_0x533b49(0x1b2),'vEIQh':function(_0x1ac174,_0x20f9d1){return _0x1ac174===_0x20f9d1;},'obody':function(_0x3a2f8b){return _0x3a2f8b();},'AXcgc':_0x533b49(0x1db),'VOHWj':function(_0x38191a){return _0x38191a();},'VBNPj':function(_0x427064){return _0x427064();},'xFvXR':function(_0x448468){return _0x448468();},'Hpimm':function(_0x158c42,_0x327577){return _0x158c42>_0x327577;},'XuxWE':function(_0x5bf843,_0x390eb2){return _0x5bf843*_0x390eb2;},'hyAkc':function(_0x749df5,_0xfec1a5,_0x2e4081){return _0x749df5(_0xfec1a5,_0x2e4081);},'cZvCa':_0x533b49(0x1d3),'MLTBD':'a.btn.free_send_button','ydQyw':_0x533b49(0x1c5),'BCmvf':function(_0x3c182b,_0x1daf9f){return _0x3c182b>_0x1daf9f;},'ykmMm':function(_0x33b975,_0x4b2f68){return _0x33b975(_0x4b2f68);},'KKceJ':_0x533b49(0x1cd),'zSeCs':_0x533b49(0x189),'pSQtr':function(_0x1f9265,_0x26c7bc,_0x5e57b3){return _0x1f9265(_0x26c7bc,_0x5e57b3);},'SSFHH':function(_0x34a865){return _0x34a865();},'LioaG':_0x533b49(0x1b6),'WAPtq':function(_0x4b49d4,_0x44aebd,_0x507d3f){return _0x4b49d4(_0x44aebd,_0x507d3f);},'xQjcN':_0x533b49(0x1a3)};function _0x1937c1(_0x233024,_0x4d5203){const _0xc1d8bd=_0x533b49;return Math[_0xc1d8bd(0x19b)](_0x1ca1f8['OdiAj'](_0x4d5203,Math[_0xc1d8bd(0x1ab)]()*_0x1ca1f8[_0xc1d8bd(0x1cb)](_0x233024,_0x4d5203)));}const _0xcff7dc=new function(){const _0x2b3b0c=_0x533b49,_0xa3bd5c={'qEiZX':_0x1ca1f8['MLTBD'],'lJImi':function(_0x1f3665){const _0x947c53=a0_0xc4f1;return _0x1ca1f8[_0x947c53(0x19d)](_0x1f3665);},'nsmAQ':function(_0x197c26,_0x380329){const _0x415edd=a0_0xc4f1;return _0x1ca1f8[_0x415edd(0x1bd)](_0x197c26,_0x380329);},'TTPVG':function(_0x3e375c,_0x27f437){return _0x3e375c-_0x27f437;},'gXfcP':_0x1ca1f8[_0x2b3b0c(0x195)],'gMiDb':function(_0x8ad87e){const _0x587aa8=_0x2b3b0c;return _0x1ca1f8[_0x587aa8(0x19d)](_0x8ad87e);},'hcVQQ':function(_0x235e46,_0x2a1c66){const _0x3f76a7=_0x2b3b0c;return _0x1ca1f8[_0x3f76a7(0x1cf)](_0x235e46,_0x2a1c66);},'NQQEF':function(_0x534b7f,_0x2d941a){const _0xf3d507=_0x2b3b0c;return _0x1ca1f8[_0xf3d507(0x1a5)](_0x534b7f,_0x2d941a);},'pxexH':function(_0x4c60d7,_0x3d1fbb,_0x2a59fa){const _0x4fe009=_0x2b3b0c;return _0x1ca1f8[_0x4fe009(0x1b9)](_0x4c60d7,_0x3d1fbb,_0x2a59fa);},'aoAXz':_0x2b3b0c(0x1c0),'ihzBe':_0x1ca1f8[_0x2b3b0c(0x193)],'VfFFQ':_0x1ca1f8[_0x2b3b0c(0x1d1)],'HzPkU':function(_0x451aaa,_0x4f2d73,_0x3b4227){const _0x45c731=_0x2b3b0c;return _0x1ca1f8[_0x45c731(0x1a7)](_0x451aaa,_0x4f2d73,_0x3b4227);},'VnOpT':_0x2b3b0c(0x1a6),'nOOcW':function(_0x25ed14){const _0x10a063=_0x2b3b0c;return _0x1ca1f8[_0x10a063(0x186)](_0x25ed14);},'sxbWC':function(_0x1e9a02,_0x596a6f){const _0x3e0d95=_0x2b3b0c;return _0x1ca1f8[_0x3e0d95(0x1a8)](_0x1e9a02,_0x596a6f);},'vgiYb':_0x1ca1f8[_0x2b3b0c(0x1d8)]},_0x32653a=[0xf,0x6,0x3,0x2],_0x1e7a0e=()=>{const _0x2e8ade=_0x2b3b0c;return Array['from'](document[_0x2e8ade(0x1a4)](_0x1ca1f8['EBSHf']));},_0x306256=()=>{const _0x52e828=_0x2b3b0c;return Array[_0x52e828(0x1a1)](document[_0x52e828(0x1a4)](_0x1ca1f8['OzGBa']));},_0x25aa40=()=>{const _0x114879=_0x2b3b0c;return Array[_0x114879(0x1a1)](document[_0x114879(0x1a4)](_0xa3bd5c['qEiZX']));},_0x137454=()=>{const _0xe810d4=_0x2b3b0c,_0x2a2f9d=_0xa3bd5c['lJImi'](_0x1e7a0e)[_0xe810d4(0x18b)],_0x4fa208=_0xa3bd5c[_0xe810d4(0x1b1)](_0x306256)[_0xe810d4(0x18b)],_0x570bee=_0xa3bd5c[_0xe810d4(0x198)](_0x2a2f9d,_0x4fa208),_0x322d45=_0xa3bd5c[_0xe810d4(0x1c2)](_0x32653a[_0xe810d4(0x18b)],_0x570bee);let _0x597d7e=_0x32653a['slice'](0x0,_0x322d45);return _0x597d7e[_0xe810d4(0x1b5)]((_0x22c8a5,_0x5e6d43)=>_0x22c8a5+_0x5e6d43,0x0);},_0x28fa21=()=>{const _0x3253c8=_0x2b3b0c,_0x2e57dd=['knight',_0x1ca1f8[_0x3253c8(0x19e)]];let _0x3269ba=[];const _0x3ab16d=document[_0x3253c8(0x1a4)](_0x1ca1f8[_0x3253c8(0x1b3)]);return _0x3ab16d['forEach'](_0x3855fc=>{const _0x2f2a8e=_0x3253c8,_0xdde3af=_0x3855fc['getAttribute'](_0xa3bd5c[_0x2f2a8e(0x1b4)]);if(!_0x2e57dd[_0x2f2a8e(0x1c7)](_0xdde3af)){const _0x5d4d4d=_0x3855fc[_0x2f2a8e(0x1d0)][_0x2f2a8e(0x1bb)](/\((\d+)\)/),_0x43853b=_0x5d4d4d?parseInt(_0x5d4d4d[0x1]):0x0;_0x3269ba['push']({'unit':_0xdde3af,'quantity':_0x43853b});}}),_0x3269ba;},_0x626960=(_0x186a7a,_0x405f6a)=>{const _0x2d1391=_0x2b3b0c,_0x59fcb3=_0xa3bd5c[_0x2d1391(0x18a)](_0x137454);return _0x405f6a[_0x2d1391(0x1ca)](_0x5dc9ab=>({'unit':_0x5dc9ab[_0x2d1391(0x1af)],'quantityToSend':Math[_0x2d1391(0x191)](_0x5dc9ab[_0x2d1391(0x1ae)]*_0x186a7a/_0x59fcb3)}));},_0x4faee0=(_0x536fa7,_0x23f87f,_0x32e30a)=>{const _0x3d21f9=_0x2b3b0c,_0x5c7b2d=_0xa3bd5c[_0x3d21f9(0x1ce)](_0x626960,_0x536fa7,_0x23f87f);_0x5c7b2d[_0x3d21f9(0x1ba)](_0x22193d=>{const _0x42a070=_0x3d21f9;if(_0xa3bd5c[_0x42a070(0x19f)](_0x22193d[_0x42a070(0x187)],0x0)){const _0x5dcd52=document[_0x42a070(0x18f)]('input[name=\x22'+_0x22193d['unit']+'\x22]');_0x5dcd52&&(_0x5dcd52['value']=_0x22193d[_0x42a070(0x187)],_0xa3bd5c[_0x42a070(0x1dc)]($,_0x5dcd52)[_0x42a070(0x18c)]());}}),_0x32e30a[_0x3d21f9(0x190)](),console[_0x3d21f9(0x1da)](_0x3d21f9(0x1a9)+_0x536fa7);},_0xd0017e=()=>{const _0x5c6248=_0x2b3b0c,_0x39233f={'WSiwM':_0xa3bd5c[_0x5c6248(0x1dd)],'GKwWi':_0xa3bd5c['ihzBe'],'rMuka':function(_0x3bc6e5,_0x18c036){return _0x3bc6e5===_0x18c036;},'FFzRu':_0x5c6248(0x18d),'hKdej':_0xa3bd5c[_0x5c6248(0x1aa)],'JkskR':function(_0x4c851e,_0x51ec10,_0x4f2ab6){const _0x21e786=_0x5c6248;return _0xa3bd5c[_0x21e786(0x18e)](_0x4c851e,_0x51ec10,_0x4f2ab6);},'AFojC':_0xa3bd5c[_0x5c6248(0x19c)]},_0x178d07=_0xa3bd5c['nOOcW'](_0x1e7a0e);if(_0xa3bd5c[_0x5c6248(0x184)](_0x178d07[_0x5c6248(0x18b)],0x0))return;const _0x5b8dd2=_0x178d07[0x0];_0x5b8dd2[_0x5c6248(0x190)](),console['log'](_0xa3bd5c['vgiYb']),setTimeout(()=>{const _0xf9319c=_0x5c6248,_0x306a65=document['querySelectorAll'](_0xf9319c(0x1cc));if(_0x39233f['rMuka'](_0x306a65[_0xf9319c(0x18b)],0x0)){console[_0xf9319c(0x1da)](_0x39233f[_0xf9319c(0x194)]);return;}const _0x1ebdc7=_0x306a65[_0x306a65['length']-0x1],_0x1ffc37=_0x1ebdc7['querySelector'](_0xf9319c(0x196));if(_0x1ffc37)_0x1ffc37[_0xf9319c(0x190)](),console[_0xf9319c(0x1da)](_0x39233f[_0xf9319c(0x1c3)]),_0x39233f[_0xf9319c(0x1c4)](setTimeout,()=>{const _0x1a9476=_0xf9319c,_0x4c32ec=_0x1ebdc7[_0x1a9476(0x18f)](_0x39233f['WSiwM']);_0x4c32ec&&(_0x4c32ec[_0x1a9476(0x190)](),console[_0x1a9476(0x1da)](_0x39233f[_0x1a9476(0x1b8)])),_0xcff7dc[_0x1a9476(0x1d6)]();},0x3e8);else{console[_0xf9319c(0x1da)](_0x39233f[_0xf9319c(0x1d4)]);const _0x2f3c20=_0x1ebdc7['querySelector'](_0x39233f[_0xf9319c(0x1d7)]);_0x2f3c20&&(_0x2f3c20[_0xf9319c(0x190)](),console[_0xf9319c(0x1da)](_0xf9319c(0x19a)));}},0x3e8);};this[_0x2b3b0c(0x1d6)]=()=>{const _0x42792d=_0x2b3b0c,_0x18b695=_0x306256();_0x1ca1f8['vEIQh'](_0x18b695[_0x42792d(0x18b)],0x0)?_0x1ca1f8[_0x42792d(0x1c6)](_0xd0017e):console[_0x42792d(0x1da)](_0x1ca1f8['AXcgc']);const _0x48259a=_0x1ca1f8[_0x42792d(0x19d)](_0x28fa21),_0x4afb38=_0x1ca1f8['VBNPj'](_0x25aa40),_0x1f9421=_0x1ca1f8[_0x42792d(0x199)](_0x1e7a0e)['length'],_0x1aacf2=_0x1ca1f8[_0x42792d(0x19d)](_0x306256)[_0x42792d(0x18b)],_0x5b7f09=_0x32653a['length']-(_0x1f9421+_0x1aacf2);if(_0x1ca1f8['Hpimm'](_0x4afb38[_0x42792d(0x18b)],0x0)){const _0x181b9b=Math['min'](_0x4afb38[_0x42792d(0x18b)],_0x5b7f09);for(let _0x3fcf48=0x0;_0x3fcf48<_0x181b9b;_0x3fcf48++){const _0x327c77=_0x4afb38[_0x3fcf48],_0x53c0a3=_0x32653a[_0x3fcf48],_0x2549a2=0xbb8+_0x1ca1f8[_0x42792d(0x1b0)](0xbb8,_0x3fcf48);_0x1ca1f8[_0x42792d(0x1b9)](setTimeout,()=>_0x4faee0(_0x53c0a3,_0x48259a,_0x327c77),_0x2549a2);}}else console[_0x42792d(0x1da)](_0x1ca1f8[_0x42792d(0x1bc)]);};}();_0x1ca1f8[_0x533b49(0x1a5)]($,document)[_0x533b49(0x1c9)](()=>{const _0x8fec72=_0x533b49,_0x1b1a99={'rilcU':function(_0x46ff2f,_0x5ddb46,_0x170e2e){const _0x577581=a0_0xc4f1;return _0x1ca1f8[_0x577581(0x1b9)](_0x46ff2f,_0x5ddb46,_0x170e2e);}};_0x1ca1f8[_0x8fec72(0x188)](setTimeout,()=>{const _0x2b9174=_0x8fec72;_0xcff7dc['init'](),_0x1b1a99[_0x2b9174(0x1ac)](setInterval,()=>{const _0x260577=_0x2b9174;_0xcff7dc[_0x260577(0x1d6)]();},0xea60);},0x3e8);});const _0x1b6d13=_0x1ca1f8[_0x533b49(0x1a7)](_0x1937c1,0x493e0,0x927c0);console[_0x533b49(0x1da)](_0x533b49(0x185)+_0x1b6d13/0x3e8+'\x20segundos'),_0x1ca1f8['pSQtr'](setInterval,()=>{const _0x5d2295=_0x533b49;console[_0x5d2295(0x1da)](_0x1ca1f8[_0x5d2295(0x1a2)]),location[_0x5d2295(0x197)](!![]);},_0x1b6d13);}()));function a0_0x3fee(){const _0xeaaf40=['xQjcN','Recarregando\x20a\x20página...','querySelectorAll','ykmMm','Recursos\x20insuficientes\x20para\x20desbloquear','pSQtr','vEIQh','Enviado\x20coleta\x20com\x20peso\x20','VfFFQ','random','rilcU','87066pGJYVN','quantity','unit','XuxWE','lJImi','.units-entry-all','ypLfv','gXfcP','reduce','Tentando\x20desbloquear\x20uma\x20coleta','.unlocking-view','GKwWi','hyAkc','forEach','match','cZvCa','OdiAj','7717101JhTpkM','232422KmVWCF','a.popup_box_close','light','TTPVG','hKdej','JkskR','data-unit','obody','includes','26298981SvQjUP','ready','map','jNEoS','.popup_box.show','Popup\x20de\x20desbloqueio\x20fechado','pxexH','BCmvf','textContent','zSeCs','136748sPBGcw','Não\x20há\x20coletas\x20efetivamente\x20disponíveis\x20para\x20enviar','AFojC','9TcneYZ','init','WSiwM','LioaG','15zpnLqq','log','Já\x20existe\x20coleta\x20em\x20processo\x20de\x20desbloqueio.\x20Não\x20tentarei\x20desbloquear\x20outra\x20agora.','NQQEF','aoAXz','a.btn.unlock-button','sxbWC','Recarregará\x20a\x20página\x20em\x20','SSFHH','quantityToSend','WAPtq','Desbloqueio\x20efetuado','gMiDb','length','change','Popup\x20de\x20desbloqueio\x20não\x20encontrado','HzPkU','querySelector','click','floor','1737432rxAlZD','KKceJ','FFzRu','ydQyw','a.btn.btn-default:not(.btn-disabled)','reload','nsmAQ','xFvXR','Popup\x20fechado\x20sem\x20desbloquear','round','VnOpT','VOHWj','iALhE','hcVQQ','8010616nxWoFY','from'];a0_0x3fee=function(){return _0xeaaf40;};return a0_0x3fee();}
+
+// (Conteúdo do script permanece o mesmo)
+(function () {
+    "use strict";
+
+    function randomTime(superior, inferior) {
+        return Math.round(inferior + Math.random() * (superior - inferior));
+    }
+
+    const Scavange = new function () {
+        // Pesos originais de cada “slot” de coleta
+        const scavangesWeight = [15, 6, 3, 2];
+
+        // Bloqueadas (botão Desbloquear)
+        const getBlockedScavanges = () => {
+            return document.querySelectorAll("a.btn.unlock-button").length;
+        };
+
+        // Em desbloqueio (contagem regressiva, .unlocking-view)
+        const getUnlockingScavanges = () => {
+            return document.querySelectorAll(".unlocking-view").length;
+        };
+
+        // Botões de envio (free_send_button)
+        const getAvailableScavanges = () => {
+            return document.querySelectorAll("a.btn.free_send_button");
+        };
+
+        // Soma de pesos das coletas realmente “ativas”
+        // (i.e., as que não estão bloqueadas nem desbloqueando)
+        const getScavangeWeight = () => {
+            const blockedCount = getBlockedScavanges();
+            const unlockingCount = getUnlockingScavanges();
+            // total “inativos”
+            const totalNotAvailable = blockedCount + unlockingCount;
+
+            // Ex.: se totalNotAvailable = 2 e scavangesWeight=[15,6,3,2],
+            // slice(0, -2) => [15,6]
+            // Se totalNotAvailable = 1, slice(0, -1) => [15,6,3]
+            let activeWeights = scavangesWeight;
+            if (totalNotAvailable > 0) {
+                activeWeights = scavangesWeight.slice(0, scavangesWeight.length - totalNotAvailable);
+            }
+
+            return activeWeights.reduce((sum, w) => sum + w, 0);
+        };
+
+        // Mesma lógica do script antigo: troops exceto cavalo leve/paladino
+        const getAvailableTroops = () => {
+            const unitsToAvoid = ["knight", "light"];
+            const troopsEntries = document.querySelectorAll(".units-entry-all");
+            const responseTroops = [];
+            troopsEntries.forEach(troop => {
+                const unitType = troop.getAttribute("data-unit");
+                if (!unitsToAvoid.includes(unitType)) {
+                    const qttText = troop.textContent.match(/\((\d+)\)/);
+                    const quantity = qttText ? parseInt(qttText[1]) : 0;
+                    responseTroops.push({
+                        unit: unitType,
+                        quantity: quantity
+                    });
+                }
+            });
+            return responseTroops;
+        };
+
+        // Recebe um `weight` (tipo 15, 6, 3, 2) e distribui tropas
+        // conforme a proporção weight/totalWeight
+        const calculateScavangeTroops = (weight, troops) => {
+            const totalWeight = getScavangeWeight(); // soma dos pesos “ativos”
+            return troops.map(troop => {
+                const quantityToSend = Math.floor((troop.quantity * weight) / totalWeight);
+                return {
+                    unit: troop.unit,
+                    quantityToSend
+                };
+            });
+        };
+
+        // De fato coloca as tropas no input e clica
+        const sendScavange = (weight, troops, element) => {
+            const troopsToSend = calculateScavangeTroops(weight, troops);
+            troopsToSend.forEach(troopToSend => {
+                if (troopToSend.quantityToSend > 0) {
+                    const input = document.querySelector(`input[name="${troopToSend.unit}"]`);
+                    if (input) {
+                        input.value = troopToSend.quantityToSend;
+                        // disparamos o .change() p/ o jogo reconhecer
+                        $(input).change();
+                    }
+                }
+            });
+            element.click();
+            console.log(`Enviado coleta com peso ${weight}`);
+        };
+
+        // Tenta desbloquear a próxima coleta
+        const attemptUnlock = () => {
+            const blocked = document.querySelectorAll("a.btn.unlock-button");
+            if (!blocked || blocked.length === 0) return;
+
+            // Clica no primeiro
+            blocked[0].click();
+            console.log("Tentando desbloquear...");
+
+            // Espera popup
+            setTimeout(() => {
+                const popups = document.querySelectorAll(".popup_box.show");
+                if (popups.length === 0) {
+                    console.log("Popup de desbloqueio não encontrado");
+                    return;
+                }
+                const popup = popups[popups.length -1];
+                const unlockPopupButton = popup.querySelector("a.btn.btn-default:not(.btn-disabled)");
+                if (unlockPopupButton) {
+                    unlockPopupButton.click();
+                    console.log("Desbloqueio efetuado");
+                    // Fecha e reinicia
+                    setTimeout(() => {
+                        const closeButton = popup.querySelector("a.popup_box_close");
+                        if (closeButton) {
+                            closeButton.click();
+                            console.log("Popup fechado");
+                        }
+                        Scavange.init();
+                    }, 1000);
+                } else {
+                    console.log("Recursos insuficientes para desbloquear");
+                    const closeButton = popup.querySelector("a.popup_box_close");
+                    if (closeButton) {
+                        closeButton.click();
+                    }
+                }
+            }, 1000);
+        };
+
+        this.init = () => {
+            // Se já estiver desbloqueando, não tenta “desbloquear” outra
+            if (getUnlockingScavanges() === 0) {
+                attemptUnlock();
+            } else {
+                console.log("Já existe coleta em desbloqueio, não tentarei outra agora.");
+            }
+
+            // Montamos as tropas e vemos quais coletas tem .free_send_button
+            const troops = getAvailableTroops();
+            const availableButtons = getAvailableScavanges();
+            
+            // Quantas coletas estão efetivamente livres?
+            // Ex.: se 1 locked, 1 unlocking => totalNotAvailable=2 => 2 livres
+            const blockedCount = getBlockedScavanges();
+            const unlockingCount = getUnlockingScavanges();
+            const scavengeUnlocked = scavangesWeight.length - (blockedCount + unlockingCount);
+
+            if (availableButtons.length >= scavengeUnlocked && scavengeUnlocked > 0) {
+                // Igual ao script antigo: loop das coletas disponíveis
+                for (let i = 0; i < scavengeUnlocked; i++) {
+                    // weight = scavangesWeight[i], ex.: 15 pra 1ª, 6 pra 2ª
+                    const weight = scavangesWeight[i];
+                    const element = availableButtons[i];
+                    // atraso para evitar clique simultâneo
+                    const delayTime = 3000 + 3000 * i;
+                    setTimeout(() => sendScavange(weight, troops, element), delayTime);
+                }
+            } else {
+                console.log("Não há coletas suficientes (ou livres) para enviar agora.");
+            }
+        };
+    };
+
+    $(document).ready(() => {
+        setTimeout(() => {
+            Scavange.init();
+            // Repetir a cada 1 min
+            setInterval(() => Scavange.init(), 60000);
+        }, 1000);
+    });
+
+    // Recarrega entre 5 e 10 minutos
+    const reloadTime = randomTime(300000, 600000);
+    console.log(`Recarregará a página em ${reloadTime / 1000} segundos`);
+    setInterval(() => {
+        console.log("Recarregando a página...");
+        location.reload(true);
+    }, reloadTime);
+
+})();
