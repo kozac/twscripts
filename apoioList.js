@@ -222,7 +222,7 @@
                 }
 
                 // Ordena do mais para o menos apoiador
-                stats.sort((a, b) => b.supported - a.supported);
+                stats.sort((a, b) => b.supportPercentage - a.supportPercentage);
 
                 console.log('Support Stats:', stats);
                 return stats;
@@ -470,6 +470,12 @@
                     return;
                 }
 
+                // Calcular estatísticas
+                let stats = calculateSupportStats(supportData);
+
+                // Ordenar jogadores do maior para o menor aproveitamento
+                stats.sort((a, b) => b.supportPercentage - a.supportPercentage);
+
                 let message = '📊 *Estatísticas de Apoio da Tribo*\n\n';
                 message += `📍 *Total de Aldeias Analisadas:* ${supportData.villages.length}\n\n`;
                 message += `📌 *Coordenadas das Aldeias Analisadas:*\n`;
@@ -480,11 +486,22 @@
 
                 message += `\n🔍 *Contagem de Apoios por Jogador:*\n`;
 
-                for (let player in supportData.supportCounts) {
-                    let supported = supportData.supportCounts[player].supported;
-                    let notSupported = supportData.supportCounts[player].notSupported;
-                    message += `• *${player}*: ${supported} Apoiou | ${notSupported} Não Apoiou\n`;
-                }
+                stats.forEach(function(stat) {
+                    let icon = '';
+                    let percentage = parseFloat(stat.supportPercentage);
+
+                    if (percentage >= 70) {
+                        icon = '🟢'; // Verde
+                    } else if (percentage >= 50) {
+                        icon = '🟡'; // Amarelo
+                    } else if (percentage >= 30) {
+                        icon = '🟠'; // Laranja
+                    } else {
+                        icon = '🔴'; // Vermelho
+                    }
+
+                    message += `• ${icon} *${stat.player}*: ${stat.supported} Apoiou | ${stat.notSupported} Não Apoiou | *${stat.supportPercentage}%* Apoio\n`;
+                });
 
                 // Copiar para a área de transferência
                 copyTextToClipboard(message).then(function() {
