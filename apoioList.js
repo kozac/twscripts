@@ -221,7 +221,7 @@
                     });
                 }
 
-                // Ordena do mais para o menos apoiador
+                // Ordena do maior para o menor aproveitamento
                 stats.sort((a, b) => b.supportPercentage - a.supportPercentage);
 
                 console.log('Support Stats:', stats);
@@ -500,7 +500,8 @@
                         icon = '🔴'; // Vermelho
                     }
 
-                    message += `• ${icon} *${stat.player}*: ${stat.supported} Apoiou | ${stat.notSupported} Não Apoiou | *${stat.supportPercentage}%* Apoio\n`;
+                    // Substituir "Apoiou" por ✅ e "Não Apoiou" por ❌
+                    message += `• ${icon} *${stat.player}*: ${stat.supported} ✅ | ${stat.notSupported} ❌ | *${stat.supportPercentage}%* Apoio\n`;
                 });
 
                 // Copiar para a área de transferência
