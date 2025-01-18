@@ -501,7 +501,7 @@
                     }
 
                     // Substituir "Apoiou" por ✅ e "Não Apoiou" por ❌
-                    message += `• ${icon} *${stat.player}*: ${stat.supported} ✅ | ${stat.notSupported} ❌ | *${stat.supportPercentage}%* Apoio\n`;
+                    message += `• ${icon} *${stat.player}*: *${stat.supported}* ✅ | *${stat.notSupported}* ❌ | *${stat.supportPercentage}%*\n`;
                 });
 
                 // Copiar para a área de transferência
