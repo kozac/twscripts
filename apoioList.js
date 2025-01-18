@@ -66,7 +66,7 @@
         function getCurrentVillageInfo() {
             let coordinates = $('#content_value > table > tbody > tr > td:nth-child(1) > table:nth-child(1) > tbody > tr:nth-child(3) > td:nth-child(2)').text().trim();
             let playerName = $('#content_value > table > tbody > tr > td:nth-child(1) > table:nth-child(1) > tbody > tr:nth-child(5) > td:nth-child(2) > a').text().trim();
-            let villageName = $('#content_value > table > tbody > tr > td:nth-child(1) > table:nth-child(1) > tbody > tr:nth-child(5) > td:nth-child(2) > a').text().trim();
+            let villageName = $('#content_value > h2').text().trim();
 
             return { coordinates, playerName, villageName };
         }
