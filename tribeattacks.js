@@ -389,7 +389,7 @@ $.getScript(
             }
         }
 
-        // Função para construir a tabela geral de incomings dos jogadores
+        // Função que constrói a tabela geral de incomings dos jogadores
         function buildPlayerIncomingsTable(playerIncomings) {
             let playerIncomingsList = ``;
 
@@ -598,7 +598,10 @@ $.getScript(
                             const current = parseInt(currentTroops[unit]) || 0;
                             const incoming = parseInt(supportData[unit]) || 0;
                             const total = current + incoming;
-                            supportCellsHtml += `<td style="font-size:10px; text-align:center;">${twSDK.formatAsNumber(incoming)} / ${twSDK.formatAsNumber(total)}</td>`;
+                            supportCellsHtml += `<td style="font-size:10px; text-align:center;">
+                                <span style="display:block;">Apoio: ${twSDK.formatAsNumber(incoming)}</span>
+                                <span style="display:block;">Total: <strong>${twSDK.formatAsNumber(total)}</strong></span>
+                            </td>`;
                         }
                     });
                     // Atualiza a linha de apoio (logo após a linha da aldeia)
