@@ -599,7 +599,7 @@ $.getScript(
                             const incoming = parseInt(supportData[unit]) || 0;
                             const total = current + incoming;
                             supportCellsHtml += `<td style="font-size:10px; text-align:center;">
-                                <span style="display:block;">Apoio: ${twSDK.formatAsNumber(incoming)}</span>
+                                <span style="display:block;">Apoio chegando: ${twSDK.formatAsNumber(incoming)}</span>
                                 <span style="display:block;">Total: <strong>${twSDK.formatAsNumber(total)}</strong></span>
                             </td>`;
                         }
