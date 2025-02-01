@@ -1,14 +1,16 @@
 /*
  * Script Name: Tribe Players Under Attack
- * Version: v1.2.5+support
+ * Version: v1.2.5+support_details
  * Last Updated: 2025-02-01
- * Author: RedAlert / Modificação por ChatGPT
+ * Author: RedAlert
  * Author URL: https://twscripts.dev/
  * Help: https://forum.tribalwars.net/index.php?threads/tribe-players-under-attack-tribe-leader.287111/
  *
  * Esse script exibe os ataques e as tropas atuais de cada aldeia dos jogadores da tribo,
  * e foi modificado para buscar também a quantidade de tropas de apoio que estão a caminho 
- * de cada aldeia atacada, exibindo o total que ficará (tropas atuais + apoio).
+ * de cada aldeia atacada. Na linha principal da aldeia é exibido o valor total de cada tropa 
+ * (tropas atuais + apoio). Caso o usuário queira ver os detalhes (valores atuais, apoio e total),
+ * basta clicar no botão “i” presente na linha.
  *
  * ATENÇÃO: Não clone ou modifique sem permissão do autor original.
  */
@@ -19,7 +21,7 @@ var scriptConfig = {
     scriptData: {
         prefix: 'tribePlayersUnderAttack',
         name: 'Tribe Players Under Attack',
-        version: 'v1.2.5+support',
+        version: 'v1.2.5+support_details',
         author: 'RedAlert',
         authorUrl: 'https://twscripts.dev/',
         helpLink:
@@ -223,9 +225,11 @@ $.getScript(
                                 .ra-player-incomings { margin-bottom: 10px; border: 1px solid #7d510f; }
                                 .ra-player-incomings:last-child { margin-bottom: 0; }
                                 .ra-player-incomings h3 { user-select: none; font-weight: normal; margin: 0; padding: 5px; font-size: 14px; background-color: #cfb278 !important; position: relative; cursor: pointer; }
-                                .ra-toggle-icon { float: right; }
-                                .ra-player-incomings-table { display: none; padding: 5px; }
-                                .ra-table th { background-color: #d2b170 !important; background-image: none !important; }
+                                .toggle-details { margin-left: 5px; font-size: 11px; }
+                                .details-row { background: #f3f0d9; }
+                                .details-table { width: 100%; font-size: 10px; }
+                                .details-table th { padding: 2px; }
+                                .details-table td { padding: 2px; text-align: center; }
                             `;
 
                             // Renderiza a interface do script
@@ -239,8 +243,9 @@ $.getScript(
                             // Inicializa os handlers de ações
                             togglePlayerExpandableWidget();
                             handleClickMassSupport();
+                            toggleDetailsRow();
 
-                            // Após renderizar a interface, busca e atualiza os dados de apoio (apoio indo)
+                            // Após renderizar a interface, busca e atualiza os dados de apoio e atualiza os totais
                             updateSupportData();
                         } catch (error) {
                             UI.ErrorMessage(twSDK.tt('There was an error!'));
@@ -458,7 +463,8 @@ $.getScript(
             return playerIncomingsList;
         }
 
-        // Função que constrói a tabela de uma única lista de incomings (de um jogador)
+        // Função que constrói a tabela de incomings de um jogador,
+        // gerando para cada aldeia duas linhas: a linha principal com os totais e uma linha de detalhes (inicialmente oculta)
         function buildSinglePlayerIncomingsTable(incomings) {
             let troopsHead = '';
             game_data.units.forEach((unit) => {
@@ -467,34 +473,30 @@ $.getScript(
                 }
             });
 
+            // Cabeçalho da tabela permanece o mesmo
             let incomingsTable = `
                 <table class="ra-table" width="100%">
                     <thead>
                         <tr>
-                            <th width="20%">
-                                ${twSDK.tt('Village')}
-                            </th>
-                            <th width="7%">
-                                <img src="/graphic/unit/att.png">
-                            </th>
+                            <th width="20%">${twSDK.tt('Village')}</th>
+                            <th width="7%"><img src="/graphic/unit/att.png"></th>
                             ${troopsHead}
-                            <th width="7%">
-                                ${twSDK.tt('Support')}
-                            </th>
+                            <th width="10%">${twSDK.tt('Actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
             `;
 
-            // Ordena as aldeias em ordem decrescente de ataques
+            // Ordena as aldeias pela quantidade de ataques (decrescente)
             incomings.sort((a, b) => b.incsCount - a.incsCount);
 
             incomings.forEach((incoming) => {
                 const { incsCount, troops, villageName, villageId } = incoming;
-                const villageTroops = buildVillageTroops(troops);
                 const supportUrl = `${game_data.link_base_pure}place&mode=call&target=${villageId}&village=${game_data.village.id}`;
 
-                // A linha com os dados atuais da aldeia recebe atributos de dados (villageId e tropas atuais)
+                // Linha principal: exibe o nome, quantidade de ataques e, para cada unidade,
+                // uma célula com a classe "unit-total" que mostrará o valor total (atual + apoio).
+                // Inicialmente, mostra apenas o valor atual.
                 incomingsTable += `
                     <tr class="incoming-row" data-village-id="${villageId}" data-current-troops='${JSON.stringify(
                     troops
@@ -504,19 +506,28 @@ $.getScript(
                                 ${villageName}
                             </a>
                         </td>
-                        <td>
-                            ${twSDK.formatAsNumber(incsCount)}
-                        </td>
-                        ${villageTroops}
+                        <td>${twSDK.formatAsNumber(incsCount)}</td>
+                `;
+                // Para cada unidade (exceto militia), cria a célula com o total
+                game_data.units.forEach((unit) => {
+                    if (unit !== 'militia') {
+                        incomingsTable += `<td class="unit-total" data-unit="${unit}">${twSDK.formatAsNumber(troops[unit])}</td>`;
+                    }
+                });
+                // Última célula: botão de suporte e botão de detalhamento
+                incomingsTable += `
                         <td>
                             <a href="${supportUrl}" class="btn ra-ask-support-btn" target="_blank" rel="noopener noreferrer">
                                 ${twSDK.tt('Support')}
                             </a>
+                            <button class="btn toggle-details" title="Ver detalhes">i</button>
                         </td>
                     </tr>
-                    <!-- Linha placeholder para os dados de apoio (apoio indo) -->
-                    <tr class="support-row" data-village-id="${villageId}" style="display:none;">
-                        <td colspan="13">Carregando apoio...</td>
+                    <!-- Linha de detalhes (inicialmente oculta) -->
+                    <tr class="details-row" data-village-id="${villageId}" style="display:none;">
+                        <td colspan="100%">
+                            <div class="details-content">Carregando detalhes...</div>
+                        </td>
                     </tr>
                 `;
             });
@@ -526,18 +537,7 @@ $.getScript(
             return incomingsTable;
         }
 
-        // Função que monta as células com as tropas atuais (já obtidas anteriormente)
-        function buildVillageTroops(troops) {
-            let villageTroops = ``;
-            game_data.units.forEach((unit) => {
-                if (unit !== 'militia') {
-                    villageTroops += `<td>${twSDK.formatAsNumber(troops[unit])}</td>`;
-                }
-            });
-            return villageTroops;
-        }
-
-        // NOVA FUNÇÃO: Busca os dados de apoio (apoio indo) de uma aldeia
+        // FUNÇÃO AUXILIAR: Busca os dados de apoio (apoio indo) de uma aldeia
         async function getSupportData(villageId) {
             let infoUrl = `/game.php?village=${game_data.village.id}&screen=info_village&id=${villageId}`;
             if (game_data.player.sitter != '0') {
@@ -560,7 +560,6 @@ $.getScript(
                         if (unit !== 'militia') {
                             const cell = supportRow.find(`td[data-unit="${unit}"]`);
                             if (cell.length > 0) {
-                                // Remove eventuais pontos de milhar e converte para número
                                 const value = parseInt(
                                     cell.text().trim().replace(/\./g, '')
                                 ) || 0;
@@ -585,37 +584,85 @@ $.getScript(
             }
         }
 
-        // NOVA FUNÇÃO: Para cada linha de aldeia (incoming), busca os dados de apoio e atualiza a tabela
+        // FUNÇÃO: Para cada linha de aldeia (incoming), busca os dados de apoio e atualiza a linha principal (total)
+        // além de preencher a linha de detalhes com o breakdown (Atual, Apoio e Total)
         function updateSupportData() {
             jQuery('.incoming-row').each(function () {
                 const $row = jQuery(this);
                 const villageId = $row.data('village-id');
                 const currentTroops = JSON.parse($row.attr('data-current-troops'));
                 getSupportData(villageId).then(function (supportData) {
-                    let supportCellsHtml = "";
+                    let breakdownHtml = '<table class="details-table"><tr>';
+                    // Atualiza as células da linha principal e monta cabeçalho para o breakdown
                     game_data.units.forEach(function (unit) {
                         if (unit !== 'militia') {
                             const current = parseInt(currentTroops[unit]) || 0;
-                            const incoming = parseInt(supportData[unit]) || 0;
-                            const total = current + incoming;
-                            supportCellsHtml += `<td style="font-size:10px; text-align:center;">
-                                <span style="display:block;">Apoio chegando: ${twSDK.formatAsNumber(incoming)}</span>
-                                <span style="display:block;">Total: <strong>${twSDK.formatAsNumber(total)}</strong></span>
+                            const support = parseInt(supportData[unit]) || 0;
+                            const total = current + support;
+                            // Atualiza a célula na linha principal com o total
+                            $row.find(`.unit-total[data-unit="${unit}"]`).html(twSDK.formatAsNumber(total));
+                            breakdownHtml += `<th>${unit}</th>`;
+                        }
+                    });
+                    breakdownHtml += '</tr><tr>';
+                    // Monta a linha com o detalhamento para cada unidade
+                    game_data.units.forEach(function (unit) {
+                        if (unit !== 'militia') {
+                            const current = parseInt(currentTroops[unit]) || 0;
+                            const support = parseInt(supportData[unit]) || 0;
+                            const total = current + support;
+                            breakdownHtml += `<td>
+                                Atual: ${twSDK.formatAsNumber(current)}<br>
+                                Apoio: ${twSDK.formatAsNumber(support)}<br>
+                                <strong>Total: ${twSDK.formatAsNumber(total)}</strong>
                             </td>`;
                         }
                     });
-                    // Atualiza a linha de apoio (logo após a linha da aldeia)
-                    const $supportRow = $row.next('.support-row[data-village-id="' + villageId + '"]');
-                    $supportRow.html(
-                        `<td colspan="2" style="padding: 0 5px; font-size: 10px;">Apoio indo:</td>${supportCellsHtml}<td></td>`
-                    );
-                    $supportRow.show();
+                    breakdownHtml += '</tr></table>';
+                    // Atualiza a linha de detalhes correspondente
+                    const $detailsRow = $row.next('.details-row[data-village-id="' + villageId + '"]');
+                    $detailsRow.find('.details-content').html(breakdownHtml);
                 });
             });
         }
 
-        // Outras funções auxiliares (mantidas do script original)
+        // Handler: Ao clicar no botão "toggle-details", exibe/recolhe a linha de detalhes
+        function toggleDetailsRow() {
+            jQuery(document).on('click', '.toggle-details', function (e) {
+                e.stopPropagation();
+                const $btn = jQuery(this);
+                const $row = $btn.closest('tr.incoming-row');
+                const villageId = $row.data('village-id');
+                const $detailsRow = $row.next('.details-row[data-village-id="' + villageId + '"]');
+                $detailsRow.slideToggle(200);
+            });
+        }
 
+        // Handler: Expande/recolhe a visualização do widget do jogador (mantido do script original)
+        function togglePlayerExpandableWidget() {
+            jQuery('.ra-player-incomings-toggle').on('click', function () {
+                jQuery(this)
+                    .parent()
+                    .find('.ra-player-incomings-table')
+                    .slideToggle(50);
+                const toggleIcon = jQuery(this).find('.ra-toggle-icon img');
+                const toggleIconSrc = jQuery(toggleIcon).attr('src');
+                if (toggleIconSrc === '/graphic/minus.png') {
+                    jQuery(toggleIcon).attr('src', '/graphic/plus.png');
+                } else {
+                    jQuery(toggleIcon).attr('src', '/graphic/minus.png');
+                }
+            });
+        }
+
+        // Handler: Ao clicar no botão de suporte em massa (mantido do script original)
+        function handleClickMassSupport() {
+            jQuery('.ra-ask-support-btn').on('click', function () {
+                jQuery(this).addClass('btn-confirm-yes');
+            });
+        }
+
+        // Funções auxiliares para obter a lista de membros da tribo (líder e não-líder)
         async function getTribeMembersList() {
             let troopsMemberPage =
                 '/game.php?village=' +
@@ -688,30 +735,6 @@ $.getScript(
             });
 
             return membersToFetch;
-        }
-
-        // Handler: Expande/recolhe a visualização do widget do jogador
-        function togglePlayerExpandableWidget() {
-            jQuery('.ra-player-incomings-toggle').on('click', function () {
-                jQuery(this)
-                    .parent()
-                    .find('.ra-player-incomings-table')
-                    .slideToggle(50);
-                const toggleIcon = jQuery(this).find('.ra-toggle-icon img');
-                const toggleIconSrc = jQuery(toggleIcon).attr('src');
-                if (toggleIconSrc === '/graphic/minus.png') {
-                    jQuery(toggleIcon).attr('src', '/graphic/plus.png');
-                } else {
-                    jQuery(toggleIcon).attr('src', '/graphic/minus.png');
-                }
-            });
-        }
-
-        // Handler: Ao clicar no botão de suporte em massa
-        function handleClickMassSupport() {
-            jQuery('.ra-ask-support-btn').on('click', function () {
-                jQuery(this).addClass('btn-confirm-yes');
-            });
         }
     }
 );
