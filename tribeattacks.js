@@ -1,8 +1,8 @@
 /*
  * Script Name: Tribe Players Under Attack
- * Version: v1.2.5+support_details
+ * Version: v1.2.5+support_details_throttled
  * Last Updated: 2025-02-01
- * Author: RedAlert
+ * Author: RedAlert / Modificação por ChatGPT
  * Author URL: https://twscripts.dev/
  * Help: https://forum.tribalwars.net/index.php?threads/tribe-players-under-attack-tribe-leader.287111/
  *
@@ -11,6 +11,9 @@
  * de cada aldeia atacada. Na linha principal da aldeia é exibido o valor total de cada tropa 
  * (tropas atuais + apoio). Caso o usuário queira ver os detalhes (valores atuais, apoio e total),
  * basta clicar no botão “i” presente na linha.
+ *
+ * Além disso, as requisições para buscar os dados de apoio foram "ralentadas" com um delay
+ * para evitar que o jogo limite a quantidade de requisições por segundo.
  *
  * ATENÇÃO: Não clone ou modifique sem permissão do autor original.
  */
@@ -21,7 +24,7 @@ var scriptConfig = {
     scriptData: {
         prefix: 'tribePlayersUnderAttack',
         name: 'Tribe Players Under Attack',
-        version: 'v1.2.5+support_details',
+        version: 'v1.2.5+support_details_throttled',
         author: 'RedAlert',
         authorUrl: 'https://twscripts.dev/',
         helpLink:
@@ -245,7 +248,7 @@ $.getScript(
                             handleClickMassSupport();
                             toggleDetailsRow();
 
-                            // Após renderizar a interface, busca e atualiza os dados de apoio e atualiza os totais
+                            // Após renderizar a interface, busca e atualiza os dados de apoio e totais
                             updateSupportData();
                         } catch (error) {
                             UI.ErrorMessage(twSDK.tt('There was an error!'));
@@ -495,8 +498,7 @@ $.getScript(
                 const supportUrl = `${game_data.link_base_pure}place&mode=call&target=${villageId}&village=${game_data.village.id}`;
 
                 // Linha principal: exibe o nome, quantidade de ataques e, para cada unidade,
-                // uma célula com a classe "unit-total" que mostrará o valor total (atual + apoio).
-                // Inicialmente, mostra apenas o valor atual.
+                // uma célula com o total (inicialmente, o valor atual).
                 incomingsTable += `
                     <tr class="incoming-row" data-village-id="${villageId}" data-current-troops='${JSON.stringify(
                     troops
@@ -584,14 +586,20 @@ $.getScript(
             }
         }
 
-        // FUNÇÃO: Para cada linha de aldeia (incoming), busca os dados de apoio e atualiza a linha principal (total)
-        // além de preencher a linha de detalhes com o breakdown (Atual, Apoio e Total)
-        function updateSupportData() {
-            jQuery('.incoming-row').each(function () {
-                const $row = jQuery(this);
+        // FUNÇÃO AUXILIAR: Delay (sleep) para aguardar um tempo determinado (em ms)
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // FUNÇÃO: Atualiza os dados de apoio para cada aldeia, de forma sequencial com delay para evitar excesso de requisições.
+        async function updateSupportData() {
+            const $rows = jQuery('.incoming-row');
+            for (let i = 0; i < $rows.length; i++) {
+                const $row = jQuery($rows[i]);
                 const villageId = $row.data('village-id');
                 const currentTroops = JSON.parse($row.attr('data-current-troops'));
-                getSupportData(villageId).then(function (supportData) {
+                try {
+                    const supportData = await getSupportData(villageId);
                     let breakdownHtml = '<table class="details-table"><tr>';
                     // Atualiza as células da linha principal e monta cabeçalho para o breakdown
                     game_data.units.forEach(function (unit) {
@@ -620,10 +628,14 @@ $.getScript(
                     });
                     breakdownHtml += '</tr></table>';
                     // Atualiza a linha de detalhes correspondente
-                    const $detailsRow = $row.next('.details-row[data-village-id="' + villageId + '"]');
+                    const $detailsRow = $row.next(`.details-row[data-village-id="${villageId}"]`);
                     $detailsRow.find('.details-content').html(breakdownHtml);
-                });
-            });
+                } catch (error) {
+                    console.error("Error updating support data for villageId: " + villageId, error);
+                }
+                // Aguarda 500ms antes de processar a próxima aldeia (pode ajustar conforme necessário)
+                await sleep(500);
+            }
         }
 
         // Handler: Ao clicar no botão "toggle-details", exibe/recolhe a linha de detalhes
@@ -633,7 +645,7 @@ $.getScript(
                 const $btn = jQuery(this);
                 const $row = $btn.closest('tr.incoming-row');
                 const villageId = $row.data('village-id');
-                const $detailsRow = $row.next('.details-row[data-village-id="' + villageId + '"]');
+                const $detailsRow = $row.next(`.details-row[data-village-id="${villageId}"]`);
                 $detailsRow.slideToggle(200);
             });
         }
