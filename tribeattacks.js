@@ -497,8 +497,8 @@ $.getScript(
                     const sup = supportData && supportData[unit] ? parseInt(supportData[unit]) : 0;
                     const total = current + sup;
                     breakdownHtml += `<td>
-                        Atual: ${twSDK.formatAsNumber(current)}<br>
-                        Apoio: ${twSDK.formatAsNumber(sup)}<br>
+                        Na aldeia: ${twSDK.formatAsNumber(current)}<br>
+                        Apoio chegando: ${twSDK.formatAsNumber(sup)}<br>
                         <strong>Total: ${twSDK.formatAsNumber(total)}</strong>
                     </td>`;
                 }
