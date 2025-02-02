@@ -1,3 +1,22 @@
+/*
+ * Script Name: Tribe Players Under Attack
+ * Version: v1.2.5+support_details_throttled_loaded_loading
+ * Last Updated: 2025-02-01
+ * Author: RedAlert / Modificação por ChatGPT
+ * Author URL: https://twscripts.dev/
+ * Help: https://forum.tribalwars.net/index.php?threads/tribe-players-under-attack-tribe-leader.287111/
+ *
+ * Esse script exibe os ataques e as tropas atuais de cada aldeia dos jogadores da tribo,
+ * e foi modificado para buscar também a quantidade de tropas de apoio que estão a caminho 
+ * de cada aldeia atacada. Na linha principal da aldeia é exibido o valor total de cada tropa 
+ * (tropas atuais + apoio). Caso o usuário queira ver os detalhes (valores atuais, apoio e total),
+ * basta clicar no botão “i” presente na linha.
+ *
+ * Enquanto os dados de apoio estão sendo coletados, uma mensagem de loading é exibida.
+ * Só após todos os dados serem obtidos é que a tabela completa é renderizada.
+ *
+ * ATENÇÃO: Não clone ou modifique sem permissão do autor original.
+ */
 
 if (typeof DEBUG !== 'boolean') DEBUG = false;
 
@@ -5,7 +24,7 @@ var scriptConfig = {
     scriptData: {
         prefix: 'tribePlayersUnderAttack',
         name: 'Tribe Players Under Attack',
-        version: 'v1.2.5+support_details_throttled_loaded',
+        version: 'v1.2.5+support_details_throttled_loaded_loading',
         author: 'RedAlert',
         authorUrl: 'https://twscripts.dev/',
         helpLink:
@@ -158,7 +177,7 @@ $.getScript(
                                             villageCoords: currentVillageCoords,
                                             incsCount: incomingsCount,
                                             troops: villageTroops,
-                                            // Aqui guardaremos os dados de apoio
+                                            // Aqui serão armazenados os dados de apoio
                                             support: null,
                                         });
                                     }
@@ -188,14 +207,7 @@ $.getScript(
                         };
                     },
                     async function () {
-                        // Após todas as requisições principais concluídas, agora buscamos os dados de apoio
-                        // para cada aldeia, com delay entre as requisições.
-                        await fetchSupportDataForPlayersData(playersData);
-
-                        // Agora que todos os dados (tanto das tropas atuais quanto dos apoios) foram coletados,
-                        // montamos a tabela completa.
-                        const playerIncomingsTable = buildPlayerIncomingsTable(playersData);
-
+                        // Antes de buscar os dados de apoio, exibe uma mensagem de loading
                         const customStyle = `
                             .ra-player-incomings { margin-bottom: 10px; border: 1px solid #7d510f; }
                             .ra-player-incomings:last-child { margin-bottom: 0; }
@@ -205,9 +217,21 @@ $.getScript(
                             .details-table { width: 100%; font-size: 10px; }
                             .details-table th { padding: 2px; }
                             .details-table td { padding: 2px; text-align: center; }
+                            .loading-message { padding: 10px; text-align: center; font-size: 13px; }
                         `;
+                        const loadingMessage = `<div class="loading-message">Carregando apoio chegando, aguarde...</div>`;
+                        twSDK.renderBoxWidget(
+                            loadingMessage,
+                            'raTribePlayersUnderAttack',
+                            'ra-tribe-players-under-attack',
+                            customStyle
+                        );
 
-                        // Renderiza a interface com a tabela completa
+                        // Agora busca os dados de apoio para cada aldeia (com delay entre requisições)
+                        await fetchSupportDataForPlayersData(playersData);
+
+                        // Com todos os dados coletados, monta a tabela completa
+                        const playerIncomingsTable = buildPlayerIncomingsTable(playersData);
                         twSDK.renderBoxWidget(
                             playerIncomingsTable,
                             'raTribePlayersUnderAttack',
@@ -215,7 +239,7 @@ $.getScript(
                             customStyle
                         );
 
-                        // Inicializa os handlers (expansão do widget, suporte em massa e detalhamento)
+                        // Inicializa os handlers para ações na tabela
                         togglePlayerExpandableWidget();
                         handleClickMassSupport();
                         toggleDetailsRow();
@@ -225,20 +249,15 @@ $.getScript(
                     }
                 );
             } else {
-                // Caso não seja líder (ou outro fluxo)
                 try {
                     const tribeMembers = await getTribeMembersListNotLeader();
-
                     const tribeMembersData = [...tribeMembers];
                     const tribeMemberUrls = tribeMembers.map((item) => item.url);
-
                     twSDK.startProgressBar(tribeMemberUrls.length);
-
                     twSDK.getAll(
                         tribeMemberUrls,
                         function (index, data) {
                             twSDK.updateProgressBar(index, tribeMemberUrls.length);
-
                             const htmlDoc = jQuery.parseHTML(data);
                             let incomingsCount = jQuery(htmlDoc)
                                 .find(`.table-responsive table tr:first th:last`)
@@ -247,7 +266,6 @@ $.getScript(
                             incomingsCount = parseInt(
                                 incomingsCount.substring(1, incomingsCount.length - 1)
                             );
-
                             tribeMembersData[index] = {
                                 ...tribeMembersData[index],
                                 incomings: incomingsCount,
@@ -257,7 +275,6 @@ $.getScript(
                             if (DEBUG) {
                                 console.debug(`${scriptInfo} tribeMembersData`, tribeMembersData);
                             }
-
                             try {
                                 let dialogContent = `
                                     <div class="ra-popup-content ra-mb15">
@@ -270,26 +287,20 @@ $.getScript(
                                             </thead>
                                             <tbody>
                                 `;
-
                                 const playersWhoHaveShared = tribeMembersData
                                     .filter((tribeMember) => tribeMember.incsShown)
                                     .sort((a, b) => b.incomings - a.incomings);
-
                                 const playersWhoHaveNotShared = tribeMembersData.filter(
                                     (tribeMember) => !tribeMember.incsShown
                                 );
-
                                 const tribeMembersList = [
                                     ...playersWhoHaveShared,
                                     ...playersWhoHaveNotShared,
                                 ];
-
                                 tribeMembersList.sort((a, b) => b.incomings - a.incomings);
-
                                 tribeMembersList.forEach((tribeMember) => {
                                     const { id, name, incomings, incsShown } = tribeMember;
                                     const className = incsShown ? '' : 'incs-shown-disabled';
-
                                     dialogContent += `
                                         <tr class="${className}">
                                             <td class="ra-tal">
@@ -301,11 +312,8 @@ $.getScript(
                                         </tr>
                                     `;
                                 });
-
                                 dialogContent += `</tbody></table></div>`;
-
                                 const customStyle = `.incs-shown-disabled td { opacity: 0.5; }`;
-
                                 twSDK.renderFixedWidget(
                                     dialogContent,
                                     'raTribePlayersUnderAttack',
@@ -332,16 +340,12 @@ $.getScript(
         // e os armazena no objeto "support" de cada aldeia.
         // =============================================
         async function fetchSupportDataForPlayersData(playersData) {
-            // Para cada jogador
             for (let p = 0; p < playersData.length; p++) {
                 const player = playersData[p];
-                // Se houver dados de incomings (aldeias sob ataque)
                 if (player.incomings && player.incomings.length) {
-                    // Para cada aldeia
                     for (let i = 0; i < player.incomings.length; i++) {
                         const village = player.incomings[i];
-                        // Aguarda um delay para evitar excesso de requisições (ajuste o valor se necessário)
-                        await sleep(500);
+                        await sleep(500); // Delay para evitar requisições excessivas
                         try {
                             const supportData = await getSupportData(village.villageId);
                             village.support = supportData;
@@ -350,7 +354,6 @@ $.getScript(
                                 `${scriptInfo} Error fetching support data for village ${village.villageId}:`,
                                 error
                             );
-                            // Em caso de erro, define os apoios como zero
                             village.support = {};
                             game_data.units.forEach((unit) => {
                                 if (unit !== 'militia') {
@@ -369,9 +372,7 @@ $.getScript(
         // =============================================
         function buildPlayerIncomingsTable(playerIncomings) {
             let playerIncomingsList = ``;
-
             playerIncomings.sort((a, b) => b.totalIncomingsNumber - a.totalIncomingsNumber);
-
             playerIncomings.forEach((player) => {
                 const {
                     id,
@@ -381,19 +382,16 @@ $.getScript(
                     totalPlayerVillages,
                     villagesUnderAttack,
                 } = player;
-
                 if (incomings.length) {
                     const incomingsTable = buildSinglePlayerIncomingsTable(incomings);
                     const totalIncs = twSDK.formatAsNumber(totalIncomingsNumber);
                     const villagesUnderAttackCount = twSDK.formatAsNumber(villagesUnderAttack);
-
                     const incomingsPerVillageUnderAttackRatio = parseFloat(
                         totalIncomingsNumber / villagesUnderAttack
                     ).toFixed(2);
                     const incomingsPerTotalVillageRatio = parseFloat(
                         totalIncomingsNumber / totalPlayerVillages
                     ).toFixed(2);
-
                     playerIncomingsList += `
                         <div class='ra-player-incomings'>
                             <h3 class="ra-player-incomings-toggle">
@@ -412,11 +410,9 @@ $.getScript(
                     `;
                 }
             });
-
             if (playerIncomingsList.length === 0) {
                 playerIncomingsList = `<b>${twSDK.tt('No player is under attack!')}</b>`;
             }
-
             return playerIncomingsList;
         }
 
@@ -432,7 +428,6 @@ $.getScript(
                     troopsHead += `<th width="6.5%"><img src="/graphic/unit/unit_${unit}.png"></th>`;
                 }
             });
-
             let incomingsTable = `
                 <table class="ra-table" width="100%">
                     <thead>
@@ -445,14 +440,10 @@ $.getScript(
                     </thead>
                     <tbody>
             `;
-
-            // Ordena as aldeias por quantidade de ataques (decrescente)
             incomings.sort((a, b) => b.incsCount - a.incsCount);
-
             incomings.forEach((incoming) => {
                 const { incsCount, troops, villageName, villageId, support } = incoming;
-                const supportData = support || {}; // Pode ainda não estar definido, mas após fetch será preenchido
-                // Na linha principal, para cada unidade, exibimos: total = tropas atuais + apoio
+                const supportData = support || {};
                 let mainRowCells = '';
                 game_data.units.forEach((unit) => {
                     if (unit !== 'militia') {
@@ -462,7 +453,6 @@ $.getScript(
                         mainRowCells += `<td class="unit-total" data-unit="${unit}">${twSDK.formatAsNumber(total)}</td>`;
                     }
                 });
-
                 incomingsTable += `
                     <tr class="incoming-row" data-village-id="${villageId}" data-current-troops='${JSON.stringify(troops)}' data-support='${JSON.stringify(supportData)}'>
                         <td class="ra-tal">
@@ -479,7 +469,6 @@ $.getScript(
                             <button class="btn toggle-details" title="Ver detalhes">i</button>
                         </td>
                     </tr>
-                    <!-- Linha de detalhes (inicialmente oculta) -->
                     <tr class="details-row" data-village-id="${villageId}" style="display:none;">
                         <td colspan="100%">
                             <div class="details-content">${buildDetailsContent(troops, supportData)}</div>
@@ -487,15 +476,12 @@ $.getScript(
                     </tr>
                 `;
             });
-
             incomingsTable += `</tbody></table>`;
-
             return incomingsTable;
         }
 
         // =============================================
-        // FUNÇÃO: Monta o conteúdo de detalhes (breakdown) para uma aldeia,
-        // exibindo os valores atuais, apoio e total para cada unidade.
+        // FUNÇÃO: Monta o conteúdo de detalhes (breakdown) para uma aldeia.
         // =============================================
         function buildDetailsContent(troops, supportData) {
             let breakdownHtml = '<table class="details-table"><tr>';
@@ -541,7 +527,6 @@ $.getScript(
                 const htmlDoc = jQuery.parseHTML(response);
                 const supportTable = jQuery(htmlDoc).find('table#support_sum');
                 let supportData = {};
-                // Inicializa com zero para cada unidade (exceto militia)
                 game_data.units.forEach((unit) => {
                     if (unit !== 'militia') {
                         supportData[unit] = 0;
@@ -575,7 +560,6 @@ $.getScript(
         // =============================================
         // HANDLERS DE AÇÃO
         // =============================================
-        // Ao clicar no botão "toggle-details", exibe/recolhe a linha de detalhes
         function toggleDetailsRow() {
             jQuery(document).on('click', '.toggle-details', function (e) {
                 e.stopPropagation();
@@ -587,7 +571,6 @@ $.getScript(
             });
         }
 
-        // Expande/recolhe a visualização do widget do jogador (mantido do script original)
         function togglePlayerExpandableWidget() {
             jQuery('.ra-player-incomings-toggle').on('click', function () {
                 jQuery(this)
@@ -604,7 +587,6 @@ $.getScript(
             });
         }
 
-        // Handler: Ao clicar no botão de suporte em massa (mantido do script original)
         function handleClickMassSupport() {
             jQuery('.ra-ask-support-btn').on('click', function () {
                 jQuery(this).addClass('btn-confirm-yes');
@@ -622,10 +604,8 @@ $.getScript(
             if (game_data.player.sitter != '0') {
                 troopsMemberPage += '&t=' + game_data.player.id;
             }
-
             const response = await jQuery.get(troopsMemberPage);
             const options = jQuery(response).find('.input-nicer option:not([disabled])');
-
             const membersToFetch = [];
             options.map(function (_, option) {
                 let url =
@@ -655,10 +635,8 @@ $.getScript(
             if (game_data.player.sitter != '0') {
                 troopsMemberPage += '&t=' + game_data.player.id;
             }
-
             const response = await jQuery.get(troopsMemberPage);
             const options = jQuery(response).find('.input-nicer option');
-
             const membersToFetch = [];
             options.map(function (_, option) {
                 let url =
