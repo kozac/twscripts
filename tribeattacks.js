@@ -1,22 +1,3 @@
-/*
- * Script Name: Tribe Players Under Attack
- * Version: v1.2.5+support_details_throttled
- * Last Updated: 2025-02-01
- * Author: RedAlert / Modificação por ChatGPT
- * Author URL: https://twscripts.dev/
- * Help: https://forum.tribalwars.net/index.php?threads/tribe-players-under-attack-tribe-leader.287111/
- *
- * Esse script exibe os ataques e as tropas atuais de cada aldeia dos jogadores da tribo,
- * e foi modificado para buscar também a quantidade de tropas de apoio que estão a caminho 
- * de cada aldeia atacada. Na linha principal da aldeia é exibido o valor total de cada tropa 
- * (tropas atuais + apoio). Caso o usuário queira ver os detalhes (valores atuais, apoio e total),
- * basta clicar no botão “i” presente na linha.
- *
- * Além disso, as requisições para buscar os dados de apoio foram "ralentadas" com um delay
- * para evitar que o jogo limite a quantidade de requisições por segundo.
- *
- * ATENÇÃO: Não clone ou modifique sem permissão do autor original.
- */
 
 if (typeof DEBUG !== 'boolean') DEBUG = false;
 
