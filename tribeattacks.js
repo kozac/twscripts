@@ -1,21 +1,14 @@
 /*
  * Script Name: Tribe Players Under Attack
- * Version: v1.2.5+support_details_throttled_loaded_loading
- * Last Updated: 2025-02-01
+ * Version: v1.2.6+support_details_command_share_warning
+ * Last Updated: 2026-03-27
  * Author: RedAlert / Modificação por ChatGPT
  * Author URL: https://twscripts.dev/
  * Help: https://forum.tribalwars.net/index.php?threads/tribe-players-under-attack-tribe-leader.287111/
  *
  * Esse script exibe os ataques e as tropas atuais de cada aldeia dos jogadores da tribo,
- * e foi modificado para buscar também a quantidade de tropas de apoio que estão a caminho 
- * de cada aldeia atacada. Na linha principal da aldeia é exibido o valor total de cada tropa 
- * (tropas atuais + apoio). Caso o usuário queira ver os detalhes (valores atuais, apoio e total),
- * basta clicar no botão “i” presente na linha.
- *
- * Enquanto os dados de apoio estão sendo coletados, uma mensagem de loading é exibida.
- * Só após todos os dados serem obtidos é que a tabela completa é renderizada.
- *
- * ATENÇÃO: Não clone ou modifique sem permissão do autor original.
+ * busca também a quantidade de tropas de apoio que estão a caminho de cada aldeia atacada,
+ * e agora mostra no topo da tabela os players que não estão compartilhando comandos.
  */
 
 if (typeof DEBUG !== 'boolean') DEBUG = false;
@@ -24,7 +17,7 @@ var scriptConfig = {
     scriptData: {
         prefix: 'tribePlayersUnderAttack',
         name: 'Tribe Players Under Attack',
-        version: 'v1.2.5+support_details_throttled_loaded_loading',
+        version: 'v1.2.6+support_details_command_share_warning',
         author: 'RedAlert',
         authorUrl: 'https://twscripts.dev/',
         helpLink:
@@ -44,6 +37,9 @@ var scriptConfig = {
             'Incs/Village Under Attack:': 'Incs/Village Under Attack:',
             'Incs/Total Village:': 'Incs/Total Village:',
             'There was an error!': 'There was an error!',
+            Actions: 'Actions',
+            'Players not sharing commands': 'WARNING, Players not sharing commands',
+            None: 'None',
         },
         fr_FR: {
             'Tribe Players Under Attack': 'Joueur tribu sous attaque',
@@ -57,6 +53,9 @@ var scriptConfig = {
             'Incs/Village Under Attack:': 'Ordres/Village sous Attaque:',
             'Incs/Total Village:': 'Ordres/Total Village:',
             'There was an error!': 'Oupsi il y a eu une erreur!',
+            Actions: 'Actions',
+            'Players not sharing commands': 'ATTENTION, Joueurs ne partageant pas les commandes',
+            None: 'Aucun',
         },
         br_BR: {
             'Tribe Players Under Attack': 'Jogadores da tribo sobre ataque',
@@ -70,6 +69,9 @@ var scriptConfig = {
             'Incs/Village Under Attack:': 'Comandos/Aldeias sobre ataque:',
             'Incs/Total Village:': 'Comandos/Total das aldeias:',
             'There was an error!': 'Ops! Houve um erro!',
+            Actions: 'Ações',
+            'Players not sharing commands': 'ATENÇÃO, Players não compartilhando comandos',
+            None: 'Nenhum',
         },
     },
     allowedMarkets: [],
@@ -82,16 +84,11 @@ var scriptConfig = {
 $.getScript(
     `https://twscripts.dev/scripts/twSDK.js?url=${document.currentScript.src}`,
     async function () {
-        // Inicializa a biblioteca
         await twSDK.init(scriptConfig);
         const scriptInfo = twSDK.scriptInfo();
 
-        // Inicia o processo principal
         initTribePlayersUnderAttack();
 
-        // =============================================
-        // FUNÇÃO PRINCIPAL
-        // =============================================
         async function initTribePlayersUnderAttack() {
             const playersToFetch = await getTribeMembersList();
 
@@ -100,7 +97,6 @@ $.getScript(
                 const coordsRegex = twSDK.coordsRegex;
                 const memberUrls = playersToFetch.map((item) => item.url);
 
-                // Exibe a barra de progresso
                 twSDK.startProgressBar(memberUrls.length);
 
                 twSDK.getAll(
@@ -108,7 +104,6 @@ $.getScript(
                     function (index, data) {
                         twSDK.updateProgressBar(index, memberUrls.length);
 
-                        // Processa a resposta HTML
                         const htmlDoc = jQuery.parseHTML(data);
                         const villagesTableRows = jQuery(htmlDoc)
                             .find(`.table-responsive table tr`)
@@ -117,14 +112,15 @@ $.getScript(
 
                         const villageIncs = [];
 
-                        // Para cada linha (aldeia) da tabela, extrai os dados
                         if (villagesTableRows && villagesTableRows.length) {
                             villagesTableRows.each(function () {
                                 try {
                                     const _this = jQuery(this);
                                     const incomingsCount = parseInt(
-                                        _this.find('td:last').text().trim()
+                                        _this.find('td:last').text().trim(),
+                                        10
                                     );
+
                                     if (incomingsCount > 0) {
                                         const currentVillageId = parseInt(
                                             twSDK.getParameterByName(
@@ -133,7 +129,8 @@ $.getScript(
                                                     _this
                                                         .find('td:first a')
                                                         .attr('href')
-                                            )
+                                            ),
+                                            10
                                         );
                                         const currentVillageName = _this
                                             .find('td:first')
@@ -167,8 +164,8 @@ $.getScript(
                                         villageData.shift();
 
                                         let villageTroops = {};
-                                        game_data.units.forEach((unit, index) => {
-                                            villageTroops[unit] = villageData[index];
+                                        game_data.units.forEach((unit, index2) => {
+                                            villageTroops[unit] = villageData[index2];
                                         });
 
                                         villageIncs.push({
@@ -177,7 +174,6 @@ $.getScript(
                                             villageCoords: currentVillageCoords,
                                             incsCount: incomingsCount,
                                             troops: villageTroops,
-                                            // Aqui serão armazenados os dados de apoio
                                             support: null,
                                         });
                                     }
@@ -194,10 +190,10 @@ $.getScript(
                             (incoming) => incoming.incsCount
                         );
                         totalIncs = parseInt(
-                            twSDK.sumOfArrayItemValues(totalIncs)
+                            twSDK.sumOfArrayItemValues(totalIncs),
+                            10
                         );
 
-                        // Atualiza os dados do jogador
                         playersData[index] = {
                             ...playersData[index],
                             incomings: villageIncs,
@@ -207,7 +203,6 @@ $.getScript(
                         };
                     },
                     async function () {
-                        // Antes de buscar os dados de apoio, exibe uma mensagem de loading
                         const customStyle = `
                             .ra-player-incomings { margin-bottom: 10px; border: 1px solid #7d510f; }
                             .ra-player-incomings:last-child { margin-bottom: 0; }
@@ -218,6 +213,10 @@ $.getScript(
                             .details-table th { padding: 2px; }
                             .details-table td { padding: 2px; text-align: center; }
                             .loading-message { padding: 10px; text-align: center; font-size: 13px; }
+                            .ra-command-share-warning { margin: 0 0 10px; padding: 8px 10px; border: 1px solid #b33b2e; background: #fbe3e1; color: #9b1c12; font-size: 12px; line-height: 1.5; }
+                            .ra-command-share-warning strong { display: block; margin-bottom: 4px; color: #b00000; }
+                            .ra-command-share-warning a { color: #9b1c12; font-weight: 700; text-decoration: underline; }
+                            .ra-command-share-warning .ra-command-share-list { word-break: break-word; }
                         `;
                         const loadingMessage = `<div class="loading-message">Carregando apoio chegando, aguarde...</div>`;
                         twSDK.renderBoxWidget(
@@ -227,11 +226,24 @@ $.getScript(
                             customStyle
                         );
 
-                        // Agora busca os dados de apoio para cada aldeia (com delay entre requisições)
+                        const playersNotSharingPromise = getPlayersNotSharingCommands();
+
                         await fetchSupportDataForPlayersData(playersData);
 
-                        // Com todos os dados coletados, monta a tabela completa
-                        const playerIncomingsTable = buildPlayerIncomingsTable(playersData);
+                        let playersNotSharingCommands = [];
+                        try {
+                            playersNotSharingCommands = await playersNotSharingPromise;
+                        } catch (error) {
+                            console.error(
+                                `${scriptInfo} Error fetching command sharing data:`,
+                                error
+                            );
+                        }
+
+                        const playerIncomingsTable = buildPlayerIncomingsTable(
+                            playersData,
+                            playersNotSharingCommands
+                        );
                         twSDK.renderBoxWidget(
                             playerIncomingsTable,
                             'raTribePlayersUnderAttack',
@@ -239,7 +251,6 @@ $.getScript(
                             customStyle
                         );
 
-                        // Inicializa os handlers para ações na tabela
                         togglePlayerExpandableWidget();
                         handleClickMassSupport();
                         toggleDetailsRow();
@@ -264,7 +275,8 @@ $.getScript(
                                 .text()
                                 .trim();
                             incomingsCount = parseInt(
-                                incomingsCount.substring(1, incomingsCount.length - 1)
+                                incomingsCount.substring(1, incomingsCount.length - 1),
+                                10
                             );
                             tribeMembersData[index] = {
                                 ...tribeMembersData[index],
@@ -335,17 +347,13 @@ $.getScript(
             }
         }
 
-        // =============================================
-        // FUNÇÃO NOVA: Busca os dados de apoio para cada aldeia dos jogadores
-        // e os armazena no objeto "support" de cada aldeia.
-        // =============================================
         async function fetchSupportDataForPlayersData(playersData) {
             for (let p = 0; p < playersData.length; p++) {
                 const player = playersData[p];
                 if (player.incomings && player.incomings.length) {
                     for (let i = 0; i < player.incomings.length; i++) {
                         const village = player.incomings[i];
-                        await sleep(500); // Delay para evitar requisições excessivas
+                        await sleep(500);
                         try {
                             const supportData = await getSupportData(village.villageId);
                             village.support = supportData;
@@ -366,12 +374,12 @@ $.getScript(
             }
         }
 
-        // =============================================
-        // FUNÇÃO: Constrói a tabela geral de incomings dos jogadores,
-        // incorporando os dados de apoio já coletados.
-        // =============================================
-        function buildPlayerIncomingsTable(playerIncomings) {
+        function buildPlayerIncomingsTable(playerIncomings, playersNotSharingCommands = []) {
             let playerIncomingsList = ``;
+            const commandSharingWarningHtml = buildCommandSharingWarning(
+                playersNotSharingCommands
+            );
+
             playerIncomings.sort((a, b) => b.totalIncomingsNumber - a.totalIncomingsNumber);
             playerIncomings.forEach((player) => {
                 const {
@@ -413,14 +421,28 @@ $.getScript(
             if (playerIncomingsList.length === 0) {
                 playerIncomingsList = `<b>${twSDK.tt('No player is under attack!')}</b>`;
             }
-            return playerIncomingsList;
+            return `${commandSharingWarningHtml}${playerIncomingsList}`;
         }
 
-        // =============================================
-        // FUNÇÃO: Constrói a tabela de incomings de um jogador,
-        // gerando para cada aldeia duas linhas: a linha principal com os totais
-        // e uma linha de detalhes (inicialmente oculta).
-        // =============================================
+        function buildCommandSharingWarning(playersNotSharingCommands) {
+            if (!playersNotSharingCommands || !playersNotSharingCommands.length) {
+                return '';
+            }
+
+            const playersListHtml = playersNotSharingCommands
+                .map((player) => {
+                    return `<a href="${player.profileUrl}" target="_blank" rel="noopener noreferrer">${twSDK.cleanString(player.name)}</a>`;
+                })
+                .join(', ');
+
+            return `
+                <div class="ra-command-share-warning">
+                    <strong>${twSDK.tt('Players not sharing commands')}</strong>
+                    <div class="ra-command-share-list">${playersListHtml}</div>
+                </div>
+            `;
+        }
+
         function buildSinglePlayerIncomingsTable(incomings) {
             let troopsHead = '';
             game_data.units.forEach((unit) => {
@@ -447,8 +469,8 @@ $.getScript(
                 let mainRowCells = '';
                 game_data.units.forEach((unit) => {
                     if (unit !== 'militia') {
-                        const current = parseInt(troops[unit]) || 0;
-                        const sup = parseInt(supportData[unit]) || 0;
+                        const current = parseInt(troops[unit], 10) || 0;
+                        const sup = parseInt(supportData[unit], 10) || 0;
                         const total = current + sup;
                         mainRowCells += `<td class="unit-total" data-unit="${unit}">${twSDK.formatAsNumber(total)}</td>`;
                     }
@@ -480,9 +502,6 @@ $.getScript(
             return incomingsTable;
         }
 
-        // =============================================
-        // FUNÇÃO: Monta o conteúdo de detalhes (breakdown) para uma aldeia.
-        // =============================================
         function buildDetailsContent(troops, supportData) {
             let breakdownHtml = '<table class="details-table"><tr>';
             game_data.units.forEach(function (unit) {
@@ -493,8 +512,8 @@ $.getScript(
             breakdownHtml += '</tr><tr>';
             game_data.units.forEach(function (unit) {
                 if (unit !== 'militia') {
-                    const current = parseInt(troops[unit]) || 0;
-                    const sup = supportData && supportData[unit] ? parseInt(supportData[unit]) : 0;
+                    const current = parseInt(troops[unit], 10) || 0;
+                    const sup = supportData && supportData[unit] ? parseInt(supportData[unit], 10) : 0;
                     const total = current + sup;
                     breakdownHtml += `<td>
                         Na aldeia: ${twSDK.formatAsNumber(current)}<br>
@@ -507,16 +526,10 @@ $.getScript(
             return breakdownHtml;
         }
 
-        // =============================================
-        // FUNÇÃO: Delay (sleep) para aguardar um tempo determinado (em ms)
-        // =============================================
         function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
+            return new Promise((resolve) => setTimeout(resolve, ms));
         }
 
-        // =============================================
-        // FUNÇÃO: Busca os dados de apoio (apoio indo) de uma aldeia
-        // =============================================
         async function getSupportData(villageId) {
             let infoUrl = `/game.php?village=${game_data.village.id}&screen=info_village&id=${villageId}`;
             if (game_data.player.sitter != '0') {
@@ -538,7 +551,7 @@ $.getScript(
                         if (unit !== 'militia') {
                             const cell = supportRow.find(`td[data-unit="${unit}"]`);
                             if (cell.length > 0) {
-                                const value = parseInt(cell.text().trim().replace(/\./g, '')) || 0;
+                                const value = parseInt(cell.text().trim().replace(/\./g, ''), 10) || 0;
                                 supportData[unit] = value;
                             }
                         }
@@ -557,9 +570,72 @@ $.getScript(
             }
         }
 
-        // =============================================
-        // HANDLERS DE AÇÃO
-        // =============================================
+        async function getPlayersNotSharingCommands() {
+            let troopsMemberPage =
+                '/game.php?village=' +
+                game_data.village.id +
+                '&screen=ally&mode=members_troops';
+
+            if (game_data.player.sitter != '0') {
+                troopsMemberPage += '&t=' + game_data.player.id;
+            }
+
+            const response = await jQuery.get(troopsMemberPage);
+            const htmlDoc = jQuery.parseHTML(response);
+            const rows = jQuery(htmlDoc)
+                .find('.table-responsive table tr')
+                .not(':first');
+            const playersNotSharingCommands = [];
+
+            rows.each(function () {
+                const $row = jQuery(this);
+                const $cells = $row.find('td');
+                if (!$cells.length) return;
+
+                const firstCellText = $cells.first().text().trim();
+                if (!firstCellText || firstCellText === 'Sumário') return;
+
+                const $playerLink = $cells.first().find('a[href*="screen=info_player"]');
+                if (!$playerLink.length) return;
+
+                const lastCellText = $cells.last().text().trim();
+                if (lastCellText !== '?') return;
+
+                let profileUrl = $playerLink.attr('href') || '';
+                if (
+                    profileUrl &&
+                    profileUrl.indexOf('http://') !== 0 &&
+                    profileUrl.indexOf('https://') !== 0
+                ) {
+                    profileUrl = window.location.origin + profileUrl;
+                }
+
+                const playerId = parseInt(
+                    twSDK.getParameterByName('id', profileUrl),
+                    10
+                );
+                const playerName = twSDK.cleanString($playerLink.text().trim());
+
+                if (!playerId || !playerName) return;
+
+                playersNotSharingCommands.push({
+                    id: playerId,
+                    name: playerName,
+                    profileUrl,
+                });
+            });
+
+            const uniquePlayers = [];
+            const seen = new Set();
+            playersNotSharingCommands.forEach((player) => {
+                if (seen.has(player.id)) return;
+                seen.add(player.id);
+                uniquePlayers.push(player);
+            });
+
+            return uniquePlayers;
+        }
+
         function toggleDetailsRow() {
             jQuery(document).on('click', '.toggle-details', function (e) {
                 e.stopPropagation();
@@ -593,9 +669,6 @@ $.getScript(
             });
         }
 
-        // =============================================
-        // FUNÇÕES AUXILIARES: Obtenção da lista de membros da tribo (líder e não-líder)
-        // =============================================
         async function getTribeMembersList() {
             let troopsMemberPage =
                 '/game.php?village=' +
@@ -616,10 +689,10 @@ $.getScript(
                 if (game_data.player.sitter != '0') {
                     url += '&t=' + game_data.player.id;
                 }
-                if (!isNaN(parseInt(option.value))) {
+                if (!isNaN(parseInt(option.value, 10))) {
                     membersToFetch.push({
                         url: url,
-                        id: parseInt(option.value),
+                        id: parseInt(option.value, 10),
                         name: option.text,
                     });
                 }
@@ -647,10 +720,10 @@ $.getScript(
                 if (game_data.player.sitter != '0') {
                     url += '&t=' + game_data.player.id;
                 }
-                if (!isNaN(parseInt(option.value))) {
+                if (!isNaN(parseInt(option.value, 10))) {
                     membersToFetch.push({
                         url: url,
-                        id: parseInt(option.value),
+                        id: parseInt(option.value, 10),
                         name: twSDK.cleanString(option.text),
                         incsShown: !option.disabled,
                     });
