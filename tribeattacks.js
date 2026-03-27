@@ -57,7 +57,7 @@ var scriptConfig = {
             'Players not sharing commands': 'ATTENTION, Joueurs ne partageant pas les commandes',
             None: 'Aucun',
         },
-        br_BR: {
+        pt_BR: {
             'Tribe Players Under Attack': 'Jogadores da tribo sobre ataque',
             Help: 'Ajuda',
             'Error fetching player incomings!': 'Erro ao buscar dados dos jogadores!',
